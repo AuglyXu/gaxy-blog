@@ -10,5 +10,5 @@ Disallow: /fonts/
 Disallow: /vendors/
 Disallow: /fancybox/
 
-Sitemap: http://auglyXu.github.io/sitemap.xml
-Sitemap: http://auglyXu.github.io/baidusitemap.xml
+Sitemap: http://auglyxu.github.io/sitemap.xml
+Sitemap: http://auglyxu.github.io/baidusitemap.xml
