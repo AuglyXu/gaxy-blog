@@ -22,6 +22,12 @@
     <title>测试文章</title>
     <url>/2020/07/18/%E6%B5%8B%E8%AF%95%E6%96%87%E7%AB%A0/</url>
     <content><![CDATA[<h1 id="11111"><a href="#11111" class="headerlink" title="11111"></a>11111</h1>]]></content>
+      <categories>
+        <category>test</category>
+      </categories>
+      <tags>
+        <tag>test</tag>
+      </tags>
   </entry>
   <entry>
     <title>hello-vip</title>
@@ -29,7 +35,7 @@
     <content><![CDATA[<h1 id="111"><a href="#111" class="headerlink" title="111"></a>111</h1>]]></content>
   </entry>
   <entry>
-    <title>test</title>
+    <title>测试文章</title>
     <url>/2020/07/18/test/</url>
     <content><![CDATA[<h3 id="用掘金－Markdown-编辑器写文章"><a href="#用掘金－Markdown-编辑器写文章" class="headerlink" title="用掘金－Markdown 编辑器写文章"></a>用掘金－Markdown 编辑器写文章</h3><p>欢迎使用 掘金－Markdown 编辑器撰写技术文章，只专注于内容和技术，不再费心排版的问题。这是一份简要的 Markdown 引导指南，希望可以帮助您顺利的开始使用 Markdown 编辑器。</p>
 <h3 id="丰富的快捷键"><a href="#丰富的快捷键" class="headerlink" title="丰富的快捷键"></a>丰富的快捷键</h3><p>本 Markdown 编辑器支持丰富的格式快捷键，可以非常便捷、轻松的使用 Markdown 语言，形成优美的排版和内容格式。</p>
@@ -136,5 +142,8 @@
 </tbody></table>
 <h4 id="结语"><a href="#结语" class="headerlink" title="结语"></a>结语</h4><p>以上是最常见的 Markdown 的语法和格式，如果你还希望深入的学习 Markdown，可以参考这里<a href="https://www.appinn.com/markdown/" target="_blank" rel="noopener">Markdown语法</a>，非常感谢使用** 掘金－Markdown 编辑器**,希望为您提供舒适的写作体验。</p>
 ]]></content>
+      <tags>
+        <tag>test</tag>
+      </tags>
   </entry>
 </search>
