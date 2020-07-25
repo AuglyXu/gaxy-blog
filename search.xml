@@ -7,6 +7,7 @@
 <li>setState有时表现出异步,有时表现出同步,在合成事件和钩子函数中表现异步</li>
 <li>setState批量更新优化是<strong>建立在合成事件和钩子函数</strong>之上的,在原生事件和setTimeout中不会发生异步.(顺序为setState =&gt; 钩子函数 =&gt; 合并更新状态)</li>
 </ul>
+<a id="more"></a>
 <hr>
 <h6 id="合成事件"><a href="#合成事件" class="headerlink" title="合成事件"></a>合成事件</h6><ul>
 <li>React通过事件冒泡,将事件冒泡到document上面,再统一分发给中间层SyntheticEvent去执行事件</li>
