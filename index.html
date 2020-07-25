@@ -21,7 +21,7 @@
 
 <script id="hexo-configurations">
     var NexT = window.NexT || {};
-    var CONFIG = {"hostname":"auglyxu.github.io","root":"/","scheme":"Pisces","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":true,"show_result":true,"style":"mac"},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":true,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":"gitalk","storage":true,"lazyload":true,"nav":null,"activeClass":"gitalk"},"algolia":{"appID":"4HUZ6JLMHZ","indexName":"gaxy-blog","hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.xml"};
+    var CONFIG = {"hostname":"auglyxu.github.io","root":"/","scheme":"Pisces","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":true,"show_result":true,"style":"flat"},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":true,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":"gitalk","storage":true,"lazyload":true,"nav":null,"activeClass":"gitalk"},"algolia":{"appID":"4HUZ6JLMHZ","indexName":"gaxy-blog","hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.xml"};
   </script>
 
   <meta name="description" content="用于个人技术分享">
@@ -199,7 +199,7 @@
               <span class="post-meta-item-text">发表于</span>
               
 
-              <time title="创建时间：2020-07-25 12:19:00 / 修改时间：15:33:12" itemprop="dateCreated datePublished" datetime="2020-07-25T12:19:00+08:00">2020-07-25</time>
+              <time title="创建时间：2020-07-25 12:19:00 / 修改时间：16:35:09" itemprop="dateCreated datePublished" datetime="2020-07-25T12:19:00+08:00">2020-07-25</time>
             </span>
             <span class="post-meta-item">
               <span class="post-meta-item-icon">
@@ -244,7 +244,7 @@
 
       
           <h1 id="setState"><a href="#setState" class="headerlink" title="setState"></a>setState</h1><h4 id="setState同步还是异步"><a href="#setState同步还是异步" class="headerlink" title="setState同步还是异步"></a>setState同步还是异步</h4><ul>
-<li>setState有时表现出异步,有时表现出同步,在<code>合成事件</code>和<code>钩子函数</code>中表现异步</li>
+<li>setState有时表现出异步,有时表现出同步,在<strong>合成事件</strong>和<strong>钩子函数</strong>中表现异步</li>
 <li>setState批量更新优化是<strong>建立在合成事件和钩子函数</strong>之上的,在原生事件和setTimeout中不会发生异步.(顺序为setState =&gt; 钩子函数 =&gt; 合并更新状态)</li>
 </ul>
           <!--noindex-->
