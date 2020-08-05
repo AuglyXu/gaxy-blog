@@ -96,7 +96,7 @@
     <content><![CDATA[<h1 id="useEffect"><a href="#useEffect" class="headerlink" title="useEffect"></a>useEffect</h1><blockquote>
 <p>Dan在OverReact上发表的文章深入浅出，本文只针对个人之前不理解的点进行思考，采用了他的案例，参考了他的文章——<a href="https://overreacted.io/zh-hans/a-complete-guide-to-useeffect/" target="_blank" rel="noopener">useEffect的完整指南</a>.</p>
 </blockquote>
-<p>在我看来，Effect hook是React Hooks中最强大最核心的一个hook，是驱动整个程序的纽带<br>我也将采用Dan的案例进行思考，并</p>
+<p>在我看来，Effect hook是React Hooks中最强大最核心的一个hook，是驱动整个程序的纽带我也将采用Dan的案例进行思考</p>
 <hr>
 <ul>
 <li>根据文章问题，进行思考后，抛出了以下几个问题，将在下文对这几个问题做详细的思考<ol>
@@ -406,6 +406,109 @@
         <tag>React</tag>
         <tag>前端</tag>
         <tag>Hooks</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>React运行时</title>
+    <url>/2020/08/02/React-UI-render/</url>
+    <content><![CDATA[<h1 id="React运行时"><a href="#React运行时" class="headerlink" title="React运行时"></a>React运行时</h1><blockquote>
+<p>Dan在OverReact上发表的文章深入浅出，本文只针对个人之前不理解的点进行思考，采用了他的案例，参考了他的文章——<a href="https://overreacted.io/zh-hans/react-as-a-ui-runtime/" target="_blank" rel="noopener">将 React 作为 UI 运行时</a>.</p>
+</blockquote>
+<p>大多数人关注React，关注它的使用方法，关注它创建页面的逻辑和效果，而忽略其模型和React本质上的一些东西，到底React帮我们做了什么，为什么要这么设计这个React。本文就将对Dan博客上文章进行思考，提炼和吸收。</p>
+<hr>
+<h2 id="宿主树和宿主实例"><a href="#宿主树和宿主实例" class="headerlink" title="宿主树和宿主实例"></a>宿主树和宿主实例</h2><hr>
+<h4 id="什么是宿主树，什么是宿主实例？"><a href="#什么是宿主树，什么是宿主实例？" class="headerlink" title="什么是宿主树，什么是宿主实例？"></a>什么是宿主树，什么是宿主实例？</h4><p>这是一个概念上的问题，区别两者，其实很简单，就像<strong>整体</strong>和<strong>局部</strong>的关系。例如一个Dom树，就是一个宿主树，Dom树中的一个<code>div</code>，就是一个宿主实例。</p>
+<p>宿主实例有自己的属性和方法，我们可以操作宿主方法做一些想做的事情，例如<code>appendChild</code>，<code>setAttribute</code>等等</p>
+<h4 id="React又是怎么利用宿主树和宿主实例的呢？"><a href="#React又是怎么利用宿主树和宿主实例的呢？" class="headerlink" title="React又是怎么利用宿主树和宿主实例的呢？"></a>React又是怎么利用宿主树和宿主实例的呢？</h4><p>在我看来，React的宿主树，是由其宿主实例构成的，而React的宿主实例，就是<strong>React元素</strong>，React元素是一个对象，与DOM树横向比对，大同小异，所以React再做UI渲染时，可以轻松的将其映射为对应的DOM元素，React经常帮我们做的，就是这个。</p>
+<p>React解放了我们直接操作宿主树和宿主实例，因为React帮我们做了这个事情。做这些事情的同时，React又保证了另外两个事情:</p>
+<ul>
+<li><strong>稳定性</strong>: 宿主树的稳定性</li>
+<li><strong>通用性</strong>：宿主树中的宿主实例单独抽出来，依旧不会改变其UI结构，达到可复用的状态</li>
+</ul>
+<h4 id="React操作宿主树和DOM有什么不同？"><a href="#React操作宿主树和DOM有什么不同？" class="headerlink" title="React操作宿主树和DOM有什么不同？"></a>React操作宿主树和DOM有什么不同？</h4><ul>
+<li>DOM会导致突变，直接操作宿主实例。在之后往里面增加或者删除子节点。宿主实例是完全可变的。</li>
+<li>React是通过克隆双亲树并始终替换掉顶级子树的宿主环境。</li>
+</ul>
+<h4 id="React的宿主实例——React元素"><a href="#React的宿主实例——React元素" class="headerlink" title="React的宿主实例——React元素"></a>React的宿主实例——React元素</h4><ul>
+<li>React的元素不是永远存在的，他总是在<strong>重建</strong>和<strong>删除</strong>之间循环</li>
+<li>你<strong>不能直接</strong>操作React元素(与DOM不同)，如果想改变，从头开始渲染</li>
+</ul>
+<h2 id="React渲染"><a href="#React渲染" class="headerlink" title="React渲染"></a>React渲染</h2><hr>
+<h3 id="ReactDOM-render"><a href="#ReactDOM-render" class="headerlink" title="ReactDOM.render"></a>ReactDOM.render</h3><h4 id="初次调用"><a href="#初次调用" class="headerlink" title="初次调用"></a>初次调用</h4><p>看以下一段代码</p>
+<figure class="highlight js"><table><tr><td class="code"><pre><code class="hljs js">ReactDOM.render(<br>  <span class="hljs-comment">// &#123; type: 'button', props: &#123; className: 'blue' &#125; &#125;</span><br>  &lt;button className=<span class="hljs-string">"blue"</span> /&gt;,<br>  <span class="hljs-built_in">document</span>.getElementById(<span class="hljs-string">'container'</span>)<br>);<br></code></pre></td></tr></table></figure>
+
+<ul>
+<li>初始调用时，实际操作就是把你的宿主树转换成实际的dom树渲染</li>
+</ul>
+<figure class="highlight js"><table><tr><td class="code"><pre><code class="hljs js"><span class="hljs-comment">// 在 ReactDOM 渲染器内部（简化版）</span><br><span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">createHostInstance</span>(<span class="hljs-params">reactElement</span>) </span>&#123;<br>  <span class="hljs-keyword">let</span> domNode = <span class="hljs-built_in">document</span>.createElement(reactElement.type); <span class="hljs-comment">// 这里是button</span><br>  domNode.className = reactElement.props.className; <span class="hljs-comment">// 这里是blue</span><br>  <span class="hljs-keyword">return</span> domNode;<br>&#125;<br><br><span class="hljs-comment">// 然后将其放进dom</span><br>domContainer.appendChild(domNode);<br></code></pre></td></tr></table></figure>
+
+<h4 id="再次调用会如何做"><a href="#再次调用会如何做" class="headerlink" title="再次调用会如何做"></a>再次调用会如何做</h4><ul>
+<li>想必看过React文档的都知道，会进行比对，只对需要更新的一部分进行更新，下面贴了Dan文章里的两段代码，简述了React的过程。但实际比对算法要复杂的多</li>
+</ul>
+<figure class="highlight js"><table><tr><td class="code"><pre><code class="hljs js">ReactDOM.render(<br>  &lt;button className=<span class="hljs-string">"blue"</span> /&gt;,<br>  <span class="hljs-built_in">document</span>.getElementById(<span class="hljs-string">'container'</span>)<br>);<br><br><span class="hljs-comment">// ... 之后 ...</span><br><br><span class="hljs-comment">// 应该替换掉 button 宿主实例吗？</span><br><span class="hljs-comment">// 还是在已有的 button 上更新属性？</span><br>ReactDOM.render(<br>  &lt;button className=<span class="hljs-string">"red"</span> /&gt;,<br>  <span class="hljs-built_in">document</span>.getElementById(<span class="hljs-string">'container'</span>)<br>);<br></code></pre></td></tr></table></figure>
+
+<ul>
+<li>React工作流程大致如下</li>
+</ul>
+<figure class="highlight js"><table><tr><td class="code"><pre><code class="hljs js"><span class="hljs-comment">// let domNode = document.createElement('button');</span><br><span class="hljs-comment">// domNode.className = 'blue';</span><br><span class="hljs-comment">// domContainer.appendChild(domNode);</span><br>ReactDOM.render(<br>  &lt;button className=<span class="hljs-string">"blue"</span> /&gt;,<br>  <span class="hljs-built_in">document</span>.getElementById(<span class="hljs-string">'container'</span>)<br>);<br><br><span class="hljs-comment">// 能重用宿主实例吗？能！(button → button)</span><br><span class="hljs-comment">// domNode.className = 'red';</span><br>ReactDOM.render(<br>  &lt;button className=<span class="hljs-string">"red"</span> /&gt;,<br>  <span class="hljs-built_in">document</span>.getElementById(<span class="hljs-string">'container'</span>)<br>);<br><br><span class="hljs-comment">// 能重用宿主实例吗？不能！(button → p)</span><br><span class="hljs-comment">// domContainer.removeChild(domNode);</span><br><span class="hljs-comment">// domNode = document.createElement('p');</span><br><span class="hljs-comment">// domNode.textContent = 'Hello';</span><br><span class="hljs-comment">// domContainer.appendChild(domNode);</span><br>ReactDOM.render(<br>  &lt;p&gt;Hello&lt;<span class="hljs-regexp">/p&gt;,</span><br><span class="hljs-regexp">  document.getElementById('container')</span><br><span class="hljs-regexp">);</span><br><span class="hljs-regexp"></span><br><span class="hljs-regexp">/</span><span class="hljs-regexp">/ 能重用宿主实例吗？能！(p → p)</span><br><span class="hljs-regexp">/</span><span class="hljs-regexp">/ domNode.textContent = 'Goodbye';</span><br><span class="hljs-regexp">ReactDOM.render(</span><br><span class="hljs-regexp">  &lt;p&gt;Goodbye&lt;/</span>p&gt;,<br>  <span class="hljs-built_in">document</span>.getElementById(<span class="hljs-string">'container'</span>)<br>);<br></code></pre></td></tr></table></figure>
+
+<p>这里有个小注意点需要注意一下，当遇到条件语句时，React并不会重新创建元素，这依赖于元素的顺序，例如：这里的input始终在第二个</p>
+<figure class="highlight js"><table><tr><td class="code"><pre><code class="hljs js"><span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">Form</span>(<span class="hljs-params">&#123; showMessage &#125;</span>) </span>&#123;<br>  <span class="hljs-keyword">let</span> message = <span class="hljs-literal">null</span>;<br>  <span class="hljs-keyword">if</span> (showMessage) &#123;<br>    message = &#123;<br>      type: <span class="hljs-string">'p'</span>,<br>      props: &#123; <span class="hljs-attr">children</span>: <span class="hljs-string">'I was just added here!'</span> &#125;<br>    &#125;;<br>  &#125;<br>  <span class="hljs-keyword">return</span> &#123;<br>    type: <span class="hljs-string">'dialog'</span>,<br>    props: &#123;<br>      children: [<br>        message,<br>        &#123; <span class="hljs-attr">type</span>: <span class="hljs-string">'input'</span>, <span class="hljs-attr">props</span>: &#123;&#125; &#125;<br>      ]<br>    &#125;<br>  &#125;;<br>&#125;<br></code></pre></td></tr></table></figure>
+
+<p>由上面的小注意点引申出，当遇到列表时，React会去比对元素，如果<strong>元素相同</strong>，那么<strong>直接复用</strong>。问题是，当我们遇到类似于商品列表时，商品列表往往各项都不相同，或者说一个列表中有几项相同，那么React该怎么办，如果还是按照顺序来，那每个元素都将被更新。</p>
+<p>这样导致的问题是，每个元素更新，消耗性能。同时，React会把类似于input这样的组件当时的值一并复用过来，导致潜在的bug。</p>
+<figure class="highlight js"><table><tr><td class="code"><pre><code class="hljs js"><span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">ShoppingList</span>(<span class="hljs-params">&#123; list &#125;</span>) </span>&#123;<br>  <span class="hljs-keyword">return</span> (<br>    &lt;form&gt;<br>      &#123;list.map(<span class="hljs-function"><span class="hljs-params">item</span> =&gt;</span> (<br>        &lt;p&gt;<br>          You bought &#123;item.name&#125;<br>          &lt;br /&gt;<br>          Enter how many <span class="hljs-keyword">do</span> you want: <span class="xml"><span class="hljs-tag">&lt;<span class="hljs-name">input</span> /&gt;</span></span><br>        &lt;<span class="hljs-regexp">/p&gt;</span><br><span class="hljs-regexp">      ))&#125;</span><br><span class="hljs-regexp">    &lt;/</span>form&gt;<br>  )<br>&#125;<br></code></pre></td></tr></table></figure>
+
+<p>React将会以以下的形式更新：</p>
+<figure class="highlight js"><table><tr><td class="code"><pre><code class="hljs js"><span class="hljs-keyword">for</span> (<span class="hljs-keyword">let</span> i = <span class="hljs-number">0</span>; i &lt; <span class="hljs-number">10</span>; i++) &#123;<br>  <span class="hljs-keyword">let</span> pNode = formNode.childNodes[i];<br>  <span class="hljs-keyword">let</span> textNode = pNode.firstChild;<br>  textNode.textContent = <span class="hljs-string">'You bought '</span> + items[i].name;<br>&#125;<br></code></pre></td></tr></table></figure>
+
+<ul>
+<li>因此我们需要一个唯一标识key，来告诉React渲染前后元素是否是相同的。</li>
+</ul>
+<p><em>组件和元素大同小异，React也会递归组件，渲染想要的元素。组件首字母必须大写，为了让React区分，告诉它这是一个组件而不是一个dom元素</em></p>
+<p><em>补充两个小点</em></p>
+<ul>
+<li><p>什么是Hooks？</p>
+<ul>
+<li>其实Hooks是绑定组件局部状态的特性。</li>
+</ul>
+</li>
+<li><p>什么是局部状态</p>
+<ul>
+<li>局部状态是宿主实例相关的能拥有的状态，例如focus、selection等等。</li>
+</ul>
+</li>
+</ul>
+<h3 id="控制反转"><a href="#控制反转" class="headerlink" title="控制反转"></a>控制反转</h3><ul>
+<li><p>组件是函数，为什么不用函数调用，而用JSX的形式呢？</p>
+</li>
+<li><p>我们自身调用函数，控制权在我们手里，用JSX的形式，React会为我们调用函数，这就是控制反转。使用控制反转有以下几个好处：</p>
+<ul>
+<li><strong>组件 &gt; 函数</strong> React组件帮助我们维护了局部状态</li>
+<li><strong>组件参与协调</strong> 也就是说React调用组件，可以更了解宿主树的结构，便于进行比对</li>
+<li><strong>组件推迟协调</strong> 不会引起渲染导致的主线程阻塞</li>
+<li><strong>组件便于调试</strong> React提供了丰富的组件调试工具</li>
+<li><strong>组件可以懒加载</strong> 组件不会去执行不需要执行的东西，例如<figure class="highlight js"><table><tr><td class="code"><pre><code class="hljs js"><span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">Page</span>(<span class="hljs-params">&#123; currentUser, children &#125;</span>) </span>&#123;<br>    <span class="hljs-keyword">if</span> (!currentUser.isLoggedIn) &#123;<br>        <span class="hljs-keyword">return</span> <span class="xml"><span class="hljs-tag">&lt;<span class="hljs-name">h1</span>&gt;</span>Please login<span class="hljs-tag">&lt;/<span class="hljs-name">h1</span>&gt;</span></span>;<br>    &#125;<br>    <span class="hljs-keyword">return</span> (<br>        &lt;Layout&gt;<br>            &#123;children&#125;<br>        &lt;<span class="hljs-regexp">/Layout&gt;</span><br><span class="hljs-regexp">    );</span><br><span class="hljs-regexp">&#125;</span><br><span class="hljs-regexp"></span><br><span class="hljs-regexp">/</span><span class="hljs-regexp">/ 这里有个地方调用组件</span><br><span class="hljs-regexp">&lt;Page&gt;</span><br><span class="hljs-regexp">    &#123;Comments()&#125; /</span><span class="hljs-regexp">/ 这个Comments函数无论是否登录永远都将执行</span><br><span class="hljs-regexp">&lt;/</span>Page&gt;<br><br><span class="hljs-comment">// 这里有个地方调用组件</span><br>&lt;Page&gt;<br>    &lt;Comments /&gt; <span class="hljs-comment">// 这个Comments组件</span><br>&lt;<span class="hljs-regexp">/Page&gt;</span><br></code></pre></td></tr></table></figure>
+
+</li>
+</ul>
+</li>
+</ul>
+<h3 id="渲染阶段-React-Fiber-和提交阶段"><a href="#渲染阶段-React-Fiber-和提交阶段" class="headerlink" title="渲染阶段(React Fiber)和提交阶段"></a>渲染阶段(React Fiber)和提交阶段</h3><figure class="highlight js"><table><tr><td class="code"><pre><code class="hljs js"><span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">ClickCounter</span> <span class="hljs-keyword">extends</span> <span class="hljs-title">React</span>.<span class="hljs-title">Component</span> </span>&#123;<br>    <span class="hljs-keyword">constructor</span>(props) &#123;<br>        <span class="hljs-keyword">super</span>(props);<br>        <span class="hljs-keyword">this</span>.state = &#123;<span class="hljs-attr">count</span>: <span class="hljs-number">0</span>&#125;;<br>        <span class="hljs-keyword">this</span>.handleClick = <span class="hljs-keyword">this</span>.handleClick.bind(<span class="hljs-keyword">this</span>);<br>    &#125;<br><br>    handleClick() &#123;<br>        <span class="hljs-keyword">this</span>.setState(<span class="hljs-function">(<span class="hljs-params">state</span>) =&gt;</span> &#123;<br>            <span class="hljs-keyword">return</span> &#123; <span class="hljs-attr">count</span>: state.count + <span class="hljs-number">1</span> &#125;;<br>        &#125;);<br>    &#125;<br>    <br>    componentDidUpdate() &#123;&#125;<br><br>    render() &#123;<br>        <span class="hljs-keyword">return</span> [<br>            &lt;button key=<span class="hljs-string">"1"</span> onClick=&#123;<span class="hljs-keyword">this</span>.handleClick&#125;&gt;Update counter&lt;<span class="hljs-regexp">/button&gt;,</span><br><span class="hljs-regexp">            &lt;span key="2"&gt;&#123;this.state.count&#125;&lt;/</span>span&gt;<br>        ]<br>    &#125;<br>&#125;<br></code></pre></td></tr></table></figure>
+<h4 id="React-Fiber"><a href="#React-Fiber" class="headerlink" title="React Fiber"></a>React Fiber</h4><ul>
+<li>什么是Fiber？为什么使用Fiber？看以下的图:</li>
+</ul>
+<p><img src="stack-reconciler" alt=""><br><img src="Fiber-reconciler" alt=""></p>
+<ul>
+<li>React 16版本之前，React完全通过stack reconciler进行比对，这种比对</li>
+</ul>
+]]></content>
+      <categories>
+        <category>React</category>
+      </categories>
+      <tags>
+        <tag>React</tag>
+        <tag>前端</tag>
       </tags>
   </entry>
 </search>
