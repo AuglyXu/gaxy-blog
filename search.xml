@@ -412,9 +412,12 @@
     <title>React运行时</title>
     <url>/2020/08/02/React-UI-render/</url>
     <content><![CDATA[<h1 id="React运行时"><a href="#React运行时" class="headerlink" title="React运行时"></a>React运行时</h1><blockquote>
-<p>Dan在OverReact上发表的文章深入浅出，本文只针对个人之前不理解的点进行思考，采用了他的案例，参考了他的文章——<a href="https://overreacted.io/zh-hans/react-as-a-ui-runtime/" target="_blank" rel="noopener">将 React 作为 UI 运行时</a>.</p>
+<p>Dan在OverReact上发表的文章深入浅出，本文只针对个人之前不理解的点进行思考，采用了他的案例，参考了他的文章——<a href="https://overreacted.io/zh-hans/react-as-a-ui-runtime/" target="_blank" rel="noopener">将 React 作为 UI 运行时</a>。</p>
 </blockquote>
-<p>大多数人关注React，关注它的使用方法，关注它创建页面的逻辑和效果，而忽略其模型和React本质上的一些东西，到底React帮我们做了什么，为什么要这么设计这个React。本文就将对Dan博客上文章进行思考，提炼和吸收。</p>
+<blockquote>
+<p>再写UI运行时的时候,发现一切都离不开Fiber,这里参考了掘金博主<em>武器大师1024</em>的一篇文章,并补充了一些他的案例<a href="https://juejin.im/post/6844903582622285831" target="_blank" rel="noopener">React Fiber</a>,同时,此案例也是<a href="https://www.youtube.com/watch?v=ZCuYPiUIONs" target="_blank" rel="noopener">Lin Clark presentation in ReactConf 2017</a>演讲上的一篇案例。</p>
+</blockquote>
+<p>大多数人关注React，关注它的使用方法，关注它创建页面的逻辑和效果，而忽略其模型和React本质上的一些东西，到底React帮我们做了什么?</p>
 <hr>
 <h2 id="宿主树和宿主实例"><a href="#宿主树和宿主实例" class="headerlink" title="宿主树和宿主实例"></a>宿主树和宿主实例</h2><hr>
 <h4 id="什么是宿主树，什么是宿主实例？"><a href="#什么是宿主树，什么是宿主实例？" class="headerlink" title="什么是宿主树，什么是宿主实例？"></a>什么是宿主树，什么是宿主实例？</h4><p>这是一个概念上的问题，区别两者，其实很简单，就像<strong>整体</strong>和<strong>局部</strong>的关系。例如一个Dom树，就是一个宿主树，Dom树中的一个<code>div</code>，就是一个宿主实例。</p>
@@ -479,11 +482,9 @@
 </ul>
 </li>
 </ul>
-<h3 id="控制反转"><a href="#控制反转" class="headerlink" title="控制反转"></a>控制反转</h3><ul>
-<li><p>组件是函数，为什么不用函数调用，而用JSX的形式呢？</p>
-</li>
-<li><p>我们自身调用函数，控制权在我们手里，用JSX的形式，React会为我们调用函数，这就是控制反转。使用控制反转有以下几个好处：</p>
+<h3 id="控制反转"><a href="#控制反转" class="headerlink" title="控制反转"></a>控制反转</h3><p>组件是函数，为什么不用函数调用，而用JSX的形式呢？</p>
 <ul>
+<li>我们自身调用函数，控制权在我们手里，用JSX的形式，React会为我们调用函数，这就是控制反转。使用控制反转有以下几个好处：<ul>
 <li><strong>组件 &gt; 函数</strong> React组件帮助我们维护了局部状态</li>
 <li><strong>组件参与协调</strong> 也就是说React调用组件，可以更了解宿主树的结构，便于进行比对</li>
 <li><strong>组件推迟协调</strong> 不会引起渲染导致的主线程阻塞</li>
@@ -494,14 +495,80 @@
 </ul>
 </li>
 </ul>
-<h3 id="渲染阶段-React-Fiber-和提交阶段"><a href="#渲染阶段-React-Fiber-和提交阶段" class="headerlink" title="渲染阶段(React Fiber)和提交阶段"></a>渲染阶段(React Fiber)和提交阶段</h3><figure class="highlight js"><table><tr><td class="code"><pre><code class="hljs js"><span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">ClickCounter</span> <span class="hljs-keyword">extends</span> <span class="hljs-title">React</span>.<span class="hljs-title">Component</span> </span>&#123;<br>    <span class="hljs-keyword">constructor</span>(props) &#123;<br>        <span class="hljs-keyword">super</span>(props);<br>        <span class="hljs-keyword">this</span>.state = &#123;<span class="hljs-attr">count</span>: <span class="hljs-number">0</span>&#125;;<br>        <span class="hljs-keyword">this</span>.handleClick = <span class="hljs-keyword">this</span>.handleClick.bind(<span class="hljs-keyword">this</span>);<br>    &#125;<br><br>    handleClick() &#123;<br>        <span class="hljs-keyword">this</span>.setState(<span class="hljs-function">(<span class="hljs-params">state</span>) =&gt;</span> &#123;<br>            <span class="hljs-keyword">return</span> &#123; <span class="hljs-attr">count</span>: state.count + <span class="hljs-number">1</span> &#125;;<br>        &#125;);<br>    &#125;<br>    <br>    componentDidUpdate() &#123;&#125;<br><br>    render() &#123;<br>        <span class="hljs-keyword">return</span> [<br>            &lt;button key=<span class="hljs-string">"1"</span> onClick=&#123;<span class="hljs-keyword">this</span>.handleClick&#125;&gt;Update counter&lt;<span class="hljs-regexp">/button&gt;,</span><br><span class="hljs-regexp">            &lt;span key="2"&gt;&#123;this.state.count&#125;&lt;/</span>span&gt;<br>        ]<br>    &#125;<br>&#125;<br></code></pre></td></tr></table></figure>
-<h4 id="React-Fiber"><a href="#React-Fiber" class="headerlink" title="React Fiber"></a>React Fiber</h4><ul>
-<li>什么是Fiber？为什么使用Fiber？看以下的图:</li>
-</ul>
-<p><img src="stack-reconciler" alt=""><br><img src="Fiber-reconciler" alt=""></p>
+<h3 id="渲染阶段-React-Fiber-和提交阶段"><a href="#渲染阶段-React-Fiber-和提交阶段" class="headerlink" title="渲染阶段(React Fiber)和提交阶段"></a>渲染阶段(<code>React Fiber</code>)和提交阶段</h3><figure class="highlight js"><table><tr><td class="code"><pre><code class="hljs js"><span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">ClickCounter</span> <span class="hljs-keyword">extends</span> <span class="hljs-title">React</span>.<span class="hljs-title">Component</span> </span>&#123;<br>    <span class="hljs-keyword">constructor</span>(props) &#123;<br>        <span class="hljs-keyword">super</span>(props);<br>        <span class="hljs-keyword">this</span>.state = &#123;<span class="hljs-attr">count</span>: <span class="hljs-number">0</span>&#125;;<br>        <span class="hljs-keyword">this</span>.handleClick = <span class="hljs-keyword">this</span>.handleClick.bind(<span class="hljs-keyword">this</span>);<br>    &#125;<br><br>    handleClick() &#123;<br>        <span class="hljs-keyword">this</span>.setState(<span class="hljs-function">(<span class="hljs-params">state</span>) =&gt;</span> &#123;<br>            <span class="hljs-keyword">return</span> &#123; <span class="hljs-attr">count</span>: state.count + <span class="hljs-number">1</span> &#125;;<br>        &#125;);<br>    &#125;<br>    <br>    componentDidUpdate() &#123;&#125;<br><br>    render() &#123;<br>        <span class="hljs-keyword">return</span> [<br>            &lt;button key=<span class="hljs-string">"1"</span> onClick=&#123;<span class="hljs-keyword">this</span>.handleClick&#125;&gt;Update counter&lt;<span class="hljs-regexp">/button&gt;,</span><br><span class="hljs-regexp">            &lt;span key="2"&gt;&#123;this.state.count&#125;&lt;/</span>span&gt;<br>        ]<br>    &#125;<br>&#125;<br></code></pre></td></tr></table></figure>
+<h4 id="React-Fiber"><a href="#React-Fiber" class="headerlink" title="React Fiber"></a>React Fiber</h4><p>什么是Fiber？为什么使用Fiber？看以下的图:</p>
+<p><img src="stack-reconciler" alt=""></p>
+<p><img src="Fiber-reconciler" alt=""></p>
+<p><code>React 16</code>版本之前，<code>React</code>完全通过<code>stack reconciler</code>进行比对(见图1)，这种比对会在<code>setState</code>进行后立即发生，会递归函数，当<code>vDom</code>遍历完成之后，得到对应的真实Dom的信息，并传递给<code>render</code>进行渲染。如果有大量的比对，那么会<strong>消耗过长的时间</strong>，浏览器线程此时被js代码所<strong>阻塞</strong>，如果遇到类似于动画效果，那么动画效果将被延迟执行，不仅如此，交互布局都将被阻塞，给用户的感觉就是卡顿的感觉。</p>
+<p><img src="stack-workflow" alt=""></p>
+<p>上述图片展示了<code>stack</code>工作时的内存情况，因此，<code>React</code>重写了其算法，使用了<code>Fiber</code>。</p>
+<h4 id="Schedule-调度"><a href="#Schedule-调度" class="headerlink" title="Schedule(调度)"></a>Schedule(调度)</h4><p>调度是什么？—— 调度就是调动，安排人力，车辆。(来自百度百科)</p>
+<p>我们已经知道<code>stack reconciler</code>模式的弊端，比对占用大量时间，阻塞了主线程。因此，我们需要有人安排，何时能够进行比对。这种调度是<code>Fiber reconciler</code>中的过程之一，如果浏览器主线程的优先级高，那么我们优先进行浏览器想要进行的操作。类似于下图。</p>
+<p><img src="Fiber-workflow" alt=""></p>
+<p>如上图所示，我们需要达成此目的，我们需要拆分我们的宿主树，拆分成一个个<strong>片段</strong>，以链表的形式，为每个节点添加一些必要的数据结构，来达成连续的片段。并且这些连续的片段可以被高优先级的任务随时中断。</p>
+<p>这样引发一个问题，真实<code>Dom</code>与我当前的<code>vDom</code>不一致(由于我可能已经更新了一些片段)，因此，调度过程中，我们必须保存我们的调度信息，除了当前正在比对的树(current树)。我们还需要维护一棵正在比对的树，这棵树保存的是已经比对过的片段(workInProgress树)。</p>
+<h5 id="怎么和浏览器进行通信，何时和浏览器进行通信呢"><a href="#怎么和浏览器进行通信，何时和浏览器进行通信呢" class="headerlink" title="怎么和浏览器进行通信，何时和浏览器进行通信呢?"></a>怎么和浏览器进行通信，何时和浏览器进行通信呢?</h5><p>客户端执行任务按帧来计算，通常执行帧在30~60帧之间。在两个执行帧之间的空闲时间，通常被用来进行调度，执行任务。</p>
+<p><img src="requestIdelCallback" alt=""></p>
+<p>如上图所示，浏览器可以在这两个空闲期之间执行<a href="https://developer.mozilla.org/zh-CN/docs/Web/API/Window/requestIdleCallback" target="_blank" rel="noopener"><code>requestIdleCallback</code></a>，浏览器同时也会传递给回调函数<code>deadline</code>相关的对象信息，如果说你这个<code>fiber node</code>执行时间过长，这个<code>fiber node</code>依旧会执行完才会去向浏览器征求意见，如果说你这个里面写了个死循环，那么页面将会卡死，通常一个<code>fiber node</code>不会超过16ms，超过了则将出现卡顿的情况。</p>
+<h4 id="一个例子"><a href="#一个例子" class="headerlink" title="一个例子"></a>一个例子</h4><blockquote>
+<p>这个例子借用React Conf 2017上Lin Clark的演讲(<a href="https://www.youtube.com/watch?v=ZCuYPiUIONs&list=PLb0IAmt7-GS3fZ46IGFirdqKTIxlws7e0&index=6&t=0s" target="_blank" rel="noopener">附上链接</a>)</p>
+</blockquote>
+<p>现在有一个列表，渲染一个<code>button</code>和一组<code>item</code>, <code>item</code>中包含一个<code>div</code>，其中的内容为数字。通过点击<code>button</code>，可以使列表中的所有数字进行平方。另外有一个按钮，点击可以调节字体大小。</p>
+<p><img src="demo-0" alt=""></p>
+<p>1.0 页面初始化完成，渲染一个<code>fiber tree</code>，如下图所示</p>
+<p><em>这里注意：每个<code>fiber node</code>，<code>child</code>指针指向的节点都为其直接子节点，至于其他子节点，将会由直接子节点的<code>sibling</code>指针指向，具体可见<code>fiber</code>数据结构，每个<code>fiber node</code>都向其父节点返回</em></p>
+<p><img src="demo-0.1" alt=""></p>
+<p>1.0.1 React同时维护用于计算更新，保存当前计算状态的树，称之为<code>workInProgressTree</code>，。</p>
+<p><img src="demo-0.2" alt=""></p>
+<p>1.1 用户点击平方操作，调用<code>setState</code>，<code>React</code>将其送入更新队列(<code>update queue</code>), 不会立即进行对比，修改<code>dom</code>，而是交给调度器(<code>scheduler</code>)</p>
+<p><img src="demo-0.3" alt=""></p>
+<p>1.2 调度器会去询问主线程的使用情况，上文已经描述了如何与浏览器进行通信，借用<code>requestIdelCallback</code>，根据优先级执行任务，低优先级通过<code>requestIdelCallback</code>，高优先级(动画)通过<code>requestAnimationFrame</code>执行。</p>
+<p><img src="requestIdelCallback" alt=""></p>
+<p>2.1 一旦调度器得到了时间，就开始进入了<code>work loop</code>，这种循环是等待与执行的循环，每次<code>fiber node</code><strong>执行完成</strong>才会去询问浏览器主线程状态，上文说了，通常是在16ms之内完成，否则会有卡顿情况，如果写了死循环，依旧会导致页面卡死的情况。在这个过程中，当前的<code>fiber node</code>需要记住下一个工作单元，如果浏览器有时间，那么我将进行下一个<code>fiber node</code>的任务执行</p>
+<p><img src="demo-1" alt=""></p>
+<p>2.2 根节点上的更新队列为空，所以直接从<code>fiber-tree</code>上将根节点复制到<code>workInProgressTree</code>中去。根节点中包含指向子节点<code>List</code>的指针。</p>
+<p><img src="demo-2" alt=""></p>
+<p>2.3 根节点根据child指针，将<code>List</code>节点和对应的更新队列一起放到<code>workInProgressTree</code>中，<code>List</code>插入后返回给父节点，标志着根节点<code>fiber node</code>处理完成</p>
+<p><img src="demo-3" alt=""></p>
+<p>2.4 重复1.2操作，询问主线程情况</p>
+<p><img src="demo-4" alt=""></p>
+<p>3.1 处理下一个<code>List</code>节点，进入<code>work loop</code>，因此此时<code>react</code>会调用<code>setState</code>时传入的<code>updater funciton</code>获取最新的state值，此时应该是<code>[1,4,9]</code></p>
 <ul>
-<li>React 16版本之前，React完全通过stack reconciler进行比对，这种比对</li>
+<li>在继续之前，我们简单回顾一下<code>setState</code>的前几步流程:<ul>
+<li>触发<code>setState</code>函数，将触发<code>setState</code>的<code>this</code>和<code>setState</code>的参数传入<code>enqueueSetState</code>函数中。</li>
+<li><code>enqueueSetState</code>函数，提出当前触发<code>setState</code>的<code>Fiber</code>节点并将传入的<code>setState</code>的参数创建一个<code>update</code>对象，<code>update</code>对象中的<code>payload</code>就是传入的<code>state</code>对象。</li>
+<li><code>enqueueUpdate</code>函数，将当前<code>Fiber</code>的<code>state</code>和需要修改的<code>state</code>创建一个对象传入当前<code>Fiber</code>节点的<code>updateQueue</code>对象中。<code>updateQueue</code>对象有几个关键值，<code>baseState</code>(当前<code>Fiber</code>节点的<code>state</code>)、<code>firstUpdate</code>(首个更新任务)、<code>lastUpdate</code>(最后一个更新任务，防止多次重复<code>setState</code>)。</li>
 </ul>
+</li>
+</ul>
+<p>在获取到最新的<code>state</code>值后，<code>react</code>会更新<code>List</code>的<code>state</code>和<code>props</code>值，并且根据<code>element</code>类型判断是否可重用，然后渲染到<code>workInProgress</code>树中，由于<code>List</code>组件有更新，因此我们需要将<code>List</code>打上标签，表明需要更新。</p>
+<p><img src="demo-5" alt=""></p>
+<p>3.2 重复1.2操作，询问主线程情况</p>
+<p><img src="demo-6" alt=""></p>
+<p>3.3 <code>button</code>没有子节点，也没有更新，因此直接标记<code>button</code>处理完成。</p>
+<p><img src="demo-7" alt=""></p>
+<p>3.4 重复1.2操作，询问主线程情况。由于我们点击了放大字体的操作，主线程已经有放大字体的操作在等待<code>fiber node</code>任务完成。</p>
+<p><img src="demo-8" alt=""></p>
+<p>3.5 对于每一个<code>item</code>,判断<code>shouldComponentUpdate</code>,如果不需要更新，那么我们像3.3中的<code>button</code>一样操作，如果需要更新，那么我们像3.1中的<code>List</code>一样操作，打需要更新的标签</p>
+<p><img src="demo-9" alt=""></p>
+<p>4.1 对于叶子节点<code>div</code>，无兄弟节点，更新操作也已结束，需要合并到父节点，才算<code>fiber node</code>完成。</p>
+<p><img src="demo-10" alt=""></p>
+<p>4.2 合并回到父节点，并移除标签，标记完成。</p>
+<p><img src="demo-11" alt=""></p>
+<p>4.3 重复1.2操作，询问主线程情况。现在有放大字体的操作在等待。因此交换主线程，放大字体。</p>
+<p><img src="demo-12" alt=""></p>
+<p>4.4 放大字体完成，<code>React</code>完成接下来的操作，形成一个完成的<code>workInProgress</code>树。</p>
+<p><img src="demo-13" alt=""></p>
+<p>4.5 那些更新的<code>item</code>向<code>List</code>返回, 标签列表如下</p>
+<p><img src="demo-14" alt=""></p>
+<p>4.6 所有节点标记完成后,<code>React</code>正式进入提交阶段,同样询问主线程,时间够用,更新<code>Dom</code></p>
+<p><img src="demo-15" alt=""></p>
+<p>4.7 更新完过后还需要交换指针</p>
+<p><img src="demo-16" alt=""></p>
+<h4 id="废除生命周期"><a href="#废除生命周期" class="headerlink" title="废除生命周期"></a>废除生命周期</h4><ul>
+<li>为什么<code>Fiber Reconciler</code>下, <code>React</code>要废除生命周期例如<code>componentWillUpdate</code>?</li>
+</ul>
+<p>我们通过刚刚<code>Fiber Reconciler</code>的过程我们看到, 这个过程是可以被高优先级例如动画所打断的, 我们初次调用<code>componentWillUpdate</code>, 结果我<code>Reconciler</code>到一半,被打断了, 当主线程又有时间的时候,我又要进行<code>componentWillUpdate</code>,显然是不合理的.</p>
 ]]></content>
       <categories>
         <category>React</category>
