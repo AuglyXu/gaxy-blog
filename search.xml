@@ -418,6 +418,8 @@
 <p>再写UI运行时的时候,发现一切都离不开Fiber,这里参考了掘金博主<em>武器大师1024</em>的一篇文章,并补充了一些他的案例<a href="https://juejin.im/post/6844903582622285831" target="_blank" rel="noopener">React Fiber</a>,同时,此案例也是<a href="https://www.youtube.com/watch?v=ZCuYPiUIONs" target="_blank" rel="noopener">Lin Clark presentation in ReactConf 2017</a>演讲上的一篇案例。</p>
 </blockquote>
 <p>大多数人关注React，关注它的使用方法，关注它创建页面的逻辑和效果，而忽略其模型和React本质上的一些东西，到底React帮我们做了什么?</p>
+<a id="more"></a>
+
 <hr>
 <h2 id="宿主树和宿主实例"><a href="#宿主树和宿主实例" class="headerlink" title="宿主树和宿主实例"></a>宿主树和宿主实例</h2><hr>
 <h4 id="什么是宿主树，什么是宿主实例？"><a href="#什么是宿主树，什么是宿主实例？" class="headerlink" title="什么是宿主树，什么是宿主实例？"></a>什么是宿主树，什么是宿主实例？</h4><p>这是一个概念上的问题，区别两者，其实很简单，就像<strong>整体</strong>和<strong>局部</strong>的关系。例如一个Dom树，就是一个宿主树，Dom树中的一个<code>div</code>，就是一个宿主实例。</p>
