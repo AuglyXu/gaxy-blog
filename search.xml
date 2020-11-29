@@ -608,8 +608,8 @@
 <a id="more"></a>
 
 <hr>
-<h2 id="配置"><a href="#配置" class="headerlink" title="配置"></a>配置</h2><h3 id="context"><a href="#context" class="headerlink" title="context"></a>context</h3><p>定义了打包的基础目录</p>
-<figure class="highlight plain"><table><tr><td class="code"><pre><code class="hljs plain">const path &#x3D; require(&#39;path&#39;);<br><br>module.exports &#x3D; &#123;<br>  &#x2F;&#x2F;...<br>  context: path.resolve(__dirname, &#39;app&#39;)<br>&#125;;<br></code></pre></td></tr></table></figure>
+<h2 id="配置"><a href="#配置" class="headerlink" title="配置"></a>配置</h2><h3 id="context"><a href="#context" class="headerlink" title="context"></a>context</h3><p>定义了打包的基础目录, 一旦设置, 那么接下来配置设置的根路径将会是配置的基础目录。</p>
+<figure class="highlight js"><table><tr><td class="code"><pre><code class="hljs js"><span class="hljs-keyword">const</span> path = <span class="hljs-built_in">require</span>(<span class="hljs-string">'path'</span>);<br><br><span class="hljs-built_in">module</span>.exports = &#123;<br>  <span class="hljs-comment">//...</span><br>  context: path.resolve(__dirname, <span class="hljs-string">'app'</span>)<br>&#125;;<br></code></pre></td></tr></table></figure>
 
 <h3 id="entry"><a href="#entry" class="headerlink" title="entry"></a>entry</h3>]]></content>
       <categories>
