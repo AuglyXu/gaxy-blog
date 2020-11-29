@@ -174,6 +174,103 @@
   
   
   <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://auglyxu.github.io/2020/11/29/webpack/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.JPG">
+      <meta itemprop="name" content="XXZ">
+      <meta itemprop="description" content="用于个人技术分享">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Gaxy">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          
+            <a href="/2020/11/29/webpack/" class="post-title-link" itemprop="url">webpack基本配置</a>
+        </h2>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+              
+
+              <time title="创建时间：2020-11-29 00:00:00 / 修改时间：14:23:47" itemprop="dateCreated datePublished" datetime="2020-11-29T00:00:00+08:00">2020-11-29</time>
+            </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/webpack-%E6%89%93%E5%8C%85%E5%B7%A5%E5%85%B7/" itemprop="url" rel="index"><span itemprop="name">webpack 打包工具</span></a>
+                </span>
+            </span>
+
+          
+            <span id="/2020/11/29/webpack/" class="post-meta-item leancloud_visitors" data-flag-title="webpack基本配置" title="阅读次数">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+              </span>
+              <span class="post-meta-item-text">阅读次数：</span>
+              <span class="leancloud-visitors-count"></span>
+            </span><br>
+            <span class="post-meta-item" title="本文字数">
+              <span class="post-meta-item-icon">
+                <i class="far fa-file-word"></i>
+              </span>
+                <span class="post-meta-item-text">本文字数：</span>
+              <span>413</span>
+            </span>
+            <span class="post-meta-item" title="阅读时长">
+              <span class="post-meta-item-icon">
+                <i class="far fa-clock"></i>
+              </span>
+                <span class="post-meta-item-text">阅读时长 &asymp;</span>
+              <span>1 分钟</span>
+            </span>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <h1 id="webpack基本配置"><a href="#webpack基本配置" class="headerlink" title="webpack基本配置"></a>webpack基本配置</h1><h2 id="基本搭建"><a href="#基本搭建" class="headerlink" title="基本搭建"></a>基本搭建</h2><figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs js">npm init -y<br></code></pre></td></tr></table></figure>
+<p>一顿yes直接搭建好基本的node环境<br><img src="%E5%88%9D%E5%A7%8B%E5%8C%96.jpg" alt=""></p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs js">yarn install webpack webpack-cli --save-dev<br></code></pre></td></tr></table></figure>
+<p>安装webpack, webpack-cli, 由于是开发环境需要,加上–save-dev</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><code class="hljs js"><span class="hljs-built_in">module</span>.exports = &#123;<br>    entry: <span class="hljs-string">"./index.js"</span>,<br>    mode: <span class="hljs-string">"development"</span>,<br>    output: &#123;<br>        path: path.resolve(__dirname, <span class="hljs-string">'dist'</span>),<br>    &#125;,<br>&#125;<br></code></pre></td></tr></table></figure>
+<p>新建<code>index.js</code>, 新建<code>webpack.config.js</code>, <code>webpack</code>默认读取<code>webpack.config.js</code>导出的对象.</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs js">npx webpack<br></code></pre></td></tr></table></figure>
+<p><code>webpack</code>默认读取根路径下的<code>webpack.config.js</code>文件, <code>npm</code>5.2之后提供了自动安装<code>npx</code> ,会自动查找当前依赖包中的可执行文件并执行<br><img src="%E6%88%90%E5%8A%9F%E6%89%A7%E8%A1%8C.jpg" alt=""></p>
+<hr>
+<h2 id="配置"><a href="#配置" class="headerlink" title="配置"></a>配置</h2><h4 id="entry"><a href="#entry" class="headerlink" title="entry"></a>entry</h4>
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
     <link itemprop="mainEntityOfPage" href="http://auglyxu.github.io/2020/08/02/React-UI-render/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -264,6 +361,101 @@
             </div>
           <!--/noindex-->
         
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://auglyxu.github.io/2020/08/02/Redux/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.JPG">
+      <meta itemprop="name" content="XXZ">
+      <meta itemprop="description" content="用于个人技术分享">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Gaxy">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          
+            <a href="/2020/08/02/Redux/" class="post-title-link" itemprop="url">Redux</a>
+        </h2>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2020-08-02 15:34:00" itemprop="dateCreated datePublished" datetime="2020-08-02T15:34:00+08:00">2020-08-02</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2020-08-24 18:49:20" itemprop="dateModified" datetime="2020-08-24T18:49:20+08:00">2020-08-24</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/React/" itemprop="url" rel="index"><span itemprop="name">React</span></a>
+                </span>
+            </span>
+
+          
+            <span id="/2020/08/02/Redux/" class="post-meta-item leancloud_visitors" data-flag-title="Redux" title="阅读次数">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+              </span>
+              <span class="post-meta-item-text">阅读次数：</span>
+              <span class="leancloud-visitors-count"></span>
+            </span><br>
+            <span class="post-meta-item" title="本文字数">
+              <span class="post-meta-item-icon">
+                <i class="far fa-file-word"></i>
+              </span>
+                <span class="post-meta-item-text">本文字数：</span>
+              <span>167</span>
+            </span>
+            <span class="post-meta-item" title="阅读时长">
+              <span class="post-meta-item-icon">
+                <i class="far fa-clock"></i>
+              </span>
+                <span class="post-meta-item-text">阅读时长 &asymp;</span>
+              <span>1 分钟</span>
+            </span>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <h1 id="Redux"><a href="#Redux" class="headerlink" title="Redux"></a>Redux</h1><p>本文默认会使用基本的Redux, 主要对自己学习Redux中一些比较困难的点进行思考和学习.</p>
+<h2 id="Redux阅读和使用上遇到的一些难点"><a href="#Redux阅读和使用上遇到的一些难点" class="headerlink" title="Redux阅读和使用上遇到的一些难点"></a>Redux阅读和使用上遇到的一些难点</h2><h3 id="reducer"><a href="#reducer" class="headerlink" title="reducer"></a>reducer</h3><h2 id="实现一个简易的Redux"><a href="#实现一个简易的Redux" class="headerlink" title="实现一个简易的Redux"></a>实现一个简易的Redux</h2><h3 id="createStore"><a href="#createStore" class="headerlink" title="createStore"></a>createStore</h3><h3 id="Provider"><a href="#Provider" class="headerlink" title="Provider"></a>Provider</h3><h3 id="connect"><a href="#connect" class="headerlink" title="connect"></a>connect</h3><h3 id="middleWare"><a href="#middleWare" class="headerlink" title="middleWare"></a>middleWare</h3><h2 id="React-Redux-Hooks"><a href="#React-Redux-Hooks" class="headerlink" title="React-Redux Hooks"></a>React-Redux Hooks</h2><h3 id="useStore"><a href="#useStore" class="headerlink" title="useStore"></a>useStore</h3><h3 id="useSelect"><a href="#useSelect" class="headerlink" title="useSelect"></a>useSelect</h3><h3 id="useDispatch"><a href="#useDispatch" class="headerlink" title="useDispatch"></a>useDispatch</h3>
       
     </div>
 
@@ -562,20 +754,20 @@
       <div class="site-state-item site-state-posts">
           <a href="/archives/">
         
-          <span class="site-state-item-count">3</span>
+          <span class="site-state-item-count">5</span>
           <span class="site-state-item-name">日志</span>
         </a>
       </div>
       <div class="site-state-item site-state-categories">
             <a href="/categories/">
           
-        <span class="site-state-item-count">1</span>
+        <span class="site-state-item-count">2</span>
         <span class="site-state-item-name">分类</span></a>
       </div>
       <div class="site-state-item site-state-tags">
             <a href="/tags/">
           
-        <span class="site-state-item-count">3</span>
+        <span class="site-state-item-count">5</span>
         <span class="site-state-item-name">标签</span></a>
       </div>
   </nav>
@@ -611,12 +803,12 @@
     <span class="post-meta-item-icon">
       <i class="fa fa-chart-area"></i>
     </span>
-    <span title="站点总字数">23k</span>
+    <span title="站点总字数">24k</span>
     <span class="post-meta-divider">|</span>
     <span class="post-meta-item-icon">
       <i class="fa fa-coffee"></i>
     </span>
-    <span title="站点阅读时长">21 分钟</span>
+    <span title="站点阅读时长">22 分钟</span>
 </div>
   <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://pisces.theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Pisces</a> 强力驱动
   </div>

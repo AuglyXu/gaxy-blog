@@ -2,6 +2,20 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   
   <url>
+    <loc>http://auglyxu.github.io/2020/11/29/webpack/</loc>
+    
+    <lastmod>2020-11-29T06:23:47.135Z</lastmod>
+    
+  </url>
+  
+  <url>
+    <loc>http://auglyxu.github.io/2020/08/02/Redux/</loc>
+    
+    <lastmod>2020-08-24T10:49:20.454Z</lastmod>
+    
+  </url>
+  
+  <url>
     <loc>http://auglyxu.github.io/2020/08/02/React-UI-render/</loc>
     
     <lastmod>2020-08-07T07:31:33.779Z</lastmod>

@@ -580,4 +580,39 @@
         <tag>前端</tag>
       </tags>
   </entry>
+  <entry>
+    <title>Redux</title>
+    <url>/2020/08/02/Redux/</url>
+    <content><![CDATA[<h1 id="Redux"><a href="#Redux" class="headerlink" title="Redux"></a>Redux</h1><p>本文默认会使用基本的Redux, 主要对自己学习Redux中一些比较困难的点进行思考和学习.</p>
+<h2 id="Redux阅读和使用上遇到的一些难点"><a href="#Redux阅读和使用上遇到的一些难点" class="headerlink" title="Redux阅读和使用上遇到的一些难点"></a>Redux阅读和使用上遇到的一些难点</h2><h3 id="reducer"><a href="#reducer" class="headerlink" title="reducer"></a>reducer</h3><h2 id="实现一个简易的Redux"><a href="#实现一个简易的Redux" class="headerlink" title="实现一个简易的Redux"></a>实现一个简易的Redux</h2><h3 id="createStore"><a href="#createStore" class="headerlink" title="createStore"></a>createStore</h3><h3 id="Provider"><a href="#Provider" class="headerlink" title="Provider"></a>Provider</h3><h3 id="connect"><a href="#connect" class="headerlink" title="connect"></a>connect</h3><h3 id="middleWare"><a href="#middleWare" class="headerlink" title="middleWare"></a>middleWare</h3><h2 id="React-Redux-Hooks"><a href="#React-Redux-Hooks" class="headerlink" title="React-Redux Hooks"></a>React-Redux Hooks</h2><h3 id="useStore"><a href="#useStore" class="headerlink" title="useStore"></a>useStore</h3><h3 id="useSelect"><a href="#useSelect" class="headerlink" title="useSelect"></a>useSelect</h3><h3 id="useDispatch"><a href="#useDispatch" class="headerlink" title="useDispatch"></a>useDispatch</h3>]]></content>
+      <categories>
+        <category>React</category>
+      </categories>
+      <tags>
+        <tag>React</tag>
+        <tag>前端</tag>
+        <tag>Redux</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>webpack基本配置</title>
+    <url>/2020/11/29/webpack/</url>
+    <content><![CDATA[<h1 id="webpack基本配置"><a href="#webpack基本配置" class="headerlink" title="webpack基本配置"></a>webpack基本配置</h1><h2 id="基本搭建"><a href="#基本搭建" class="headerlink" title="基本搭建"></a>基本搭建</h2><figure class="highlight js"><table><tr><td class="code"><pre><code class="hljs js">npm init -y<br></code></pre></td></tr></table></figure>
+<p>一顿yes直接搭建好基本的node环境<br><img src="%E5%88%9D%E5%A7%8B%E5%8C%96.jpg" alt=""></p>
+<figure class="highlight js"><table><tr><td class="code"><pre><code class="hljs js">yarn install webpack webpack-cli --save-dev<br></code></pre></td></tr></table></figure>
+<p>安装webpack, webpack-cli, 由于是开发环境需要,加上–save-dev</p>
+<figure class="highlight js"><table><tr><td class="code"><pre><code class="hljs js"><span class="hljs-built_in">module</span>.exports = &#123;<br>    entry: <span class="hljs-string">"./index.js"</span>,<br>    mode: <span class="hljs-string">"development"</span>,<br>    output: &#123;<br>        path: path.resolve(__dirname, <span class="hljs-string">'dist'</span>),<br>    &#125;,<br>&#125;<br></code></pre></td></tr></table></figure>
+<p>新建<code>index.js</code>, 新建<code>webpack.config.js</code>, <code>webpack</code>默认读取<code>webpack.config.js</code>导出的对象.</p>
+<figure class="highlight js"><table><tr><td class="code"><pre><code class="hljs js">npx webpack<br></code></pre></td></tr></table></figure>
+<p><code>webpack</code>默认读取根路径下的<code>webpack.config.js</code>文件, <code>npm</code>5.2之后提供了自动安装<code>npx</code> ,会自动查找当前依赖包中的可执行文件并执行<br><img src="%E6%88%90%E5%8A%9F%E6%89%A7%E8%A1%8C.jpg" alt=""></p>
+<hr>
+<h2 id="配置"><a href="#配置" class="headerlink" title="配置"></a>配置</h2><h4 id="entry"><a href="#entry" class="headerlink" title="entry"></a>entry</h4>]]></content>
+      <categories>
+        <category>webpack 打包工具</category>
+      </categories>
+      <tags>
+        <tag>前端</tag>
+        <tag>webpack</tag>
+      </tags>
+  </entry>
 </search>
