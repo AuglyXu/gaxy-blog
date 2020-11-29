@@ -605,6 +605,8 @@
 <p>新建<code>index.js</code>, 新建<code>webpack.config.js</code>, <code>webpack</code>默认读取<code>webpack.config.js</code>导出的对象.</p>
 <figure class="highlight js"><table><tr><td class="code"><pre><code class="hljs js">npx webpack<br></code></pre></td></tr></table></figure>
 <p><code>webpack</code>默认读取根路径下的<code>webpack.config.js</code>文件, <code>npm</code>5.2之后提供了自动安装<code>npx</code> ,会自动查找当前依赖包中的可执行文件并执行<br><img src="%E6%88%90%E5%8A%9F%E6%89%A7%E8%A1%8C.jpg" alt=""></p>
+<a id="more"></a>
+
 <hr>
 <h2 id="配置"><a href="#配置" class="headerlink" title="配置"></a>配置</h2><h4 id="entry"><a href="#entry" class="headerlink" title="entry"></a>entry</h4>]]></content>
       <categories>
