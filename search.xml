@@ -608,10 +608,77 @@
 <a id="more"></a>
 
 <hr>
-<h2 id="配置"><a href="#配置" class="headerlink" title="配置"></a>配置</h2><h3 id="context"><a href="#context" class="headerlink" title="context"></a>context</h3><p>定义了打包的基础目录, 一旦设置, 那么接下来配置设置的根路径将会是配置的基础目录。</p>
+<h2 id="context"><a href="#context" class="headerlink" title="context"></a>context</h2><p>定义了打包的基础目录, 一旦设置, 那么接下来配置设置的根路径将会是配置的基础目录。</p>
 <figure class="highlight js"><table><tr><td class="code"><pre><code class="hljs js"><span class="hljs-keyword">const</span> path = <span class="hljs-built_in">require</span>(<span class="hljs-string">'path'</span>);<br><br><span class="hljs-built_in">module</span>.exports = &#123;<br>  <span class="hljs-comment">//...</span><br>  context: path.resolve(__dirname, <span class="hljs-string">'app'</span>)<br>&#125;;<br></code></pre></td></tr></table></figure>
 
-<h3 id="entry"><a href="#entry" class="headerlink" title="entry"></a>entry</h3>]]></content>
+<h2 id="entry"><a href="#entry" class="headerlink" title="entry"></a>entry</h2><p>文件打包的起点</p>
+<ul>
+<li>可以传入数组, 传入数组从前往后依次进行打包, 包名为main</li>
+<li>可以传入对象, 每个键作为打包的包名， 值为打包的资源路径或者打包的描述符<figure class="highlight js"><table><tr><td class="code"><pre><code class="hljs js"><span class="hljs-built_in">module</span>.exports = &#123;<br>  <span class="hljs-comment">//...</span><br>  entry: <span class="hljs-string">'./index.js'</span><br>&#125;;<br><br><span class="hljs-comment">// 也可以自定义包名</span><br><span class="hljs-built_in">module</span>.exports = &#123;<br>  <span class="hljs-comment">//...</span><br>  entry: &#123;<br>    app: <span class="hljs-string">'./app.js'</span>,<br>    home: &#123; <span class="hljs-attr">import</span>: <span class="hljs-string">'./contact.js'</span>, <span class="hljs-attr">filename</span>: <span class="hljs-string">'pages/[name][ext]'</span> &#125;,<br>    about: &#123; <span class="hljs-attr">import</span>: <span class="hljs-string">'./about.js'</span>, <span class="hljs-attr">filename</span>: <span class="hljs-string">'pages/[name][ext]'</span> &#125;<br>  &#125;<br>&#125;;<br></code></pre></td></tr></table></figure>
+多入口可以设置打包依赖， 减少包体积， 避免重复使用相同的包<figure class="highlight js"><table><tr><td class="code"><pre><code class="hljs js"><span class="hljs-built_in">module</span>.exports = &#123;<br>  <span class="hljs-comment">//...</span><br>  entry: &#123;<br>    app: &#123; <span class="hljs-attr">import</span>: [<span class="hljs-string">'./app.js'</span>, <span class="hljs-string">'./app2.js'</span>], <span class="hljs-attr">dependOn</span>: <span class="hljs-string">'react-vendors'</span> &#125;,<br>    <span class="hljs-string">'react-vendors'</span>: [<span class="hljs-string">'react'</span>, <span class="hljs-string">'react-dom'</span>, <span class="hljs-string">'prop-types'</span>]<br>  &#125;<br>&#125;;<br></code></pre></td></tr></table></figure>
+可以动态引入， 将在make事件中触发<figure class="highlight js"><table><tr><td class="code"><pre><code class="hljs js"><span class="hljs-built_in">module</span>.exports = &#123;<br>  <span class="hljs-comment">//...</span><br>  entry: <span class="hljs-function"><span class="hljs-params">()</span> =&gt;</span> <span class="hljs-string">'./demo'</span> <span class="hljs-comment">// () =&gt; new Promise((resolve) =&gt; resolve(['./demo', './demo2']))</span><br>&#125;;<br></code></pre></td></tr></table></figure>
+
+</li>
+</ul>
+<h2 id="mode"><a href="#mode" class="headerlink" title="mode"></a>mode</h2><p>打包模式分为<code>development</code>和<code>production</code></p>
+<figure class="highlight js"><table><tr><td class="code"><pre><code class="hljs js"><span class="hljs-built_in">module</span>.exports = &#123;<br>  <span class="hljs-comment">//...</span><br>  mode: <span class="hljs-string">'development'</span> <span class="hljs-comment">// 'production'</span><br>&#125;;<br></code></pre></td></tr></table></figure>
+<p>可以在打包时决定</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><code class="hljs plain">npx webpack --mode&#x3D;development<br></code></pre></td></tr></table></figure>
+
+<p>如果我们需要在不同模式下进行定义不同的打包行为， 我们可以定义为函数， 使用方法如下。</p>
+<p><strong>开发环境打包文件<code>webpack.base.js</code></strong></p>
+<figure class="highlight js"><table><tr><td class="code"><pre><code class="hljs js"><span class="hljs-built_in">module</span>.exports = <span class="hljs-function">(<span class="hljs-params">options</span>) =&gt;</span> (&#123;<br>    <span class="hljs-comment">// 这里注入基本配置</span><br>&#125;)<br></code></pre></td></tr></table></figure>
+<p><strong>主打包文件<code>webpack.dev.js</code></strong></p>
+<figure class="highlight js"><table><tr><td class="code"><pre><code class="hljs js"><span class="hljs-built_in">module</span>.exports = <span class="hljs-built_in">require</span>(<span class="hljs-string">'./webpack.base.js'</span>)(&#123;<br>    <span class="hljs-comment">// 这里将开发环境打包需要的配置注入</span><br>&#125;)<br></code></pre></td></tr></table></figure>
+<p>通过配置进行打包， 选择对应的打包文件</p>
+<figure class="highlight js"><table><tr><td class="code"><pre><code class="hljs js">webpack --config webpack.dev.js<br></code></pre></td></tr></table></figure>
+
+<h2 id="output"><a href="#output" class="headerlink" title="output"></a>output</h2><p>打包的输出形态， 包括bundle和静态文件</p>
+<h3 id="filename"><a href="#filename" class="headerlink" title="filename"></a>filename</h3><p><code>filename</code> 是一个很常见的配置，就是对应于 <code>entry</code> 里面的输入文件。</p>
+<p>这里可以使用可替换模板字符串的形式定义输出的打包文件名，浏览器存在缓存机制，如果名称相同，浏览器默认文件没有改变，这样打包文件名相同会使得获取文件出现问题，因此我们通过可替换模板字符串的形式定义输出的打包文件名。</p>
+<ul>
+<li>编译层<ul>
+<li>name： chunk文件名</li>
+</ul>
+</li>
+<li>chunk层<ul>
+<li>id: 内部chunk的id</li>
+<li>chunkhash：这个chunk的hash值</li>
+</ul>
+</li>
+<li>模块层<ul>
+<li>contenthash： 根据内容生成的hash</li>
+<li>id：模块id</li>
+<li>hash：模块的hash值</li>
+</ul>
+</li>
+<li>文件层：<ul>
+<li>file： 文件名称和路径</li>
+<li>query： 带前缀 ? 的 query</li>
+</ul>
+</li>
+<li>url层：<ul>
+<li>url</li>
+</ul>
+</li>
+</ul>
+<blockquote>
+<p>具体参照<a href="https://webpack.docschina.org/configuration/output/#outputfilename" target="_blank" rel="noopener">模板字符串替换</a></p>
+</blockquote>
+<h3 id="chunkFilename"><a href="#chunkFilename" class="headerlink" title="chunkFilename"></a>chunkFilename</h3><p><code>chunkFilename</code> 指未被列在 <code>entry</code> 中，却又需要被打包出来的 <code>chunk</code> 文件的名称。一般来说，这个 <code>chunk</code> 文件指的就是要懒加载的代码。</p>
+<p>注意点： 默认文件输出为<code>[id].js</code>或者遵循<code>output.filename</code>的设置，如果<code>output.filename</code>设置了<code>name</code>， 则会被预先替换为<code>id</code></p>
+<blockquote>
+<p>可以参照这篇文章看到<a href="https://www.cnblogs.com/skychx/p/webpack-filename-chunkFilename.html" target="_blank" rel="noopener">filename和chunkFilename的区别</a></p>
+</blockquote>
+<h3 id="path"><a href="#path" class="headerlink" title="path"></a>path</h3><p>打包文件路径</p>
+<h3 id="publicPath"><a href="#publicPath" class="headerlink" title="publicPath"></a>publicPath</h3><p>外部资源路径，通常以<code>/</code>结尾, 默认参照路径为HTML页面所在的路径为准</p>
+<p>例如如下配置，请求一个<code>chunk</code>就相当于请求<code>/assets/1.chunk.js</code></p>
+<figure class="highlight js"><table><tr><td class="code"><pre><code class="hljs js"><span class="hljs-built_in">module</span>.exports = &#123;<br>  <span class="hljs-comment">//...</span><br>  output: &#123;<br>    publicPath: <span class="hljs-string">'/assets/'</span>,<br>    chunkFilename: <span class="hljs-string">'[id].chunk.js'</span><br>  &#125;<br>&#125;;<br></code></pre></td></tr></table></figure>
+
+<h3 id="library"><a href="#library" class="headerlink" title="library"></a>library</h3><p>组织打包的模块，库开发使用</p>
+<h3 id="libraryTarget"><a href="#libraryTarget" class="headerlink" title="libraryTarget"></a>libraryTarget</h3><p>库打包引入的方式</p>
+<h2 id="Module"><a href="#Module" class="headerlink" title="Module"></a>Module</h2><p>todo</p>
+]]></content>
       <categories>
         <category>webpack 打包工具</category>
       </categories>
