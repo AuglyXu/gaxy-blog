@@ -611,6 +611,7 @@
 <h2 id="context"><a href="#context" class="headerlink" title="context"></a>context</h2><p>定义了打包的基础目录, 一旦设置, 那么接下来配置设置的根路径将会是配置的基础目录。</p>
 <figure class="highlight js"><table><tr><td class="code"><pre><code class="hljs js"><span class="hljs-keyword">const</span> path = <span class="hljs-built_in">require</span>(<span class="hljs-string">'path'</span>);<br><br><span class="hljs-built_in">module</span>.exports = &#123;<br>  <span class="hljs-comment">//...</span><br>  context: path.resolve(__dirname, <span class="hljs-string">'app'</span>)<br>&#125;;<br></code></pre></td></tr></table></figure>
 
+<hr>
 <h2 id="entry"><a href="#entry" class="headerlink" title="entry"></a>entry</h2><p>文件打包的起点</p>
 <ul>
 <li>可以传入数组, 传入数组从前往后依次进行打包, 包名为main</li>
@@ -620,6 +621,7 @@
 
 </li>
 </ul>
+<hr>
 <h2 id="mode"><a href="#mode" class="headerlink" title="mode"></a>mode</h2><p>打包模式分为<code>development</code>和<code>production</code></p>
 <figure class="highlight js"><table><tr><td class="code"><pre><code class="hljs js"><span class="hljs-built_in">module</span>.exports = &#123;<br>  <span class="hljs-comment">//...</span><br>  mode: <span class="hljs-string">'development'</span> <span class="hljs-comment">// 'production'</span><br>&#125;;<br></code></pre></td></tr></table></figure>
 <p>可以在打包时决定</p>
@@ -633,6 +635,7 @@
 <p>通过配置进行打包， 选择对应的打包文件</p>
 <figure class="highlight js"><table><tr><td class="code"><pre><code class="hljs js">webpack --config webpack.dev.js<br></code></pre></td></tr></table></figure>
 
+<hr>
 <h2 id="output"><a href="#output" class="headerlink" title="output"></a>output</h2><p>打包的输出形态， 包括bundle和静态文件</p>
 <h3 id="filename"><a href="#filename" class="headerlink" title="filename"></a>filename</h3><p><code>filename</code> 是一个很常见的配置，就是对应于 <code>entry</code> 里面的输入文件。</p>
 <p>这里可以使用可替换模板字符串的形式定义输出的打包文件名，浏览器存在缓存机制，如果名称相同，浏览器默认文件没有改变，这样打包文件名相同会使得获取文件出现问题，因此我们通过可替换模板字符串的形式定义输出的打包文件名。</p>
@@ -677,8 +680,44 @@
 
 <h3 id="library"><a href="#library" class="headerlink" title="library"></a>library</h3><p>组织打包的模块，库开发使用</p>
 <h3 id="libraryTarget"><a href="#libraryTarget" class="headerlink" title="libraryTarget"></a>libraryTarget</h3><p>库打包引入的方式</p>
-<h2 id="Module"><a href="#Module" class="headerlink" title="Module"></a>Module</h2><p>todo</p>
-]]></content>
+<hr>
+<h2 id="Module"><a href="#Module" class="headerlink" title="Module"></a>Module</h2><p><code>module</code>对象用于模块的处理方式</p>
+<h3 id="rules"><a href="#rules" class="headerlink" title="rules"></a>rules</h3><h4 id="对应值为-Rule-数组"><a href="#对应值为-Rule-数组" class="headerlink" title="对应值为[Rule]数组"></a>对应值为<code>[Rule]</code>数组</h4><p><code>rules</code>作用在于提供模块的创建规则，提供对应的<code>loader</code>和解析器(<code>parser</code>)</p>
+<h4 id="Rule"><a href="#Rule" class="headerlink" title="Rule"></a>Rule</h4><p><code>Rule</code>是一个对象，这个对象分为三部分</p>
+<ul>
+<li>条件匹配： 条件匹配通过 <code>test</code> 、 <code>include</code> 、 <code>exclude</code> 和 <code>resource</code> 对资源进行匹配(这个资源指的是请求的资源)，并且属性 <code>issuer</code> 对 <code>issuer</code> 匹配, 这个 <code>issuer</code> 指的是请求者的文件绝对路径。是导入时的位置。</li>
+<li>应用规则： 对选中的文件使用 <code>use</code> 来应用 <code>loader</code>，按照从后往前的顺序应用， 并可以为loader传递参数。</li>
+<li>嵌套规则：父规则(文档这里没怎么理解, 在我看来是指一般的规则)、 <code>rule</code>、<code>oneOf</code>的顺序，可以通过<code>enforce</code>强制修改顺序。</li>
+</ul>
+<figure class="highlight js"><table><tr><td class="code"><pre><code class="hljs js"><span class="hljs-built_in">module</span>.exports = &#123;<br>  <span class="hljs-comment">//...</span><br>  <span class="hljs-built_in">module</span>: &#123;<br>    rules: [ <span class="hljs-comment">// 以下对象对应一个Rule</span><br>      &#123;<br>        test: <span class="hljs-regexp">/\\.css$/</span>, <span class="hljs-comment">// loader1</span><br>      &#125;,<br>      &#123;<br>          test: <span class="hljs-regexp">/\\.js$/</span>, <span class="hljs-comment">// loader2</span><br>      &#125;<br>    ]<br>  &#125;<br>&#125;;<br></code></pre></td></tr></table></figure>
+
+<ul>
+<li>注意： <code>loader</code> 顺序从右往左，从下往上执行，按照 <code>pitching</code> 顺序执行<figure class="highlight js"><table><tr><td class="code"><pre><code class="hljs js">|- a-loader <span class="hljs-string">`pitch`</span><br>  |- b-loader <span class="hljs-string">`pitch`</span><br>    |- c-loader <span class="hljs-string">`pitch`</span><br>      |- requested <span class="hljs-built_in">module</span> is picked up <span class="hljs-keyword">as</span> a dependency<br>    |- c-loader normal execution<br>  |- b-loader normal execution<br>|- a-loader normal execution<br></code></pre></td></tr></table></figure>
+
+</li>
+</ul>
+<h4 id="Rule-oneOf"><a href="#Rule-oneOf" class="headerlink" title="Rule.oneOf"></a>Rule.oneOf</h4><p>一旦匹配，就使用</p>
+<figure class="highlight js"><table><tr><td class="code"><pre><code class="hljs js"><span class="hljs-built_in">module</span>.exports = &#123;<br>  <span class="hljs-comment">//...</span><br>  <span class="hljs-built_in">module</span>: &#123;<br>    rules: [ <span class="hljs-comment">// 以下对象对应一个Rule</span><br>      &#123;<br>        test: <span class="hljs-regexp">/\\.css$/</span>,<br>        oneOf: [<br>            &#123;<br>                resourceQuery: <span class="hljs-regexp">/inline/</span>, <span class="hljs-comment">// foo.css?inline</span><br>                use: <span class="hljs-string">'url-loader'</span><br>            &#125;,<br>            &#123;<br>                resourceQuery: <span class="hljs-regexp">/external/</span>, <span class="hljs-comment">// foo.css?external</span><br>                use: <span class="hljs-string">'file-loader'</span><br>            &#125;<br>        ]<br>      &#125;<br>    ]<br>  &#125;<br>&#125;;<br></code></pre></td></tr></table></figure>
+
+<h4 id="Rule-use"><a href="#Rule-use" class="headerlink" title="Rule.use"></a>Rule.use</h4><p>提供一个 <code>loader</code> 数组, 从右往左进行匹配</p>
+<figure class="highlight js"><table><tr><td class="code"><pre><code class="hljs js"><span class="hljs-built_in">module</span>.exports = &#123;<br>  <span class="hljs-comment">//...</span><br>  <span class="hljs-built_in">module</span>: &#123;<br>    rules: [<br>      &#123;<br>        <span class="hljs-comment">//...</span><br>        use: [<br>          <span class="hljs-string">'style-loader'</span>,<br>          &#123;<br>            loader: <span class="hljs-string">'css-loader'</span>,<br>            options: &#123;<br>              importLoaders: <span class="hljs-number">1</span><br>            &#125;<br>          &#125;,<br>          &#123;<br>            loader: <span class="hljs-string">'less-loader'</span>,<br>            options: &#123;<br>              noIeCompat: <span class="hljs-literal">true</span><br>            &#125;<br>          &#125;<br>        ]<br>      &#125;<br>    ]<br>  &#125;<br>&#125;;<br></code></pre></td></tr></table></figure>
+
+<h4 id="Rule-exclude-include"><a href="#Rule-exclude-include" class="headerlink" title="Rule.exclude/include"></a>Rule.exclude/include</h4><p>排除/包括 <code>loader</code> 加载某个模块</p>
+<h4 id="Rule-parse"><a href="#Rule-parse" class="headerlink" title="Rule.parse"></a>Rule.parse</h4><p>文件被 <code>loader</code> 执行后会转成一段js字符串， <code>parse</code>会将其转换为 <code>AST</code> 语法树，有了语法树就可以对代码为所欲为了，其中最重要的功能就是分析出这段代码依赖了哪些模块</p>
+<h4 id="Rule-sideEffect"><a href="#Rule-sideEffect" class="headerlink" title="Rule.sideEffect"></a>Rule.sideEffect</h4><p>模块是否包含副作用</p>
+<h4 id="Rule-type"><a href="#Rule-type" class="headerlink" title="Rule.type"></a>Rule.type</h4><p>设置匹配模块的类型，防止 <code>webpack</code> 自定义的行为发生，常用于自定义loader加载模块</p>
+<h4 id="Rule-resolve"><a href="#Rule-resolve" class="headerlink" title="Rule.resolve"></a>Rule.resolve</h4><p>模块解析可以在模块层被配置, <code>Rule</code>层面的 <code>resolve</code> 会覆盖顶层的 <code>resolve配置</code></p>
+<h3 id="UseEntry"><a href="#UseEntry" class="headerlink" title="UseEntry"></a>UseEntry</h3><p><code>Rule</code> 传入的形式，通常可以是对象或者一个函数, 一个必选的字符串形式的 <code>loader</code> 和一个可选的 <code>option</code></p>
+<p>函数形式则会接受一个加载模块的对象参数</p>
+<figure class="highlight js"><table><tr><td class="code"><pre><code class="hljs js"><span class="hljs-comment">// 对象形式</span><br><span class="hljs-built_in">module</span>.exports = &#123;<br>  <span class="hljs-comment">//...</span><br>  <span class="hljs-built_in">module</span>: &#123;<br>    rules: [<br>      &#123;<br>        loader: <span class="hljs-string">'css-loader'</span>,<br>        options: &#123;<br>          modules: <span class="hljs-literal">true</span><br>        &#125;<br>      &#125;<br>    ]<br>  &#125;<br>&#125;;<br><br><span class="hljs-comment">// 函数形式</span><br><span class="hljs-built_in">module</span>.exports = &#123;<br>  <span class="hljs-comment">//...</span><br>  <span class="hljs-built_in">module</span>: &#123;<br>    rules: [<br>      &#123;<br>        loader: <span class="hljs-string">'file-loader'</span>,<br>        options: &#123;<br>          outputPath: <span class="hljs-string">'svgs'</span><br>        &#125;<br>      &#125;,<br>      (info) =&gt; (&#123;<br>        loader: <span class="hljs-string">'svgo-loader'</span>,<br>        options: &#123;<br>          plugins: [&#123;<br>            cleanupIDs: &#123; <span class="hljs-attr">prefix</span>: basename(info.resource) &#125;<br>          &#125;]<br>        &#125;<br>      &#125;)<br>    ]<br>  &#125;<br>&#125;;<br></code></pre></td></tr></table></figure>
+
+<h3 id="noParse"><a href="#noParse" class="headerlink" title="noParse"></a>noParse</h3><p>不解析所传递的正则表达式匹配到的文件，这里特别注意不匹配的文件不能存在<code>require</code>和<code>import</code></p>
+<figure class="highlight js"><table><tr><td class="code"><pre><code class="hljs js"><span class="hljs-built_in">module</span>.exports = &#123;<br>  <span class="hljs-comment">//...</span><br>  <span class="hljs-built_in">module</span>: &#123;<br>    noParse: <span class="hljs-regexp">/jquery|lodash/</span>,<br>  &#125;<br>&#125;;<br></code></pre></td></tr></table></figure>
+
+<h3 id="unsafeCache"><a href="#unsafeCache" class="headerlink" title="unsafeCache"></a>unsafeCache</h3><p>缓存模块是否需要解析， 首先得保证缓存开启。缓存未开启，默认为<code>false</code>。缓存开启，默认会解析<code>node_modules</code>的模块。</p>
+<figure class="highlight js"><table><tr><td class="code"><pre><code class="hljs js"><span class="hljs-built_in">module</span>.exports = &#123;<br>  <span class="hljs-comment">//...</span><br>  <span class="hljs-built_in">module</span>: &#123;<br>    cache: <span class="hljs-literal">true</span>,<br>    <span class="hljs-comment">// unsafeCache</span><br>  &#125;<br>&#125;;<br></code></pre></td></tr></table></figure>
+
+<h2 id="Resolve"><a href="#Resolve" class="headerlink" title="Resolve"></a>Resolve</h2><h2 id="Optimization"><a href="#Optimization" class="headerlink" title="Optimization"></a>Optimization</h2><h2 id="Plugins"><a href="#Plugins" class="headerlink" title="Plugins"></a>Plugins</h2><h2 id="DevServer"><a href="#DevServer" class="headerlink" title="DevServer"></a>DevServer</h2><h2 id="Devtool"><a href="#Devtool" class="headerlink" title="Devtool"></a>Devtool</h2><h2 id="Targets"><a href="#Targets" class="headerlink" title="Targets"></a>Targets</h2><h2 id="watch"><a href="#watch" class="headerlink" title="watch"></a>watch</h2><h2 id="externals"><a href="#externals" class="headerlink" title="externals"></a>externals</h2><h2 id="performance"><a href="#performance" class="headerlink" title="performance"></a>performance</h2><h2 id="Node"><a href="#Node" class="headerlink" title="Node"></a>Node</h2><h2 id="stats对象"><a href="#stats对象" class="headerlink" title="stats对象"></a>stats对象</h2><h2 id="cache"><a href="#cache" class="headerlink" title="cache"></a>cache</h2>]]></content>
       <categories>
         <category>webpack 打包工具</category>
       </categories>
