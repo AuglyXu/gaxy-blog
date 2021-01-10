@@ -825,7 +825,7 @@
 <p>然后修改<code>babel.config.json</code>配置</p>
 <figure class="highlight json"><table><tr><td class="code"><pre><code class="hljs json"><span class="hljs-comment">// babel.config.json</span><br>&#123;<br>    <span class="hljs-attr">"presets"</span>: [<br>      [<br>        <span class="hljs-string">"@babel/env"</span>,<br>        &#123;<br>          <span class="hljs-attr">"useBuiltIns"</span>: <span class="hljs-string">"usage"</span><br>        &#125;<br>      ],<br>      [<span class="hljs-string">"@babel/preset-react"</span>, <br>        &#123;<br>          <span class="hljs-attr">"development"</span>: <span class="hljs-literal">true</span><br>        &#125;<br>      ]<br>    ],<br>    <span class="hljs-attr">"plugins"</span>: [<br>        [<span class="hljs-string">"@babel/plugin-proposal-class-properties"</span>, &#123; <span class="hljs-attr">"loose"</span>: <span class="hljs-literal">true</span> &#125;],<br>        [<span class="hljs-string">"import"</span>, &#123; <span class="hljs-attr">"libraryName"</span>: <span class="hljs-string">"antd"</span>, <span class="hljs-attr">"libraryDirectory"</span>: <span class="hljs-string">"es"</span>, <span class="hljs-attr">"style"</span>: <span class="hljs-string">"css"</span> &#125;]<br>    ]<br>&#125;<br></code></pre></td></tr></table></figure>
 <p>结果如下</p>
-<p>!()[antd样式注入成功.png]</p>
+<p><img src="antd%E6%A0%B7%E5%BC%8F%E6%B3%A8%E5%85%A5%E6%88%90%E5%8A%9F.png" alt=""></p>
 ]]></content>
       <categories>
         <category>React</category>
