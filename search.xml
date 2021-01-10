@@ -758,6 +758,8 @@
 <p>项目结构如下</p>
 <figure class="highlight plain"><table><tr><td class="code"><pre><code class="hljs plain">├─ app<br>   |-app.js<br>├─ node_modules<br>    |- ......<br>├─ webpack.config.js<br>└─ package.json<br></code></pre></td></tr></table></figure>
 
+<a id="more"></a>
+
 <h4 id="配置基本webpack"><a href="#配置基本webpack" class="headerlink" title="配置基本webpack"></a>配置基本webpack</h4><p>这里我们配置一些基本的<code>webpack</code>打包必须的配置项</p>
 <figure class="highlight js"><table><tr><td class="code"><pre><code class="hljs js"><span class="hljs-keyword">const</span> path = <span class="hljs-built_in">require</span>(<span class="hljs-string">"path"</span>)<br><br><span class="hljs-built_in">module</span>.exports = &#123;<br>    entry: &#123; <br>      index: &#123;<br>        <span class="hljs-keyword">import</span>: <span class="hljs-string">'/app/app.js'</span>,<br>      &#125;,<br>    &#125;,<br>    mode: <span class="hljs-string">"development"</span>,<br>    output: &#123;<br>        filename: <span class="hljs-string">'[name].[contenthash].bundle.js'</span>,<br>        chunkFilename: <span class="hljs-string">'[name].[id].js'</span>,<br>        publicPath: <span class="hljs-string">'/'</span>,<br>        path: path.resolve(__dirname, <span class="hljs-string">'dist'</span>),<br>    &#125;,<br>    devtool: <span class="hljs-string">'inline-source-map'</span>,<br>&#125;<br></code></pre></td></tr></table></figure>
 <h4 id="管理资源"><a href="#管理资源" class="headerlink" title="管理资源"></a>管理资源</h4><p>我们需要解析模块, 生成<code>bundle</code>, 这里我们使用<code>babel-loader</code>来转换js, <code>less-loader</code> &nbsp;&nbsp;&nbsp; <code>css-loader</code> &nbsp;&nbsp;&nbsp; <code>style-loader</code>来加载样式</p>
