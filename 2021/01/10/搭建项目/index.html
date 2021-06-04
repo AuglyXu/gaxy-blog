@@ -1,0 +1,279 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+  <meta name="viewport"
+        content="width=device-width, initial-scale=1.0, user-scalable=no">
+  <title>
+    手把手搭建一个React应用程序 | Gaxy
+  </title>
+  <meta name="description" content="专心学技术">
+  
+  <meta name="keywords" content="
+  React,前端,webpack
+  ">
+  
+  <meta name="author" content="王八吉吉">
+
+  <meta http-equiv="Cache-Control" content="no-transform"/>
+  <meta http-equiv="Cache-Control" content="no-siteapp">
+  <meta name="theme-color" content="#1e2327">
+  <link rel="apple-touch-icon" href="https://github.githubassets.com/apple-touch-icon.png">
+  <link rel="apple-touch-icon" sizes="180x180" href="https://github.githubassets.com/apple-touch-icon-180x180.png">
+
+  <link rel="icon" type="image/x-icon" href="https://github.githubassets.com/favicon.ico">
+  <link rel="stylesheet" href="/css/main.css">
+  <link rel="stylesheet"
+        href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
+  
+
+  
+
+  <script src="//cdnjs.cloudflare.com/ajax/libs/vue/1.0.25-csp/vue.min.js"></script>
+  <script src="//cdnjs.cloudflare.com/ajax/libs/moment.js/2.11.2/moment.min.js"></script>
+<meta name="generator" content="Hexo 4.2.1"></head>
+
+<body id="replica-app">
+
+<nav class="navbar-wrapper">
+  <div class="navbar">
+    <div class="container clearfix">
+      <a href="/" class="navbar-logo"><i class="fa fa-github"></i></a>
+
+      <div class="navbar-search float-left desktop-only">
+        <div class="navbar-search-form">
+          <label for="gsc-i-id1">This website</label>
+          <div id="google-search">
+            <gcse:search></gcse:search>
+          </div>
+        </div>
+      </div>
+
+      <ul class="navbar-nav float-left">
+        
+        <li><a href="/archives">Archives</a></li>
+        
+        
+        <li><a href="/categories">Categories</a></li>
+        
+        
+        <li><a href="/tags">Tags</a></li>
+        
+        
+        <li class="desktop-only"><a href="/atom.xml" target="_blank">RSS</a></li>
+        
+      </ul>
+
+      <ul class="navbar-nav user-nav float-right desktop-only">
+        <li class="user-nav-notification">
+          <a><span class="user-nav-unread"></span><i class="fa fa-bell"></i></a>
+        </li>
+        <li>
+          <a><i class="fa fa-plus"></i> <i class="fa fa-caret-down"></i></a>
+        </li>
+        <li class="user-nav-logo">
+          <a><img src="/images/avatar.JPG"> <i class="fa fa-caret-down"></i></i></a>
+        </li>
+      </ul>
+    </div>
+  </div>
+</nav>
+
+<div class="main-container">
+  <header class="header-wrapper desktop-only">
+  <div class="container header-site-detail">
+    <ul class="header-toolbar">
+      <li class="clearfix">
+        <a href="/archives" class="header-toolbar-left"><i
+                  class="fa fa-file-text"></i> Posts </a>
+        <a href="/archives"
+           class="header-toolbar-right"> 7 </a>
+      </li>
+      <li>
+        <a href="/tags" class="header-toolbar-left"><i
+                  class="fa fa-tags"></i> Tags </a>
+        <a href="/tags"
+           class="header-toolbar-right"> 6 </a>
+      </li>
+      <li>
+        <a href="/categories" class="header-toolbar-left"><i
+                  class="fa fa-folder-open"></i> Categories </a>
+        <a href="/categories"
+           class="header-toolbar-right"> 2 </a>
+      </li>
+    </ul>
+    <h2 class="header-title">
+      <i class="fa fa-book text-muted"></i>
+      <a href="/">Gaxy</a>
+      
+      
+    </h2>
+  </div>
+
+  <div class="container">
+    <div class="header-tab-wrapper clearfix">
+      <span class="header-tab header-tab-selected"><i class="fa fa-thumbs-o-up"></i> Like</span>
+      <span class="header-tab"><i class="fa fa-share-alt"></i> Share</span>
+      <span class="header-tab"><i class="fa fa-comments-o"></i> Discussion</span>
+      <span class="header-tab"><i class="fa fa-bookmark-o"></i> Bookmark </span>
+      <span class="header-tab"><i class="fa fa-smile-o"></i> Smile <i class="fa fa-caret-down"></i></span>
+    </div>
+  </div>
+</header>
+
+
+<div class="post-container container">
+  <h3>
+    <i class="fa fa-user-o"></i>
+    王八吉吉
+
+    <span class="post-date float-right" title="{{moment(1610264940000).format('MMM DD, YYYY, h:mm:ss A')}}">
+      
+          <i class="fa fa-pencil-square-o"></i>
+      
+      {{moment(1610264940000).fromNow()}}
+    </span>
+  </h3>
+
+  <article class="post-content">
+    <h1>手把手搭建一个React应用程序</h1>
+    <p>本应用程序为<code>webpack5.0</code> + <code>React17</code> + <code>antd4.x</code></p>
+<h2 id="搭建环境"><a href="#搭建环境" class="headerlink" title="搭建环境"></a>搭建环境</h2><h3 id="初始化项目"><a href="#初始化项目" class="headerlink" title="初始化项目"></a>初始化项目</h3><h4 id="初始化包"><a href="#初始化包" class="headerlink" title="初始化包"></a>初始化包</h4><p>我们使用<code>npm</code>先创建一个<code>package.json</code>, 安装<code>webpack</code>&nbsp;&nbsp;&nbsp;  <code>webpack-cli</code> &nbsp;&nbsp;&nbsp;<code>react</code> &nbsp;&nbsp;&nbsp; <code>react-dom</code> &nbsp;&nbsp;&nbsp; <code>react-router-dom</code></p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><code class="hljs js">npm init -y<br><br>yarn add webpack webpack-cli --dev<br><br>yarn add react react-dom react-router-dom<br></code></pre></td></tr></table></figure>
+
+<p>根目录创建<code>webpack.config.js</code>(暂时只考虑<strong>开发环境</strong>)</p>
+<p>根目录下创建<code>app</code>文件夹作为我们的应用程序主入口,入口文件为<code>app.js</code></p>
+<p>项目结构如下</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><code class="hljs plain">├─ app<br>   |-app.js<br>├─ node_modules<br>    |- ......<br>├─ webpack.config.js<br>└─ package.json<br></code></pre></td></tr></table></figure>
+
+<a id="more"></a>
+
+<h4 id="配置基本webpack"><a href="#配置基本webpack" class="headerlink" title="配置基本webpack"></a>配置基本webpack</h4><p>这里我们配置一些基本的<code>webpack</code>打包必须的配置项</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><code class="hljs js"><span class="hljs-keyword">const</span> path = <span class="hljs-built_in">require</span>(<span class="hljs-string">"path"</span>)<br><br><span class="hljs-built_in">module</span>.exports = &#123;<br>    entry: &#123; <br>      index: &#123;<br>        <span class="hljs-keyword">import</span>: <span class="hljs-string">'/app/app.js'</span>,<br>      &#125;,<br>    &#125;,<br>    mode: <span class="hljs-string">"development"</span>,<br>    output: &#123;<br>        filename: <span class="hljs-string">'[name].[contenthash].bundle.js'</span>,<br>        chunkFilename: <span class="hljs-string">'[name].[id].js'</span>,<br>        publicPath: <span class="hljs-string">'/'</span>,<br>        path: path.resolve(__dirname, <span class="hljs-string">'dist'</span>),<br>    &#125;,<br>    devtool: <span class="hljs-string">'inline-source-map'</span>,<br>&#125;<br></code></pre></td></tr></table></figure>
+<h4 id="管理资源"><a href="#管理资源" class="headerlink" title="管理资源"></a>管理资源</h4><p>我们需要解析模块, 生成<code>bundle</code>, 这里我们使用<code>babel-loader</code>来转换js, <code>less-loader</code> &nbsp;&nbsp;&nbsp; <code>css-loader</code> &nbsp;&nbsp;&nbsp; <code>style-loader</code>来加载样式</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><code class="hljs js">yarn add less less-loader --dev<br>yarn add babel-loader --dev<br>yarn add css-loader style-loader --dev<br></code></pre></td></tr></table></figure>
+
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br></pre></td><td class="code"><pre><code class="hljs js"><span class="hljs-keyword">const</span> path = <span class="hljs-built_in">require</span>(<span class="hljs-string">"path"</span>)<br><br><span class="hljs-built_in">module</span>.exports = &#123;<br>    entry: &#123; <br>      index: &#123;<br>        <span class="hljs-keyword">import</span>: <span class="hljs-string">'/app/app.js'</span>,<br>      &#125;,<br>    &#125;,<br>    mode: <span class="hljs-string">"development"</span>,<br>    output: &#123;<br>        filename: <span class="hljs-string">'[name].[contenthash].bundle.js'</span>,<br>        chunkFilename: <span class="hljs-string">'[name].[id].js'</span>,<br>        publicPath: <span class="hljs-string">'/'</span>,<br>        path: path.resolve(__dirname, <span class="hljs-string">'dist'</span>),<br>    &#125;,<br>    devtool: <span class="hljs-string">'inline-source-map'</span>,<br>    <span class="hljs-built_in">module</span>: &#123;<br>        rules: [<br>          &#123;<br>            test: <span class="hljs-regexp">/\.js$/</span>,<br>            exclude: <span class="hljs-regexp">/(node_modules)/</span>,<br>            include: path.resolve(__dirname, <span class="hljs-string">'app'</span>),<br>            use: &#123;<br>              loader: <span class="hljs-string">'babel-loader'</span>,<br>              options: &#123;<br>                presets: [<span class="hljs-string">'@babel/preset-env'</span>]<br>              &#125;<br>            &#125;<br>          &#125;,<br>          &#123;<br>            test: <span class="hljs-regexp">/\.less$/i</span>,<br>            use: [<span class="hljs-string">'style-loader'</span>, <span class="hljs-string">'css-loader'</span>, <span class="hljs-string">'less-loader'</span>],<br>          &#125;,<br>          &#123;<br>            test: <span class="hljs-regexp">/\.css$/i</span>,<br>            use: [<span class="hljs-string">'style-loader'</span>, <span class="hljs-string">'css-loader'</span>],<br>          &#125;,<br>        ],<br>    &#125;<br>&#125;<br></code></pre></td></tr></table></figure>
+
+<p>由于用到了<code>babel</code>转换<code>js</code>,我们需要装一些<code>babel</code>的核心模块</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs js">yarn add @babel/core @babel/cli @babel/preset-env --dev<br></code></pre></td></tr></table></figure>
+
+<h4 id="添加调试基础插件"><a href="#添加调试基础插件" class="headerlink" title="添加调试基础插件"></a>添加调试基础插件</h4><p>接下来装一些便于我们调试的基础插件<code>html-webpack-plugin</code> &nbsp;&nbsp;&nbsp;<code>clean-webpack-plugin</code> &nbsp;&nbsp;&nbsp;<code>webpack-manifest-plugin</code></p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs js">yarn add html-webpack-plugin clean-webpack-plugin webpack-manifest-plugin --dev<br></code></pre></td></tr></table></figure>
+
+<p>创建模板<code>index.html</code>, 并添加插件</p>
+<figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><code class="hljs html"><span class="hljs-tag">&lt;<span class="hljs-name">html</span>&gt;</span><br>  <span class="hljs-tag">&lt;<span class="hljs-name">head</span>&gt;</span><br>    <span class="hljs-tag">&lt;<span class="hljs-name">meta</span> <span class="hljs-attr">charset</span>=<span class="hljs-string">"utf-8"</span> /&gt;</span><br>    <span class="hljs-tag">&lt;<span class="hljs-name">title</span>&gt;</span>起步<span class="hljs-tag">&lt;/<span class="hljs-name">title</span>&gt;</span><br>  <span class="hljs-tag">&lt;/<span class="hljs-name">head</span>&gt;</span><br>  <span class="hljs-tag">&lt;<span class="hljs-name">body</span>&gt;</span><br>    <span class="hljs-tag">&lt;<span class="hljs-name">div</span> <span class="hljs-attr">id</span>=<span class="hljs-string">"app"</span>&gt;</span><span class="hljs-tag">&lt;/<span class="hljs-name">div</span>&gt;</span><br>  <span class="hljs-tag">&lt;/<span class="hljs-name">body</span>&gt;</span><br><span class="hljs-tag">&lt;/<span class="hljs-name">html</span>&gt;</span><br></code></pre></td></tr></table></figure>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br></pre></td><td class="code"><pre><code class="hljs js"><span class="hljs-comment">// webpack.config.js</span><br><span class="hljs-keyword">const</span> HtmlWebpackPlugin = <span class="hljs-built_in">require</span>(<span class="hljs-string">'html-webpack-plugin'</span>);<br><span class="hljs-keyword">const</span> &#123; CleanWebpackPlugin &#125; = <span class="hljs-built_in">require</span>(<span class="hljs-string">'clean-webpack-plugin'</span>);<br><span class="hljs-keyword">const</span> &#123; WebpackManifestPlugin &#125; = <span class="hljs-built_in">require</span>(<span class="hljs-string">'webpack-manifest-plugin'</span>);<br><br><span class="hljs-built_in">module</span>.exports = &#123;<br>    entry: &#123; <br>      index: &#123;<br>        <span class="hljs-keyword">import</span>: <span class="hljs-string">'/app/app.js'</span>,<br>      &#125;,<br>    &#125;,<br>    mode: <span class="hljs-string">"development"</span>,<br>    output: &#123;<br>        filename: <span class="hljs-string">'[name].[contenthash].bundle.js'</span>,<br>        chunkFilename: <span class="hljs-string">'[name].[id].js'</span>,<br>        publicPath: <span class="hljs-string">'/'</span>,<br>        path: path.resolve(__dirname, <span class="hljs-string">'dist'</span>),<br>    &#125;,<br>    devtool: <span class="hljs-string">'eval-source-map'</span>,<br>    devServer: &#123;<br>      contentBase: <span class="hljs-string">'/dist'</span>,<br>    &#125;,<br>    <span class="hljs-built_in">module</span>: &#123;<br>        rules: [<br>          &#123;<br>            test: <span class="hljs-regexp">/\.js$/</span>,<br>            exclude: <span class="hljs-regexp">/(node_modules)/</span>,<br>            include: path.resolve(__dirname, <span class="hljs-string">'app'</span>),<br>            use: &#123;<br>              loader: <span class="hljs-string">'babel-loader'</span>,<br>              options: &#123;<br>                presets: [<span class="hljs-string">'@babel/preset-env'</span>]<br>              &#125;<br>            &#125;<br>          &#125;,<br>          &#123;<br>            test: <span class="hljs-regexp">/\.less$/i</span>,<br>            use: [<span class="hljs-string">'style-loader'</span>, <span class="hljs-string">'css-loader'</span>, <span class="hljs-string">'less-loader'</span>],<br>          &#125;,<br>          &#123;<br>            test: <span class="hljs-regexp">/\.css$/i</span>,<br>            use: [<span class="hljs-string">'style-loader'</span>, <span class="hljs-string">'css-loader'</span>],<br>          &#125;,<br>        ],<br>    &#125;,<br>    plugins: [<br>      <span class="hljs-keyword">new</span> CleanWebpackPlugin(),<br>      <span class="hljs-keyword">new</span> HtmlWebpackPlugin(&#123;<br>        inject: <span class="hljs-literal">true</span>,<br>        template: <span class="hljs-string">'/app/index.html'</span>,<br>      &#125;),<br>      <span class="hljs-keyword">new</span> WebpackManifestPlugin()<br>    ],<br>&#125;<br></code></pre></td></tr></table></figure>
+
+<h4 id="创建服务"><a href="#创建服务" class="headerlink" title="创建服务"></a>创建服务</h4><p>新建本地服务, 添加模块热更新, 这里我们使用<code>Express</code>启动服务</p>
+<p>我们在根目录创建一个<code>server</code>的文件夹, 创建一个<code>index.js</code>文件, 编写我们的启动脚本</p>
+<p>这里我们需要安装<code>webpack-dev-server</code> &nbsp;&nbsp;&nbsp; <code>webpack-dev-middleware</code></p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><code class="hljs js">yarn add express<br>yarn add webpack-dev-server --dev<br>yarn add webpack-dev-middleware --dev<br></code></pre></td></tr></table></figure>
+
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><code class="hljs js"><span class="hljs-comment">// /server/index.js</span><br><span class="hljs-keyword">const</span> express = <span class="hljs-built_in">require</span>(<span class="hljs-string">'express'</span>);<br><span class="hljs-keyword">const</span> webpack = <span class="hljs-built_in">require</span>(<span class="hljs-string">'webpack'</span>);<br><span class="hljs-keyword">const</span> webpackDevMiddleware = <span class="hljs-built_in">require</span>(<span class="hljs-string">'webpack-dev-middleware'</span>);<br><br><span class="hljs-keyword">const</span> app = express();<br><span class="hljs-keyword">const</span> config = <span class="hljs-built_in">require</span>(<span class="hljs-string">'./webpack.config.js'</span>);<br><span class="hljs-keyword">const</span> compiler = webpack(config);<br><br><span class="hljs-comment">// 告知 express 使用 webpack-dev-middleware，</span><br><span class="hljs-comment">// 以及将 webpack.config.js 配置文件作为基础配置。</span><br>app.use(<br>  webpackDevMiddleware(compiler, &#123;<br>    publicPath: config.output.publicPath,<br>  &#125;)<br>);<br><br><span class="hljs-comment">// 将文件 serve 到 port 3000。</span><br>app.listen(<span class="hljs-number">3000</span>, <span class="hljs-function"><span class="hljs-keyword">function</span> (<span class="hljs-params"></span>) </span>&#123;<br>  <span class="hljs-built_in">console</span>.log(<span class="hljs-string">'Example app listening on port 3000!\n'</span>);<br>&#125;);<br></code></pre></td></tr></table></figure>
+
+<p><code>webpack.config.js</code>文件添加<code>contentBase</code>,表明从哪里去寻找文件</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><code class="hljs js">devServer: &#123;<br>    contentBase: <span class="hljs-string">'./dist'</span>, <span class="hljs-comment">// dist为我们的输出目录</span><br>&#125;,<br></code></pre></td></tr></table></figure>
+
+<h4 id="编写启动脚本"><a href="#编写启动脚本" class="headerlink" title="编写启动脚本"></a>编写启动脚本</h4><p>我们在<code>package.json</code>中编写一些脚本,便于我们启动服务和打包</p>
+<figure class="highlight"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><code class="hljs json">"scripts": &#123;<br>    "test": "echo \"Error: no test specified\" &amp;&amp; exit 1",<br>    "build": "webpack --config webpack.config.js",<br>    "start": "node server/index.js"<br>&#125;,<br></code></pre></td></tr></table></figure>
+
+<p>这时候基本的需要已经搭建完成, 我们在<code>app.js</code>中随便写点东西</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs js"><span class="hljs-built_in">console</span>.log(<span class="hljs-number">123</span>)<br></code></pre></td></tr></table></figure>
+<p><img src="webpack%E5%90%AF%E5%8A%A8.png" alt=""><br><img src="%E5%90%AF%E5%8A%A8%E9%A1%B5%E9%9D%A2.png" alt=""></p>
+<h3 id="解析jsx"><a href="#解析jsx" class="headerlink" title="解析jsx"></a>解析jsx</h3><p>到此为止我们已经可以正确打包js文件, 正确启动脚本, 安装了应用程序一些必要的依赖, 但是我们还无法解析<code>jsx</code>语法</p>
+<p>如果我们在app.js文件中写如下代码, 启动或编译</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><code class="hljs js"><span class="hljs-comment">// app.js</span><br><br><span class="hljs-keyword">import</span> React <span class="hljs-keyword">from</span> <span class="hljs-string">'react'</span><br><span class="hljs-keyword">import</span> ReactDOM <span class="hljs-keyword">from</span> <span class="hljs-string">'react-dom'</span><br><br>ReactDOM.render(<span class="xml"><span class="hljs-tag">&lt;<span class="hljs-name">div</span>&gt;</span>111<span class="hljs-tag">&lt;/<span class="hljs-name">div</span>&gt;</span></span>, <span class="hljs-built_in">document</span>.getElementById(<span class="hljs-string">"app"</span>))<br></code></pre></td></tr></table></figure>
+<p>我们会看到如下报错<br><img src="jsx%E6%8A%A5%E9%94%99.png" alt=""></p>
+<p>因此我们需要安装<code>babel</code>转换jsx相关的插件</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs js">yarn add @babel/preset-react --dev<br></code></pre></td></tr></table></figure>
+
+<p>按照<code>babel</code>官网的教程,在根目录下创建<code>babel.config.json</code></p>
+<p>此时项目结构如下</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><code class="hljs plain">├─ app<br>   |-app.js<br>├─ node_modules<br>    |- ......<br>├─ server<br>    ├─ index.js<br>├─ webpack.config.js<br>├─ babel.config.json<br>└─ package.json<br>└─ yarn.lock<br></code></pre></td></tr></table></figure>
+
+<p>在这里我们配一些基础的 <code>js</code> 转换的预设, 这里包括一个解析 <code>jsx</code> 的<code>babel</code>预设,一个<code>js</code>转换的预设, 这里 <code>module</code> 设置为 <code>false</code> 是根据当前的调用者判断其已经支持ES6模块语法，则默认的auto将自动选择<code>false</code>，否则将选择 <code>commonjs</code>, 这里手动设置为 <code>false</code> 将不支持将 <code>ES6</code> 模块语法转换为其他模块类型</p>
+<figure class="highlight json"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><code class="hljs json"><span class="hljs-comment">// babel.config.json</span><br>&#123;<br>    <span class="hljs-attr">"presets"</span>: [<br>      [<br>        <span class="hljs-string">"@babel/env"</span>,<br>        &#123;<br>          <span class="hljs-attr">"useBuiltIns"</span>: <span class="hljs-string">"usage"</span>,<br>          <span class="hljs-attr">"module"</span>: <span class="hljs-literal">false</span><br>        &#125;<br>      ],<br>      [<span class="hljs-string">"@babel/preset-react"</span>, <br>        &#123;<br>          <span class="hljs-attr">"development"</span>: <span class="hljs-literal">true</span><br>        &#125;<br>      ]<br>    ],<br>&#125;<br></code></pre></td></tr></table></figure>
+<p>这里注意,<code>babel</code> 中<code>preset</code>顺序是从后往前执行,<code>plugin</code>的顺序是从后往前执行</p>
+<p>再次打包后成功<br><img src="babel%E8%A7%A3%E6%9E%90jsx.png" alt=""></p>
+<p>我们启动下试试看<br><img src="babel%E8%BD%AC%E6%8D%A2jsx%E6%88%90%E5%8A%9F" alt=""></p>
+<p>同样, 使用<code>class</code>的写法也能正确解析, 这里有个注意点, 针对类, 我们需要使用<code>@babel/plugin-proposal-class-properties</code>,否则如下代码无法编译</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><code class="hljs js"><span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">A</span> </span>&#123;<br>    say = <span class="hljs-function"><span class="hljs-params">()</span> =&gt;</span> &#123;<br>        <span class="hljs-built_in">console</span>.log(<span class="hljs-string">'我说话了'</span>)<br>    &#125;<br>&#125;<br><br><span class="hljs-keyword">let</span> a = <span class="hljs-keyword">new</span> A()<br>a.say()<br></code></pre></td></tr></table></figure>
+
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs js">yarn add @babel/plugin-proposal-<span class="hljs-class"><span class="hljs-keyword">class</span>-<span class="hljs-title">properties</span> --<span class="hljs-title">dev</span></span><br></code></pre></td></tr></table></figure>
+
+<figure class="highlight json"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><code class="hljs json"><span class="hljs-comment">// babel.config.json</span><br>&#123;<br>    <span class="hljs-attr">"presets"</span>: [<br>      [<br>        <span class="hljs-string">"@babel/env"</span>,<br>        &#123;<br>          <span class="hljs-attr">"useBuiltIns"</span>: <span class="hljs-string">"usage"</span>,<br>          <span class="hljs-attr">"module"</span>: <span class="hljs-literal">false</span><br>        &#125;<br>      ],<br>      [<span class="hljs-string">"@babel/preset-react"</span>, <br>        &#123;<br>          <span class="hljs-attr">"development"</span>: <span class="hljs-literal">true</span><br>        &#125;<br>      ]<br>    ],<br>    <span class="hljs-attr">"plugins"</span>: [<br>        [<span class="hljs-string">"@babel/plugin-proposal-class-properties"</span>, &#123; <span class="hljs-attr">"loose"</span>: <span class="hljs-literal">true</span> &#125;]<br>    ]<br>&#125;<br></code></pre></td></tr></table></figure>
+
+<h3 id="安装antd"><a href="#安装antd" class="headerlink" title="安装antd"></a>安装antd</h3><figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs js">yarn add antd<br></code></pre></td></tr></table></figure>
+<p>我们修改<code>app.js</code>,导入<code>antd</code>的<code>Button</code>看看效果如何</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><code class="hljs js"><span class="hljs-comment">// app.js</span><br><span class="hljs-keyword">import</span> React <span class="hljs-keyword">from</span> <span class="hljs-string">'react'</span><br><span class="hljs-keyword">import</span> ReactDOM <span class="hljs-keyword">from</span> <span class="hljs-string">'react-dom'</span><br><span class="hljs-keyword">import</span> &#123; Button &#125; <span class="hljs-keyword">from</span> <span class="hljs-string">'antd'</span><br><br><span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">MyDemo</span> <span class="hljs-keyword">extends</span> <span class="hljs-title">React</span>.<span class="hljs-title">Component</span></span>&#123;<br>    <span class="hljs-keyword">constructor</span>(props)&#123;<br>        <span class="hljs-keyword">super</span>(props)<br>        <span class="hljs-keyword">this</span>.state = &#123;<br>            buttonText: <span class="hljs-string">"我是按钮"</span><br>        &#125;<br>    &#125;<br><br>    render()&#123;<br>        <span class="hljs-keyword">return</span> <span class="xml"><span class="hljs-tag">&lt;<span class="hljs-name">Button</span>&gt;</span>&#123;this.state.buttonText&#125;<span class="hljs-tag">&lt;/<span class="hljs-name">Button</span>&gt;</span></span><br>    &#125;<br>&#125;<br><br>ReactDOM.render(<span class="xml"><span class="hljs-tag">&lt;<span class="hljs-name">MyDemo</span> /&gt;</span></span>, <span class="hljs-built_in">document</span>.getElementById(<span class="hljs-string">"app"</span>))<br></code></pre></td></tr></table></figure>
+<p>结果是确实引入了<code>antd</code>的组件,但是并未引入<code>antd</code>的样式</p>
+<p>我们选择使用<code>babel</code>动态导入的方法引入样式</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs shell">yarn add babel-plugin-import --dev<br></code></pre></td></tr></table></figure>
+
+<p>然后修改<code>babel.config.json</code>配置</p>
+<figure class="highlight json"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><code class="hljs json"><span class="hljs-comment">// babel.config.json</span><br>&#123;<br>    <span class="hljs-attr">"presets"</span>: [<br>      [<br>        <span class="hljs-string">"@babel/env"</span>,<br>        &#123;<br>          <span class="hljs-attr">"useBuiltIns"</span>: <span class="hljs-string">"usage"</span>,<br>          <span class="hljs-attr">"modules"</span>: <span class="hljs-literal">false</span> <br>        &#125;<br>      ],<br>      [<span class="hljs-string">"@babel/preset-react"</span>, <br>        &#123;<br>          <span class="hljs-attr">"development"</span>: <span class="hljs-literal">true</span><br>        &#125;<br>      ]<br>    ],<br>    <span class="hljs-attr">"plugins"</span>: [<br>        [<span class="hljs-string">"@babel/plugin-proposal-class-properties"</span>, &#123; <span class="hljs-attr">"loose"</span>: <span class="hljs-literal">true</span> &#125;],<br>        [<span class="hljs-string">"import"</span>, &#123; <span class="hljs-attr">"libraryName"</span>: <span class="hljs-string">"antd"</span>, <span class="hljs-attr">"libraryDirectory"</span>: <span class="hljs-string">"es"</span>, <span class="hljs-attr">"style"</span>: <span class="hljs-string">"css"</span> &#125;]<br>    ]<br>&#125;<br></code></pre></td></tr></table></figure>
+<p>结果如下</p>
+<p><img src="antd%E6%A0%B7%E5%BC%8F%E6%B3%A8%E5%85%A5%E6%88%90%E5%8A%9F.png" alt=""></p>
+<h3 id="浏览器兼容"><a href="#浏览器兼容" class="headerlink" title="浏览器兼容"></a>浏览器兼容</h3><p>为了确保项目需要, 我们保持<code>ie10</code>及以上的兼容, <code>babel</code>会根据配置文件的<code>target</code>, <code>package.json</code>, 根目录<code>browserslist</code>依次去寻找浏览器版本.这里我们在 <code>package.json</code> 中配置 <code>browerslist</code></p>
+<figure class="highlight"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><code class="hljs json">"browserslist": [<br>    "last 1 version",<br>    "&gt; 1%",<br>    <span class="hljs-string">"IE 10"</span><br>]<br></code></pre></td></tr></table></figure>
+
+<p>运行 <code>npx browerslist</code>得到如下图</p>
+<p><img src="%E6%B5%8F%E8%A7%88%E5%99%A8%E5%85%BC%E5%AE%B9.png" alt=""></p>
+
+  </article>
+</div>
+
+
+    <link rel="stylesheet" href="https://unpkg.com/gitalk/dist/gitalk.css">
+<script src="https://unpkg.com/gitalk/dist/gitalk.min.js"></script>
+<div class='container' id="gitalk-container"></div>
+<script>
+    var gitalk = new Gitalk({
+          clientID: 'ebab0fe0ea5c0f618928',
+          clientSecret: '1050c58823025393511c5e0b131e0bf6dd7714a5',
+          repo: 'AuglyXu.github.io',
+          owner: 'AuglyXu',
+          admin: 'AuglyXu',
+          language: 'zh-CN',
+        })
+    gitalk.render('gitalk-container');
+</script>
+
+
+
+
+</div>
+
+<div class="footer-wrapper container">
+  <footer class="footer clearfix">
+    <div class="clearfix">
+    <a href="http://auglyXu.github.io" class="footer-logo">
+      <i class="fa fa-github"></i>
+    </a>
+    <ul class="footer-social-link">
+      <li>© 2019 王八吉吉</li>
+      <li><a href="http://auglyXu.github.io">Home</a></li>
+      
+      <li><a href="https://github.com/AuglyXu" target="_blank" rel="noopener">Github</a></li>
+      
+    </ul>
+    <div class="footer-theme-info">
+      Theme <a href="//github.com/sabrinaluo/hexo-theme-replica" target="_blank" rel="noopener">Replica</a>
+      by <a href="//github.com/sabrinaluo" target="_blank" rel="noopener">Hiitea</a> ❤ Powered by Hexo
+    </div>
+    </div>
+    
+  </footer>
+</div>
+
+
+
+
+<script src="/js/main.js"></script>
+
+</body>
+</html>

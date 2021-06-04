@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+  <meta name="viewport"
+        content="width=device-width, initial-scale=1.0, user-scalable=no">
+  <title>
+    React_渲染阶段_beginWork | Gaxy
+  </title>
+  <meta name="description" content="专心学技术">
+  
+  <meta name="keywords" content="
+  React,前端,源码系列
+  ">
+  
+  <meta name="author" content="王八吉吉">
+
+  <meta http-equiv="Cache-Control" content="no-transform"/>
+  <meta http-equiv="Cache-Control" content="no-siteapp">
+  <meta name="theme-color" content="#1e2327">
+  <link rel="apple-touch-icon" href="https://github.githubassets.com/apple-touch-icon.png">
+  <link rel="apple-touch-icon" sizes="180x180" href="https://github.githubassets.com/apple-touch-icon-180x180.png">
+
+  <link rel="icon" type="image/x-icon" href="https://github.githubassets.com/favicon.ico">
+  <link rel="stylesheet" href="/css/main.css">
+  <link rel="stylesheet"
+        href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
+  
+
+  
+
+  <script src="//cdnjs.cloudflare.com/ajax/libs/vue/1.0.25-csp/vue.min.js"></script>
+  <script src="//cdnjs.cloudflare.com/ajax/libs/moment.js/2.11.2/moment.min.js"></script>
+<meta name="generator" content="Hexo 4.2.1"></head>
+
+<body id="replica-app">
+
+<nav class="navbar-wrapper">
+  <div class="navbar">
+    <div class="container clearfix">
+      <a href="/" class="navbar-logo"><i class="fa fa-github"></i></a>
+
+      <div class="navbar-search float-left desktop-only">
+        <div class="navbar-search-form">
+          <label for="gsc-i-id1">This website</label>
+          <div id="google-search">
+            <gcse:search></gcse:search>
+          </div>
+        </div>
+      </div>
+
+      <ul class="navbar-nav float-left">
+        
+        <li><a href="/archives">Archives</a></li>
+        
+        
+        <li><a href="/categories">Categories</a></li>
+        
+        
+        <li><a href="/tags">Tags</a></li>
+        
+        
+        <li class="desktop-only"><a href="/atom.xml" target="_blank">RSS</a></li>
+        
+      </ul>
+
+      <ul class="navbar-nav user-nav float-right desktop-only">
+        <li class="user-nav-notification">
+          <a><span class="user-nav-unread"></span><i class="fa fa-bell"></i></a>
+        </li>
+        <li>
+          <a><i class="fa fa-plus"></i> <i class="fa fa-caret-down"></i></a>
+        </li>
+        <li class="user-nav-logo">
+          <a><img src="/images/avatar.JPG"> <i class="fa fa-caret-down"></i></i></a>
+        </li>
+      </ul>
+    </div>
+  </div>
+</nav>
+
+<div class="main-container">
+  <header class="header-wrapper desktop-only">
+  <div class="container header-site-detail">
+    <ul class="header-toolbar">
+      <li class="clearfix">
+        <a href="/archives" class="header-toolbar-left"><i
+                  class="fa fa-file-text"></i> Posts </a>
+        <a href="/archives"
+           class="header-toolbar-right"> 7 </a>
+      </li>
+      <li>
+        <a href="/tags" class="header-toolbar-left"><i
+                  class="fa fa-tags"></i> Tags </a>
+        <a href="/tags"
+           class="header-toolbar-right"> 6 </a>
+      </li>
+      <li>
+        <a href="/categories" class="header-toolbar-left"><i
+                  class="fa fa-folder-open"></i> Categories </a>
+        <a href="/categories"
+           class="header-toolbar-right"> 2 </a>
+      </li>
+    </ul>
+    <h2 class="header-title">
+      <i class="fa fa-book text-muted"></i>
+      <a href="/">Gaxy</a>
+      
+      
+    </h2>
+  </div>
+
+  <div class="container">
+    <div class="header-tab-wrapper clearfix">
+      <span class="header-tab header-tab-selected"><i class="fa fa-thumbs-o-up"></i> Like</span>
+      <span class="header-tab"><i class="fa fa-share-alt"></i> Share</span>
+      <span class="header-tab"><i class="fa fa-comments-o"></i> Discussion</span>
+      <span class="header-tab"><i class="fa fa-bookmark-o"></i> Bookmark </span>
+      <span class="header-tab"><i class="fa fa-smile-o"></i> Smile <i class="fa fa-caret-down"></i></span>
+    </div>
+  </div>
+</header>
+
+
+<div class="post-container container">
+  <h3>
+    <i class="fa fa-user-o"></i>
+    王八吉吉
+
+    <span class="post-date float-right" title="{{moment(1622558820000).format('MMM DD, YYYY, h:mm:ss A')}}">
+      
+          <i class="fa fa-pencil-square-o"></i>
+      
+      {{moment(1622558820000).fromNow()}}
+    </span>
+  </h3>
+
+  <article class="post-content">
+    <h1>React_渲染阶段_beginWork</h1>
+    <h2 id="概览"><a href="#概览" class="headerlink" title="概览"></a>概览</h2><p><code>React</code>在<code>16.8</code>版本之后, 使用<code>Fiber</code>提供了任务的优先级，中断可恢复的能力(开启<code>CM</code>模式). <code>React</code>通过<code>Scheduler</code>将高优先级的任务率先扔进<code>Reconciler</code>, <code>Reconcile</code>阶段创建了每个节点(其中可能经历<code>复用或者diff</code>等),生成<code>Fiber</code>树,并生成对应的<code>dom</code>树(暂未插入到页面),这个阶段我们称之为<code>render</code>阶段(渲染阶段)</p>
+<p><code>React Fiber</code>使用了双缓存机制, 提供了两棵<code>Fiber</code>树, 当前展示的这棵树我们称之为<code>current</code>树(本次更新的上一次更新的树), 还有一棵是首次更新或者触发更新后在内存中生成的树, 我们称之为<code>WorkInProgress</code>树</p>
+<h2 id="渲染阶段"><a href="#渲染阶段" class="headerlink" title="渲染阶段"></a>渲染阶段</h2><p><code>render</code>阶段开始于<code>performSyncWorkOnRoot</code>或<code>performConcurrentWorkOnRoot</code>,取决于当前的模式. 这个函数是<code>React</code>整个流程,包括<code>render阶段</code>和<code>commit阶段</code></p>
+<a id="more"></a>
+
+<p><img src="%E6%BA%90%E7%A0%81%E8%B5%B7%E7%82%B9.png" alt=""></p>
+<p>上图红框标出三个断点, 第一个断点是<code>render阶段</code>的核心</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br></pre></td><td class="code"><pre><code class="hljs js"><span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">renderRootSync</span>(<span class="hljs-params">root, lanes</span>) </span>&#123;<br>  <span class="hljs-comment">// ......</span><br>  <span class="hljs-keyword">if</span> (workInProgressRoot !== root || workInProgressRootRenderLanes !== lanes) &#123;<br>    &#123;<br>      <span class="hljs-keyword">if</span> (isDevToolsPresent) &#123;<br>        <span class="hljs-keyword">var</span> memoizedUpdaters = root.memoizedUpdaters;<br><br>        <span class="hljs-keyword">if</span> (memoizedUpdaters.size &gt; <span class="hljs-number">0</span>) &#123;<br>          restorePendingUpdaters(root, workInProgressRootRenderLanes);<br>          memoizedUpdaters.clear();<br>        &#125; <span class="hljs-comment">// At this point, move Fibers that scheduled the upcoming work from the Map to the Set.</span><br>        <span class="hljs-comment">// If we bailout on this work, we'll move them back (like above).</span><br>        <span class="hljs-comment">// It's important to move them now in case the work spawns more work at the same priority with different updaters.</span><br>        <span class="hljs-comment">// That way we can keep the current update and future updates separate.</span><br><br><br>        movePendingFibersToMemoized(root, lanes);<br>      &#125;<br>    &#125;<br>    <span class="hljs-comment">// 重置调度队列,并从root节点(新的高优先级的节点)开始调度</span><br>    prepareFreshStack(root, lanes);<br>  &#125;<br><br>  &#123;<br>    markRenderStarted(lanes);<br>  &#125;<br><br>  <span class="hljs-keyword">do</span> &#123;<br>    <span class="hljs-keyword">try</span> &#123;<br>      <span class="hljs-comment">// 尝试循环创建工作单元</span><br>      workLoopSync();<br>      <span class="hljs-keyword">break</span>;<br>    &#125; <span class="hljs-keyword">catch</span> (thrownValue) &#123;<br>      handleError(root, thrownValue);<br>    &#125;<br>  &#125; <span class="hljs-keyword">while</span> (<span class="hljs-literal">true</span>);<br><br> <span class="hljs-comment">// .....</span><br>  <span class="hljs-keyword">return</span> workInProgressRootExitStatus;<br>&#125; <span class="hljs-comment">// Th</span><br></code></pre></td></tr></table></figure>
+<p>这个方法最重要的两个方法, 一个是<code>prepareFreshStack</code>, 这个方法是用于重置调度队列,并从<code>root</code>节点(新的高优先级的节点)开始调度</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><code class="hljs js"><span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">workLoopSync</span>(<span class="hljs-params"></span>) </span>&#123;<br>  <span class="hljs-keyword">while</span> (workInProgress !== <span class="hljs-literal">null</span>) &#123;<br>    performUnitOfWork(workInProgress);<br>  &#125;<br>&#125;<br><br><span class="hljs-comment">// performConcurrentWorkOnRoot会调用该方法</span><br><span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">workLoopConcurrent</span>(<span class="hljs-params"></span>) </span>&#123; <br>  <span class="hljs-comment">//和上面的区别在于shouldYield, 这个代表是否存在剩余时间</span><br>  <span class="hljs-keyword">while</span> (workInProgress !== <span class="hljs-literal">null</span> &amp;&amp; !shouldYield()) &#123;<br>    performUnitOfWork(workInProgress);<br>  &#125;<br>&#125;<br></code></pre></td></tr></table></figure>
+<p>还有一个是<code>workLoopSync</code>, 循环创建调用<code>performUnitOfWork</code>, 通过函数名可以看到是循环执行工作单元, 为遍历到的每个<code>Fiber</code>节点提供<code>beginWork</code></p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br></pre></td><td class="code"><pre><code class="hljs js"><br><span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">performUnitOfWork</span>(<span class="hljs-params">unitOfWork</span>) </span>&#123;<br>  <span class="hljs-keyword">var</span> current = unitOfWork.alternate;<br>  setCurrentFiber(unitOfWork);<br>  <span class="hljs-keyword">var</span> next;<br>  <span class="hljs-keyword">if</span> ( (unitOfWork.mode &amp; ProfileMode) !== NoMode) &#123;<br>    startProfilerTimer(unitOfWork);<br>    <span class="hljs-comment">// 开始beginWork阶段, 主要是创建当前节点的子Fiber节点</span><br>    next = beginWork$<span class="hljs-number">1</span>(current, unitOfWork, subtreeRenderLanes);<br>    stopProfilerTimerIfRunningAndRecordDelta(unitOfWork, <span class="hljs-literal">true</span>);<br>  &#125; <span class="hljs-keyword">else</span> &#123;<br>    next = beginWork$<span class="hljs-number">1</span>(current, unitOfWork, subtreeRenderLanes);<br>  &#125;<br><br>  resetCurrentFiber();<br>  unitOfWork.memoizedProps = unitOfWork.pendingProps;<br><br>  <span class="hljs-keyword">if</span> (next === <span class="hljs-literal">null</span>) &#123;<br>    <span class="hljs-comment">// 如果子节点为null, 那么直接把当前节点completeWork</span><br>    completeUnitOfWork(unitOfWork);<br>  &#125; <span class="hljs-keyword">else</span> &#123;<br>    workInProgress = next;<br>  &#125;<br><br>  ReactCurrentOwner$<span class="hljs-number">2.</span>current = <span class="hljs-literal">null</span>;<br>&#125;<br></code></pre></td></tr></table></figure>
+<p><code>beginWork</code>的主要作用在于创建当前节点的子<code>Fiber</code>节点, 该方法为<code>render</code>阶段递归阶段<em>递</em>阶段的主要方法</p>
+<h3 id="beginWork"><a href="#beginWork" class="headerlink" title="beginWork"></a>beginWork</h3><figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br></pre></td><td class="code"><pre><code class="hljs js"><span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">beginWork</span>(<span class="hljs-params">current, workInProgress, renderLanes</span>) </span>&#123;<br>  <span class="hljs-keyword">var</span> updateLanes = workInProgress.lanes;<br>  &#123;<br>    <span class="hljs-keyword">if</span> (workInProgress._debugNeedsRemount &amp;&amp; current !== <span class="hljs-literal">null</span>) &#123;<br>      <span class="hljs-comment">// This will restart the begin phase with a new fiber.</span><br>      <span class="hljs-keyword">return</span> remountFiber(current, workInProgress, createFiberFromTypeAndProps(workInProgress.type, workInProgress.key, workInProgress.pendingProps, workInProgress._debugOwner || <span class="hljs-literal">null</span>, workInProgress.mode, workInProgress.lanes));<br>    &#125;<br>  &#125;<br><br>  <span class="hljs-comment">// 当前的workInProgress树上正在工作的单元对应的alternate对应的Fiber节点</span><br>  <span class="hljs-keyword">if</span> (current !== <span class="hljs-literal">null</span>) &#123;<br>    <span class="hljs-keyword">var</span> oldProps = current.memoizedProps;<br>    <span class="hljs-keyword">var</span> newProps = workInProgress.pendingProps;<br><br>    <span class="hljs-keyword">if</span> (oldProps !== newProps || hasContextChanged() || ( <span class="hljs-comment">// Force a re-render if the implementation changed due to hot reload:</span><br>     workInProgress.type !== current.type )) &#123;<br>       <span class="hljs-comment">// props或者context变化, 有更新的逻辑</span><br>      didReceiveUpdate = <span class="hljs-literal">true</span>;<br>    &#125; <span class="hljs-keyword">else</span> <span class="hljs-keyword">if</span> (!includesSomeLane(renderLanes, updateLanes)) &#123;<br>      didReceiveUpdate = <span class="hljs-literal">false</span>; <br><br>      <span class="hljs-comment">// 这里主要是针对不接受更新的ReactElement对象, 进行复用, 针对不同的类型传递一些属性</span><br>      <span class="hljs-keyword">switch</span> (workInProgress.tag) &#123; <br>        <span class="hljs-keyword">case</span> HostRoot:<br>          <span class="hljs-comment">// ...</span><br>        <span class="hljs-keyword">case</span> <span class="hljs-comment">// ...</span><br>      &#125;<br><br>      <span class="hljs-keyword">return</span> bailoutOnAlreadyFinishedWork(current, workInProgress, renderLanes);<br>    &#125; <span class="hljs-keyword">else</span> &#123;<br>      <span class="hljs-keyword">if</span> ((current.flags &amp; ForceUpdateForLegacySuspense) !== NoFlags) &#123;<br>        <span class="hljs-comment">// 这个解决了context改变的时候suspense没有触发更新的问题</span><br>        didReceiveUpdate = <span class="hljs-literal">true</span>;<br>      &#125; <span class="hljs-keyword">else</span> &#123;<br>        didReceiveUpdate = <span class="hljs-literal">false</span>;<br>      &#125;<br>    &#125;<br>  &#125; <span class="hljs-keyword">else</span> &#123;<br>    didReceiveUpdate = <span class="hljs-literal">false</span>;<br>  &#125;<br><br>  workInProgress.lanes = NoLanes;<br><br>  <span class="hljs-keyword">switch</span> (workInProgress.tag) &#123;<br>    <span class="hljs-comment">// 根据tag判断当前工作单元的类型, 基于当前类型进入不同的逻辑</span><br>    <span class="hljs-keyword">case</span> IndeterminateComponent:<br>      <span class="hljs-comment">// ...</span><br>    <span class="hljs-keyword">case</span> LazyComponent:<br>      <span class="hljs-comment">// ...</span><br><br>    <span class="hljs-keyword">case</span> FunctionComponent:<br>      &#123;<br>        <span class="hljs-keyword">var</span> _Component = workInProgress.type;<br>        <span class="hljs-keyword">var</span> unresolvedProps = workInProgress.pendingProps;<br>        <span class="hljs-keyword">var</span> resolvedProps = workInProgress.elementType === _Component ? unresolvedProps : resolveDefaultProps(_Component, unresolvedProps);<br>        <span class="hljs-keyword">return</span> updateFunctionComponent(current, workInProgress, _Component, resolvedProps, renderLanes);<br>      &#125;<br><br>    <span class="hljs-keyword">case</span> ClassComponent:<br>      &#123;<br>        <span class="hljs-keyword">var</span> _Component2 = workInProgress.type;<br>        <span class="hljs-keyword">var</span> _unresolvedProps = workInProgress.pendingProps;<br><br>        <span class="hljs-keyword">var</span> _resolvedProps = workInProgress.elementType === _Component2 ? _unresolvedProps : resolveDefaultProps(_Component2, _unresolvedProps);<br><br>        <span class="hljs-keyword">return</span> updateClassComponent(current, workInProgress, _Component2, _resolvedProps, renderLanes);<br>      &#125;<br><br>    <span class="hljs-keyword">case</span> HostRoot:<br>      <span class="hljs-keyword">return</span> updateHostRoot(current, workInProgress, renderLanes);<br><br>    <span class="hljs-keyword">case</span> HostComponent:<br>      <span class="hljs-keyword">return</span> updateHostComponent(current, workInProgress, renderLanes);<br><br>    <span class="hljs-keyword">case</span> xxxx:<br>      <span class="hljs-comment">// ..........</span><br>  &#125;<br>&#125;<br></code></pre></td></tr></table></figure>
+<p>我们可以看到<code>beginWork</code>主要做了几件事情</p>
+<ol>
+<li>根据<code>current</code>判断这个工作单元能否复用</li>
+<li>如果不能复用则更新, 根据当前工作单元的类型决定进入什么逻辑<ul>
+<li>工作单元类型可以在<code>src/react-reconciler/ReactWorkTags.js</code>中找到, <code>div</code>属于<code>HostComponent</code></li>
+</ul>
+</li>
+</ol>
+<h3 id="beginWork中的更新逻辑-以div举例"><a href="#beginWork中的更新逻辑-以div举例" class="headerlink" title="beginWork中的更新逻辑(以div举例)"></a>beginWork中的更新逻辑(以div举例)</h3><p>如果当前工作单元是<code>div</code>, 那么会进入<code>updateHostComponent</code>的更新逻辑</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br></pre></td><td class="code"><pre><code class="hljs js"><span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">updateHostComponent</span>(<span class="hljs-params">current, workInProgress, renderLanes</span>) </span>&#123;<br>  pushHostContext(workInProgress);<br><br>  <span class="hljs-keyword">if</span> (current === <span class="hljs-literal">null</span>) &#123;<br>    tryToClaimNextHydratableInstance(workInProgress);<br>  &#125;<br><br>  <span class="hljs-keyword">var</span> type = workInProgress.type;<br>  <span class="hljs-keyword">var</span> nextProps = workInProgress.pendingProps;<br>  <span class="hljs-keyword">var</span> prevProps = current !== <span class="hljs-literal">null</span> ? current.memoizedProps : <span class="hljs-literal">null</span>;<br>  <span class="hljs-keyword">var</span> nextChildren = nextProps.children;<br>  <span class="hljs-keyword">var</span> isDirectTextChild = shouldSetTextContent(type, nextProps);<br>  <span class="hljs-comment">// 文本节点的优化, 当div下只有一个单独的文本节点,那么react不会单独为这个Fiber节点创建子节点</span><br>  <span class="hljs-keyword">if</span> (isDirectTextChild) &#123;<br>    nextChildren = <span class="hljs-literal">null</span>;<br>  &#125; <span class="hljs-keyword">else</span> <span class="hljs-keyword">if</span> (prevProps !== <span class="hljs-literal">null</span> &amp;&amp; shouldSetTextContent(type, prevProps)) &#123;<br>    workInProgress.flags |= ContentReset;<br>  &#125;<br><br>  markRef(current, workInProgress);<br>  <span class="hljs-comment">// reconcileChildren是diff子节点, 如果current是null, 说明是mount, 否则是update</span><br>  reconcileChildren(current, workInProgress, nextChildren, renderLanes);<br>  <span class="hljs-keyword">return</span> workInProgress.child;<br>&#125;<br></code></pre></td></tr></table></figure>
+<p>针对<code>div</code>的更新, 主要调用了<code>reconcileChilren</code>的方法, 以下是<code>reconcileChilren</code>方法</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><code class="hljs js"><span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">reconcileChildren</span>(<span class="hljs-params">current, workInProgress, nextChildren, renderLanes</span>) </span>&#123;<br>  <span class="hljs-keyword">if</span> (current === <span class="hljs-literal">null</span>) &#123;<br>    <span class="hljs-comment">// mount时</span><br>    workInProgress.child = mountChildFibers(workInProgress, <span class="hljs-literal">null</span>, nextChildren, renderLanes);<br>  &#125; <span class="hljs-keyword">else</span> &#123;<br>    <span class="hljs-comment">// update时</span><br>    workInProgress.child = reconcileChildFibers(workInProgress, current.child, nextChildren, renderLanes);<br>  &#125;<br>&#125;<br></code></pre></td></tr></table></figure>
+<p><code>reconcileChilren</code>在<code>mount</code>时调用了<code>mountChildFibers</code>, 在<code>update</code>时调用了<code>reconcileChildFibers</code>, 这两个方法都是调用的<code>ChildReconciler</code>, 返回一个节点并赋值给<code>workInProgress.child</code>, 因此可以验证<code>beginWork</code>的目的是创建当前节点的子<code>Fiber</code> 节点</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><code class="hljs js"><span class="hljs-keyword">var</span> reconcileChildFibers = ChildReconciler(<span class="hljs-literal">true</span>);<br><span class="hljs-keyword">var</span> mountChildFibers = ChildReconciler(<span class="hljs-literal">false</span>);<br></code></pre></td></tr></table></figure>
+<p><code>ChildReconciler</code>的参数的含义代表的是是否需要追踪副作用, <code>mount</code>时不需要追踪副作用,原因是我们只需要被插入一次, 如果追踪副作用, 那么每个节点都将被打上<code>effectTag</code>为<code>Placement</code>(插入), 这样commit阶段所有节点都会被插入一次, 这种频繁操作<code>dom</code>的行为显然是消耗性能且没有必要的</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br></pre></td><td class="code"><pre><code class="hljs js"><span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">ChildReconciler</span>(<span class="hljs-params">shouldTrackSideEffects</span>) </span>&#123;<br>  <span class="hljs-comment">// ......其他节点的diff算法</span><br>  <span class="hljs-comment">// 这里只展示单一节点的diff算法的源码</span><br>  <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">reconcileSingleElement</span>(<span class="hljs-params">returnFiber, currentFirstChild, element, lanes</span>) </span>&#123;<br>    <span class="hljs-keyword">var</span> key = element.key;<br>    <span class="hljs-keyword">var</span> child = currentFirstChild;<br><br>    <span class="hljs-keyword">while</span> (child !== <span class="hljs-literal">null</span>) &#123;<br>      <span class="hljs-comment">// <span class="hljs-doctag">TODO:</span> If key === null and child.key === null, then this only applies to</span><br>      <span class="hljs-comment">// the first item in the list.</span><br>      <span class="hljs-keyword">if</span> (child.key === key) &#123;<br>        <span class="hljs-keyword">var</span> elementType = element.type;<br><br>        <span class="hljs-keyword">if</span> (elementType === REACT_FRAGMENT_TYPE) &#123;<br>          <span class="hljs-keyword">if</span> (child.tag === Fragment) &#123;<br>            deleteRemainingChildren(returnFiber, child.sibling);<br>            <span class="hljs-keyword">var</span> existing = useFiber(child, element.props.children);<br>            existing.return = returnFiber;<br><br>            &#123;<br>              existing._debugSource = element._source;<br>              existing._debugOwner = element._owner;<br>            &#125;<br><br>            <span class="hljs-keyword">return</span> existing;<br>          &#125;<br>        &#125; <span class="hljs-keyword">else</span> &#123;<br>          <span class="hljs-keyword">if</span> (child.elementType === elementType || ( <span class="hljs-comment">// Keep this check inline so it only runs on the false path:</span><br>           isCompatibleFamilyForHotReloading(child, element) ) || <span class="hljs-comment">// Lazy types should reconcile their resolved type.</span><br>          <span class="hljs-comment">// We need to do this after the Hot Reloading check above,</span><br>          <span class="hljs-comment">// because hot reloading has different semantics than prod because</span><br>          <span class="hljs-comment">// it doesn't resuspend. So we can't let the call below suspend.</span><br>           <span class="hljs-keyword">typeof</span> elementType === <span class="hljs-string">'object'</span> &amp;&amp; elementType !== <span class="hljs-literal">null</span> &amp;&amp; elementType.$$<span class="hljs-keyword">typeof</span> === REACT_LAZY_TYPE &amp;&amp; resolveLazy(elementType) === child.type) &#123;<br>            deleteRemainingChildren(returnFiber, child.sibling);<br><br>            <span class="hljs-keyword">var</span> _existing = useFiber(child, element.props);<br><br>            _existing.ref = coerceRef(returnFiber, child, element);<br>            _existing.return = returnFiber;<br><br>            &#123;<br>              _existing._debugSource = element._source;<br>              _existing._debugOwner = element._owner;<br>            &#125;<br><br>            <span class="hljs-keyword">return</span> _existing;<br>          &#125;<br>        &#125; <span class="hljs-comment">// Didn't match.</span><br><br><br>        deleteRemainingChildren(returnFiber, child);<br>        <span class="hljs-keyword">break</span>;<br>      &#125; <span class="hljs-keyword">else</span> &#123;<br>        deleteChild(returnFiber, child);<br>      &#125;<br><br>      child = child.sibling;<br>    &#125;<br><br>    <span class="hljs-keyword">if</span> (element.type === REACT_FRAGMENT_TYPE) &#123;<br>      <span class="hljs-keyword">var</span> created = createFiberFromFragment(element.props.children, returnFiber.mode, lanes, element.key);<br>      created.return = returnFiber;<br>      <span class="hljs-keyword">return</span> created;<br>    &#125; <span class="hljs-keyword">else</span> &#123;<br>      <span class="hljs-keyword">var</span> _created4 = createFiberFromElement(element, returnFiber.mode, lanes);<br><br>      _created4.ref = coerceRef(returnFiber, currentFirstChild, element);<br>      _created4.return = returnFiber;<br>      <span class="hljs-keyword">return</span> _created4;<br>    &#125;<br>  &#125;<br><br>  <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">reconcileChildFibers</span>(<span class="hljs-params">returnFiber, currentFirstChild, newChild, lanes</span>) </span>&#123;<br>    <span class="hljs-keyword">var</span> isUnkeyedTopLevelFragment = <span class="hljs-keyword">typeof</span> newChild === <span class="hljs-string">'object'</span> &amp;&amp; newChild !== <span class="hljs-literal">null</span> &amp;&amp; newChild.type === REACT_FRAGMENT_TYPE &amp;&amp; newChild.key === <span class="hljs-literal">null</span>;<br><br>    <span class="hljs-keyword">if</span> (isUnkeyedTopLevelFragment) &#123;<br>      newChild = newChild.props.children;<br>    &#125; <span class="hljs-comment">// Handle object types</span><br>    <span class="hljs-keyword">if</span> (<span class="hljs-keyword">typeof</span> newChild === <span class="hljs-string">'object'</span> &amp;&amp; newChild !== <span class="hljs-literal">null</span>) &#123;<br>      <span class="hljs-keyword">switch</span> (newChild.$$<span class="hljs-keyword">typeof</span>) &#123;<br>        <span class="hljs-keyword">case</span> REACT_ELEMENT_TYPE:<br>          <span class="hljs-keyword">return</span> placeSingleChild(reconcileSingleElement(returnFiber, currentFirstChild, newChild, lanes));<br><br>        <span class="hljs-keyword">case</span> REACT_PORTAL_TYPE:<br>          <span class="hljs-keyword">return</span> placeSingleChild(reconcileSinglePortal(returnFiber, currentFirstChild, newChild, lanes));<br><br>        <span class="hljs-keyword">case</span> REACT_LAZY_TYPE:<br>          &#123;<br>            <span class="hljs-keyword">var</span> payload = newChild._payload;<br>            <span class="hljs-keyword">var</span> init = newChild._init; <span class="hljs-comment">// <span class="hljs-doctag">TODO:</span> This function is supposed to be non-recursive.</span><br><br>            <span class="hljs-keyword">return</span> reconcileChildFibers(returnFiber, currentFirstChild, init(payload), lanes);<br>          &#125;<br><br>      &#125;<br>    &#125;<br>    <span class="hljs-comment">// return deleteRemainingChildren(returnFiber, currentFirstChild);</span><br>  &#125;<br><br>  <span class="hljs-keyword">return</span> reconcileChildFibers;<br>&#125;<br></code></pre></td></tr></table></figure>
+<p>手动执行<code>ChildReconciler</code>会返回<code>reconcileChildFibers</code>, 这里巧妙的使用了闭包, 根据<code>newChild</code>中的<code>$$typeof</code>去进行不同逻辑.<br>参数的<code>newChild</code>可以看到向上追溯看到是当前<code>workInProgress.pendingProps.children</code>, 也就是当前工作单元<code>props</code>上的<code>children</code><br><code>reconcileSingleElement</code>代码已经展示在上面, 是单一节点的<code>diff</code>算法, 等讲到<code>diff</code>算法时在详细解读</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><code class="hljs js"><span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">placeSingleChild</span>(<span class="hljs-params">newFiber</span>) </span>&#123;<br>  <span class="hljs-comment">// This is simpler for the single child case. We only need to do a</span><br>  <span class="hljs-comment">// placement for inserting new children.</span><br>  <span class="hljs-keyword">if</span> (shouldTrackSideEffects &amp;&amp; newFiber.alternate === <span class="hljs-literal">null</span>) &#123;<br>    newFiber.flags |= Placement;<br>  &#125;<br><br>  <span class="hljs-keyword">return</span> newFiber;<br>&#125;<br></code></pre></td></tr></table></figure>
+<p><code>placeSingleChild</code>就是为新节点添加<code>Placement</code>操作(<code>mount</code>时不添加), 并将其返回并添加到<code>workInProgress.child</code>上</p>
+
+  </article>
+</div>
+
+
+    <link rel="stylesheet" href="https://unpkg.com/gitalk/dist/gitalk.css">
+<script src="https://unpkg.com/gitalk/dist/gitalk.min.js"></script>
+<div class='container' id="gitalk-container"></div>
+<script>
+    var gitalk = new Gitalk({
+          clientID: 'ebab0fe0ea5c0f618928',
+          clientSecret: '1050c58823025393511c5e0b131e0bf6dd7714a5',
+          repo: 'AuglyXu.github.io',
+          owner: 'AuglyXu',
+          admin: 'AuglyXu',
+          language: 'zh-CN',
+        })
+    gitalk.render('gitalk-container');
+</script>
+
+
+
+
+</div>
+
+<div class="footer-wrapper container">
+  <footer class="footer clearfix">
+    <div class="clearfix">
+    <a href="http://auglyXu.github.io" class="footer-logo">
+      <i class="fa fa-github"></i>
+    </a>
+    <ul class="footer-social-link">
+      <li>© 2019 王八吉吉</li>
+      <li><a href="http://auglyXu.github.io">Home</a></li>
+      
+      <li><a href="https://github.com/AuglyXu" target="_blank" rel="noopener">Github</a></li>
+      
+    </ul>
+    <div class="footer-theme-info">
+      Theme <a href="//github.com/sabrinaluo/hexo-theme-replica" target="_blank" rel="noopener">Replica</a>
+      by <a href="//github.com/sabrinaluo" target="_blank" rel="noopener">Hiitea</a> ❤ Powered by Hexo
+    </div>
+    </div>
+    
+  </footer>
+</div>
+
+
+
+
+<script src="/js/main.js"></script>
+
+</body>
+</html>
