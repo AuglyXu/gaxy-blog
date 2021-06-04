@@ -10,13 +10,13 @@
   <title>
     Redux | Gaxy
   </title>
-  <meta name="description" content="用于个人技术分享">
+  <meta name="description" content="专心学技术">
   
   <meta name="keywords" content="
   React,前端,Redux
   ">
   
-  <meta name="author" content="XXZ">
+  <meta name="author" content="王八吉吉">
 
   <meta http-equiv="Cache-Control" content="no-transform"/>
   <meta http-equiv="Cache-Control" content="no-siteapp">
@@ -128,7 +128,7 @@
 <div class="post-container container">
   <h3>
     <i class="fa fa-user-o"></i>
-    XXZ
+    王八吉吉
 
     <span class="post-date float-right" title="{{moment(1596353640000).format('MMM DD, YYYY, h:mm:ss A')}}">
       
@@ -146,7 +146,20 @@
 </div>
 
 
-    
+    <link rel="stylesheet" href="https://unpkg.com/gitalk/dist/gitalk.css">
+<script src="https://unpkg.com/gitalk/dist/gitalk.min.js"></script>
+<div class='container' id="gitalk-container"></div>
+<script>
+    var gitalk = new Gitalk({
+        clientID: 'ebab0fe0ea5c0f618928',
+        clientSecret: '1050c58823025393511c5e0b131e0bf6dd7714a5',
+        repo: 'AuglyXu.github.io',
+        owner: '',
+        admin: [''],
+        distractionFreeMode: true,
+    })
+    gitalk.render('gitalk-container')
+</script>
 
 
 
@@ -160,7 +173,7 @@
       <i class="fa fa-github"></i>
     </a>
     <ul class="footer-social-link">
-      <li>© 2019 XXZ</li>
+      <li>© 2019 王八吉吉</li>
       <li><a href="http://auglyXu.github.io">Home</a></li>
       
       <li><a href="https://github.com/AuglyXu" target="_blank" rel="noopener">Github</a></li>
