@@ -2,7 +2,7 @@
 <search>
   <entry>
     <title>React-渲染阶段-beginWork</title>
-    <url>/2021/06/01/React%E6%BA%90%E7%A0%81_beginWork/</url>
+    <url>/2021/06/01/React%E6%BA%90%E7%A0%81-beginWork/</url>
     <content><![CDATA[<h2 id="概览"><a href="#概览" class="headerlink" title="概览"></a>概览</h2><p><code>React</code>在<code>16.8</code>版本之后, 使用<code>Fiber</code>提供了任务的优先级，中断可恢复的能力(开启<code>CM</code>模式). <code>React</code>通过<code>Scheduler</code>将高优先级的任务率先扔进<code>Reconciler</code>, <code>Reconcile</code>阶段创建了每个节点(其中可能经历<code>复用或者diff</code>等),生成<code>Fiber</code>树,并生成对应的<code>dom</code>树(暂未插入到页面),这个阶段我们称之为<code>render</code>阶段(渲染阶段)</p>
 <p><code>React Fiber</code>使用了双缓存机制, 提供了两棵<code>Fiber</code>树, 当前展示的这棵树我们称之为<code>current</code>树(本次更新的上一次更新的树), 还有一棵是首次更新或者触发更新后在内存中生成的树, 我们称之为<code>WorkInProgress</code>树</p>
 <h2 id="渲染阶段"><a href="#渲染阶段" class="headerlink" title="渲染阶段"></a>渲染阶段</h2><p><code>render</code>阶段开始于<code>performSyncWorkOnRoot</code>或<code>performConcurrentWorkOnRoot</code>,取决于当前的模式. 这个函数是<code>React</code>整个流程,包括<code>render阶段</code>和<code>commit阶段</code></p>
@@ -233,86 +233,91 @@
       </tags>
   </entry>
   <entry>
-    <title>setState到底是同步还是异步的</title>
-    <url>/2020/07/25/setState/</url>
-    <content><![CDATA[<h4 id="setState同步还是异步"><a href="#setState同步还是异步" class="headerlink" title="setState同步还是异步"></a>setState同步还是异步</h4><ul>
-<li>setState有时表现出异步,有时表现出同步,在<strong>合成事件</strong>和<strong>钩子函数</strong>中表现异步</li>
-<li>setState批量更新优化是<strong>建立在合成事件和钩子函数</strong>之上的,在原生事件和setTimeout中不会发生异步.(顺序为setState =&gt; 钩子函数 =&gt; 合并更新状态)</li>
-</ul>
+    <title>手把手搭建一个React应用程序</title>
+    <url>/2021/01/10/%E6%90%AD%E5%BB%BA%E9%A1%B9%E7%9B%AE/</url>
+    <content><![CDATA[<p>本应用程序为<code>webpack5.0</code> + <code>React17</code> + <code>antd4.x</code></p>
+<h2 id="搭建环境"><a href="#搭建环境" class="headerlink" title="搭建环境"></a>搭建环境</h2><h3 id="初始化项目"><a href="#初始化项目" class="headerlink" title="初始化项目"></a>初始化项目</h3><h4 id="初始化包"><a href="#初始化包" class="headerlink" title="初始化包"></a>初始化包</h4><p>我们使用<code>npm</code>先创建一个<code>package.json</code>, 安装<code>webpack</code>&nbsp;&nbsp;&nbsp;  <code>webpack-cli</code> &nbsp;&nbsp;&nbsp;<code>react</code> &nbsp;&nbsp;&nbsp; <code>react-dom</code> &nbsp;&nbsp;&nbsp; <code>react-router-dom</code></p>
+<figure class="highlight js"><table><tr><td class="code"><pre><code class="hljs js">npm init -y<br><br>yarn add webpack webpack-cli --dev<br><br>yarn add react react-dom react-router-dom<br></code></pre></td></tr></table></figure>
+
+<p>根目录创建<code>webpack.config.js</code>(暂时只考虑<strong>开发环境</strong>)</p>
+<p>根目录下创建<code>app</code>文件夹作为我们的应用程序主入口,入口文件为<code>app.js</code></p>
+<p>项目结构如下</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><code class="hljs plain">├─ app<br>   |-app.js<br>├─ node_modules<br>    |- ......<br>├─ webpack.config.js<br>└─ package.json<br></code></pre></td></tr></table></figure>
+
 <a id="more"></a>
-<hr>
-<h6 id="合成事件"><a href="#合成事件" class="headerlink" title="合成事件"></a>合成事件</h6><ul>
-<li>React通过事件冒泡,将事件冒泡到document上面,再统一分发给中间层SyntheticEvent去执行事件</li>
-</ul>
-<h6 id="钩子函数"><a href="#钩子函数" class="headerlink" title="钩子函数"></a>钩子函数</h6><ul>
-<li>钩子函数指生命周期的钩子</li>
-</ul>
-<hr>
-<p><a href="https://www.jianshu.com/p/8d8f9aa4b033" target="_blank" rel="noopener">合成事件和钩子函数参考文档</a></p>
-<h4 id="setState之后到底发生了什么"><a href="#setState之后到底发生了什么" class="headerlink" title="setState之后到底发生了什么"></a>setState之后到底发生了什么</h4><p>setState有两个注意事项:<br>官网提供:</p>
-<ol>
-<li>出于性能考虑，React 可能会把多个 setState() 调用<strong>合并成一个</strong>调用</li>
-<li>因为 this.props 和 this.state 可能会异步更新，所以你<strong>不要依赖他们的值</strong>来更新下一个状态<figure class="highlight javascript"><table><tr><td class="code"><pre><code class="hljs JavaScript">add() &#123;<br>    <span class="hljs-keyword">this</span>.setState(&#123;<span class="hljs-attr">count</span>:count + <span class="hljs-number">1</span>&#125;)<br>    <span class="hljs-keyword">this</span>.setState(&#123;<span class="hljs-attr">count</span>:count + <span class="hljs-number">1</span>&#125;)<br>&#125;<br>add()<br></code></pre></td></tr></table></figure></li>
-</ol>
-<ul>
-<li>上述连续两次在点击事件调用setState<h4 id="图例"><a href="#图例" class="headerlink" title="图例"></a>图例</h4><img src="setState%E6%B5%81%E7%A8%8B.png" alt=""><h5 id="执行顺序"><a href="#执行顺序" class="headerlink" title="执行顺序"></a>执行顺序</h5><h6 id="第一步"><a href="#第一步" class="headerlink" title="第一步"></a>第一步</h6></li>
-<li>首先调用实例的updater上的enqueueSetState</li>
-<li>目的是让setState入列<figure class="highlight javascript"><table><tr><td class="code"><pre><code class="hljs JavaScript">ReactComponent.prototype.setState = <span class="hljs-function"><span class="hljs-keyword">function</span> (<span class="hljs-params">partialState, callback</span>) </span>&#123;<br>  <span class="hljs-comment">//  将setState事务放进队列中</span><br>  <span class="hljs-keyword">this</span>.updater.enqueueSetState(<span class="hljs-keyword">this</span>, partialState);<br>  <span class="hljs-keyword">if</span> (callback) &#123;<br>      <span class="hljs-keyword">this</span>.updater.enqueueCallback(<span class="hljs-keyword">this</span>, callback, <span class="hljs-string">'setState'</span>);<br>  &#125;<br>&#125;;<br></code></pre></td></tr></table></figure>
-<h6 id="第二步"><a href="#第二步" class="headerlink" title="第二步"></a>第二步</h6></li>
-<li>将更新状态的组件也放入队列中</li>
-<li>将新的state放进数组里 </li>
-<li>用enqueueUpdate来处理将要更新的实例对象</li>
-</ul>
-<h6 id="目前达到的效果"><a href="#目前达到的效果" class="headerlink" title="目前达到的效果"></a>目前达到的效果</h6><ul>
-<li>setState在队列中</li>
-<li>在这个setState执行过程里 我们将state放入了一个队列 将要更新的组件也放入了一个队列<figure class="highlight javascript"><table><tr><td class="code"><pre><code class="hljs JavaScript"> enqueueSetState: <span class="hljs-function"><span class="hljs-keyword">function</span> (<span class="hljs-params">publicInstance, partialState</span>) </span>&#123;<br> <br> <span class="hljs-comment">// 获取当前组件的instance</span><br><span class="hljs-keyword">var</span> internalInstance = getInternalInstanceReadyForUpdate(publicInstance, <span class="hljs-string">'setState'</span>);<br><br> <span class="hljs-comment">// 将要更新的state放入一个数组里</span><br> <span class="hljs-keyword">var</span> queue = internalInstance._pendingStateQueue || (internalInstance._pendingStateQueue = []);<br>queue.push(partialState);<br><br><span class="hljs-comment">//  将要更新的component instance也放在一个队列里</span><br>enqueueUpdate(internalInstance);<br>  &#125;<br></code></pre></td></tr></table></figure>
 
-</li>
-</ul>
-<h5 id="第三步"><a href="#第三步" class="headerlink" title="第三步"></a>第三步</h5><ul>
-<li>调用enqueueUpdate执行更新操作,如果处在更新,那么只是将组件放入脏组件队列中<figure class="highlight javascript"><table><tr><td class="code"><pre><code class="hljs JavaScript"><span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">enqueueUpdate</span>(<span class="hljs-params">component</span>) </span>&#123;<br>  <span class="hljs-comment">// 如果没有处于批量创建/更新组件的阶段，则处理update state事务</span><br>  <span class="hljs-keyword">if</span> (!batchingStrategy.isBatchingUpdates) &#123;<br>    batchingStrategy.batchedUpdates(enqueueUpdate, component);<br>    <span class="hljs-keyword">return</span>;<br>  &#125;<br>  <span class="hljs-comment">// 如果正处于批量创建/更新组件的过程，将当前的组件放在dirtyComponents数组中</span><br>  dirtyComponents.push(component);<br>&#125;<br></code></pre></td></tr></table></figure></li>
-<li>这个更新函数,接收一个组件的实例 首先判断是否处于更新阶段 如果不是 那么执行更新 如果处在更新阶段 那么我将组件的实例push到队列中 等待更新<h6 id="这个函数也说明了setState是一个异步的过程，它会集齐一批需要更新的组件然后一起更新"><a href="#这个函数也说明了setState是一个异步的过程，它会集齐一批需要更新的组件然后一起更新" class="headerlink" title="这个函数也说明了setState是一个异步的过程，它会集齐一批需要更新的组件然后一起更新"></a>这个函数也说明了setState是一个异步的过程，它会集齐一批需要更新的组件然后一起更新</h6></li>
-</ul>
-<h5 id="第三步拓展——批量更新策略-batchingStrategy"><a href="#第三步拓展——批量更新策略-batchingStrategy" class="headerlink" title="第三步拓展——批量更新策略(batchingStrategy)"></a>第三步拓展——批量更新策略(batchingStrategy)</h5><ul>
-<li>第三步中,如果不处在更新状态,就执行<code>batchingStrategy.batchedUpdates(enqueueUpdate,component)</code></li>
-</ul>
-<h6 id="批量更新策略所在的对象"><a href="#批量更新策略所在的对象" class="headerlink" title="批量更新策略所在的对象"></a>批量更新策略所在的对象</h6><ul>
-<li>batchedUpdates做了个判断,如果我处在更新状态,那么组件入列, 否则开启更新事务<figure class="highlight javascript"><table><tr><td class="code"><pre><code class="hljs JavaScript"><span class="hljs-keyword">var</span> ReactDefaultBatchingStrategy = &#123;<br>  <span class="hljs-comment">// 用于标记当前是否出于批量更新</span><br>  isBatchingUpdates: <span class="hljs-literal">false</span>,<br>  <span class="hljs-comment">// 当调用这个方法时，正式开始批量更新</span><br>  batchedUpdates: <span class="hljs-function"><span class="hljs-keyword">function</span> (<span class="hljs-params">callback, a, b, c, d, e</span>) </span>&#123;<br>    <span class="hljs-keyword">var</span> alreadyBatchingUpdates = ReactDefaultBatchingStrategy.isBatchingUpdates;<br><br>    ReactDefaultBatchingStrategy.isBatchingUpdates = <span class="hljs-literal">true</span>;<br><br><span class="hljs-comment">// 如果当前事务正在更新过程中，则调用enqueueUpdate</span><br>    <span class="hljs-keyword">if</span> (alreadyBatchingUpdates) &#123;<br>      <span class="hljs-keyword">return</span> callback(a, b, c, d, e);<br>    &#125; <span class="hljs-keyword">else</span> &#123;<br>    <span class="hljs-comment">// 否则执行更新事务</span><br>      <span class="hljs-keyword">return</span> transaction.perform(callback, <span class="hljs-literal">null</span>, a, b, c, d, e);<br>    &#125;<br>  &#125;<br>&#125;;<br></code></pre></td></tr></table></figure>
+<h4 id="配置基本webpack"><a href="#配置基本webpack" class="headerlink" title="配置基本webpack"></a>配置基本webpack</h4><p>这里我们配置一些基本的<code>webpack</code>打包必须的配置项</p>
+<figure class="highlight js"><table><tr><td class="code"><pre><code class="hljs js"><span class="hljs-keyword">const</span> path = <span class="hljs-built_in">require</span>(<span class="hljs-string">"path"</span>)<br><br><span class="hljs-built_in">module</span>.exports = &#123;<br>    entry: &#123; <br>      index: &#123;<br>        <span class="hljs-keyword">import</span>: <span class="hljs-string">'/app/app.js'</span>,<br>      &#125;,<br>    &#125;,<br>    mode: <span class="hljs-string">"development"</span>,<br>    output: &#123;<br>        filename: <span class="hljs-string">'[name].[contenthash].bundle.js'</span>,<br>        chunkFilename: <span class="hljs-string">'[name].[id].js'</span>,<br>        publicPath: <span class="hljs-string">'/'</span>,<br>        path: path.resolve(__dirname, <span class="hljs-string">'dist'</span>),<br>    &#125;,<br>    devtool: <span class="hljs-string">'inline-source-map'</span>,<br>&#125;<br></code></pre></td></tr></table></figure>
+<h4 id="管理资源"><a href="#管理资源" class="headerlink" title="管理资源"></a>管理资源</h4><p>我们需要解析模块, 生成<code>bundle</code>, 这里我们使用<code>babel-loader</code>来转换js, <code>less-loader</code> &nbsp;&nbsp;&nbsp; <code>css-loader</code> &nbsp;&nbsp;&nbsp; <code>style-loader</code>来加载样式</p>
+<figure class="highlight js"><table><tr><td class="code"><pre><code class="hljs js">yarn add less less-loader --dev<br>yarn add babel-loader --dev<br>yarn add css-loader style-loader --dev<br></code></pre></td></tr></table></figure>
 
-</li>
-</ul>
-<h5 id="第三步拓展——事务"><a href="#第三步拓展——事务" class="headerlink" title="第三步拓展——事务"></a>第三步拓展——事务</h5><ul>
-<li><p>所谓事务,就是把函数做一层包装,开始是做一些操作,结束时做一些操作</p>
-</li>
-<li><p>下面是一个简单的事务例子</p>
-<figure class="highlight javascript"><table><tr><td class="code"><pre><code class="hljs JavaScript"><span class="hljs-keyword">var</span> Transaction = <span class="hljs-built_in">require</span>(<span class="hljs-string">'./Transaction'</span>);<br><br><span class="hljs-comment">// 我们自己定义的 Transaction</span><br><span class="hljs-keyword">var</span> MyTransaction = <span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params"></span>) </span>&#123;<br>  <span class="hljs-comment">// do sth.</span><br>&#125;;<br><br><span class="hljs-built_in">Object</span>.assign(MyTransaction.prototype, Transaction.Mixin, &#123;<br>  getTransactionWrappers: <span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params"></span>) </span>&#123;<br>    <span class="hljs-keyword">return</span> [&#123;<br>      initialize: <span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params"></span>) </span>&#123;<br>        <span class="hljs-built_in">console</span>.log(<span class="hljs-string">'before method perform'</span>);<br>      &#125;,<br>      close: <span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params"></span>) </span>&#123;<br>        <span class="hljs-built_in">console</span>.log(<span class="hljs-string">'after method perform'</span>);<br>      &#125;<br>    &#125;];<br>  &#125;;<br>&#125;);<br><br><span class="hljs-keyword">var</span> transaction = <span class="hljs-keyword">new</span> MyTransaction();<br><span class="hljs-keyword">var</span> testMethod = <span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params"></span>) </span>&#123;<br>  <span class="hljs-built_in">console</span>.log(<span class="hljs-string">'test'</span>);<br>&#125;<br>transaction.perform(testMethod);<br><br><span class="hljs-comment">// before method perform</span><br><span class="hljs-comment">// test</span><br><span class="hljs-comment">// after method perform</span><br></code></pre></td></tr></table></figure>
-<p><img src="setState%E4%BA%8B%E5%8A%A1.png" alt=""></p>
-</li>
-<li><p>React源码的事务中有两个事务RESET_BATCHED_UPDATES(用于重置更新状态) FLUSH_BATCHED_UPDATES(再发起一个dom的批量更新,包括渲染和虚拟dom比对等等)</p>
-</li>
-<li><p>FLUSH_BATCHED_UPDATES这个事务的目的在于循环所有更新组件,执行update,调用组件更新的生命周期等等</p>
-<figure class="highlight javascript"><table><tr><td class="code"><pre><code class="hljs JavaScript"><span class="hljs-keyword">var</span> RESET_BATCHED_UPDATES = &#123;<br>  initialize: emptyFunction,<br>  close: <span class="hljs-function"><span class="hljs-keyword">function</span> (<span class="hljs-params"></span>) </span>&#123;<br>    ReactDefaultBatchingStrategy.isBatchingUpdates = <span class="hljs-literal">false</span>;<br>  &#125;<br>&#125;;<br><br><span class="hljs-keyword">var</span> FLUSH_BATCHED_UPDATES = &#123;<br>  initialize: emptyFunction,<br>  close: ReactUpdates.flushBatchedUpdates.bind(ReactUpdates)<br>&#125;;<br></code></pre></td></tr></table></figure>
+<figure class="highlight js"><table><tr><td class="code"><pre><code class="hljs js"><span class="hljs-keyword">const</span> path = <span class="hljs-built_in">require</span>(<span class="hljs-string">"path"</span>)<br><br><span class="hljs-built_in">module</span>.exports = &#123;<br>    entry: &#123; <br>      index: &#123;<br>        <span class="hljs-keyword">import</span>: <span class="hljs-string">'/app/app.js'</span>,<br>      &#125;,<br>    &#125;,<br>    mode: <span class="hljs-string">"development"</span>,<br>    output: &#123;<br>        filename: <span class="hljs-string">'[name].[contenthash].bundle.js'</span>,<br>        chunkFilename: <span class="hljs-string">'[name].[id].js'</span>,<br>        publicPath: <span class="hljs-string">'/'</span>,<br>        path: path.resolve(__dirname, <span class="hljs-string">'dist'</span>),<br>    &#125;,<br>    devtool: <span class="hljs-string">'inline-source-map'</span>,<br>    <span class="hljs-built_in">module</span>: &#123;<br>        rules: [<br>          &#123;<br>            test: <span class="hljs-regexp">/\.js$/</span>,<br>            exclude: <span class="hljs-regexp">/(node_modules)/</span>,<br>            include: path.resolve(__dirname, <span class="hljs-string">'app'</span>),<br>            use: &#123;<br>              loader: <span class="hljs-string">'babel-loader'</span>,<br>              options: &#123;<br>                presets: [<span class="hljs-string">'@babel/preset-env'</span>]<br>              &#125;<br>            &#125;<br>          &#125;,<br>          &#123;<br>            test: <span class="hljs-regexp">/\.less$/i</span>,<br>            use: [<span class="hljs-string">'style-loader'</span>, <span class="hljs-string">'css-loader'</span>, <span class="hljs-string">'less-loader'</span>],<br>          &#125;,<br>          &#123;<br>            test: <span class="hljs-regexp">/\.css$/i</span>,<br>            use: [<span class="hljs-string">'style-loader'</span>, <span class="hljs-string">'css-loader'</span>],<br>          &#125;,<br>        ],<br>    &#125;<br>&#125;<br></code></pre></td></tr></table></figure>
 
+<p>由于用到了<code>babel</code>转换<code>js</code>,我们需要装一些<code>babel</code>的核心模块</p>
+<figure class="highlight js"><table><tr><td class="code"><pre><code class="hljs js">yarn add @babel/core @babel/cli @babel/preset-env --dev<br></code></pre></td></tr></table></figure>
 
-</li>
-</ul>
-<h4 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h4><ul>
-<li>setState第一步:<strong>将state塞入数组,将组件交给更新队列</strong></li>
-<li>setState第二步:更新队列进行更新,如果更新队列<strong>正在更新</strong>,将组件<strong>塞入脏组件队列</strong>.否则<strong>执行批量更新策略</strong></li>
-<li>setState第三步:批量更新策略<strong>判断是否处在批量更新状态</strong>,如果<strong>正在更新</strong>,那么将<strong>更新组件塞入脏组件队列</strong>,否则把脏组件所有组件拿出来<strong>开启事务更新</strong></li>
-<li>setState第四步,批量更新结束事务,在事务结束前,会调用FLUSH_BATCHED_UPDATES<strong>计算最新的<code>state</code>和<code>props</code></strong>.然后关闭事务</li>
-<li>然后React可以拿到最新的state和props进行虚拟dom比对,虚拟dom比对完之后,会去渲染组件,此时如果有shouldUpdate,会进行一个是否渲染组件的判断</li>
-</ul>
-<h4 id="为什么setTimeout下setState是同步的"><a href="#为什么setTimeout下setState是同步的" class="headerlink" title="为什么setTimeout下setState是同步的"></a>为什么setTimeout下setState是同步的</h4><ul>
-<li>关键在于批量更新策略什么时候开启的</li>
-<li>React开启批量更新策略有两个位置,一个是钩子函数,一个是合成事件,可以将钩子函数和合成事件理解为一个大的事务,当触发时,React会开启批量更新策略.而当执行setTimeout的时候,大事务已经关闭,批量更新策略已经重置为false</li>
-<li>实际上,调用setState触发了两个批量更新事务,相当于同步更新的过程了.</li>
-</ul>
-<h4 id="面试问答"><a href="#面试问答" class="headerlink" title="面试问答"></a>面试问答</h4><ul>
-<li>问: setState过后到底发生了什么?</li>
-<li>答: 将组件交给更新队列,将state塞入数组,然后执行队列更新方法,如果队列正在更新,组件就塞入脏组件,否则执行批量更新策略, 批量更新策略会去判断是否正在批量更新,如果正在更新,会把队列放入脏组件,否则循环脏组件队列开启事务执行批量更新,然后在事务结束前计算最新state和props,React拿到他们去进行虚拟dom比对,组件渲染,判断shouldUpdate,进行更新.更新完执行componentDidUpdate…</li>
-</ul>
-<p><a href="https://juejin.im/post/5aa25967518825558251f61f" target="_blank" rel="noopener">React - setState源码分析（小白可读）</a><br><a href="https://imweb.io/topic/5b189d04d4c96b9b1b4c4ed6" target="_blank" rel="noopener">揭密React setState</a><br><a href="https://juejin.im/post/5d7f219a51882501734c2921" target="_blank" rel="noopener">react源码分析之-setState是异步还是同步？</a></p>
+<h4 id="添加调试基础插件"><a href="#添加调试基础插件" class="headerlink" title="添加调试基础插件"></a>添加调试基础插件</h4><p>接下来装一些便于我们调试的基础插件<code>html-webpack-plugin</code> &nbsp;&nbsp;&nbsp;<code>clean-webpack-plugin</code> &nbsp;&nbsp;&nbsp;<code>webpack-manifest-plugin</code></p>
+<figure class="highlight js"><table><tr><td class="code"><pre><code class="hljs js">yarn add html-webpack-plugin clean-webpack-plugin webpack-manifest-plugin --dev<br></code></pre></td></tr></table></figure>
+
+<p>创建模板<code>index.html</code>, 并添加插件</p>
+<figure class="highlight html"><table><tr><td class="code"><pre><code class="hljs html"><span class="hljs-tag">&lt;<span class="hljs-name">html</span>&gt;</span><br>  <span class="hljs-tag">&lt;<span class="hljs-name">head</span>&gt;</span><br>    <span class="hljs-tag">&lt;<span class="hljs-name">meta</span> <span class="hljs-attr">charset</span>=<span class="hljs-string">"utf-8"</span> /&gt;</span><br>    <span class="hljs-tag">&lt;<span class="hljs-name">title</span>&gt;</span>起步<span class="hljs-tag">&lt;/<span class="hljs-name">title</span>&gt;</span><br>  <span class="hljs-tag">&lt;/<span class="hljs-name">head</span>&gt;</span><br>  <span class="hljs-tag">&lt;<span class="hljs-name">body</span>&gt;</span><br>    <span class="hljs-tag">&lt;<span class="hljs-name">div</span> <span class="hljs-attr">id</span>=<span class="hljs-string">"app"</span>&gt;</span><span class="hljs-tag">&lt;/<span class="hljs-name">div</span>&gt;</span><br>  <span class="hljs-tag">&lt;/<span class="hljs-name">body</span>&gt;</span><br><span class="hljs-tag">&lt;/<span class="hljs-name">html</span>&gt;</span><br></code></pre></td></tr></table></figure>
+<figure class="highlight js"><table><tr><td class="code"><pre><code class="hljs js"><span class="hljs-comment">// webpack.config.js</span><br><span class="hljs-keyword">const</span> HtmlWebpackPlugin = <span class="hljs-built_in">require</span>(<span class="hljs-string">'html-webpack-plugin'</span>);<br><span class="hljs-keyword">const</span> &#123; CleanWebpackPlugin &#125; = <span class="hljs-built_in">require</span>(<span class="hljs-string">'clean-webpack-plugin'</span>);<br><span class="hljs-keyword">const</span> &#123; WebpackManifestPlugin &#125; = <span class="hljs-built_in">require</span>(<span class="hljs-string">'webpack-manifest-plugin'</span>);<br><br><span class="hljs-built_in">module</span>.exports = &#123;<br>    entry: &#123; <br>      index: &#123;<br>        <span class="hljs-keyword">import</span>: <span class="hljs-string">'/app/app.js'</span>,<br>      &#125;,<br>    &#125;,<br>    mode: <span class="hljs-string">"development"</span>,<br>    output: &#123;<br>        filename: <span class="hljs-string">'[name].[contenthash].bundle.js'</span>,<br>        chunkFilename: <span class="hljs-string">'[name].[id].js'</span>,<br>        publicPath: <span class="hljs-string">'/'</span>,<br>        path: path.resolve(__dirname, <span class="hljs-string">'dist'</span>),<br>    &#125;,<br>    devtool: <span class="hljs-string">'eval-source-map'</span>,<br>    devServer: &#123;<br>      contentBase: <span class="hljs-string">'/dist'</span>,<br>    &#125;,<br>    <span class="hljs-built_in">module</span>: &#123;<br>        rules: [<br>          &#123;<br>            test: <span class="hljs-regexp">/\.js$/</span>,<br>            exclude: <span class="hljs-regexp">/(node_modules)/</span>,<br>            include: path.resolve(__dirname, <span class="hljs-string">'app'</span>),<br>            use: &#123;<br>              loader: <span class="hljs-string">'babel-loader'</span>,<br>              options: &#123;<br>                presets: [<span class="hljs-string">'@babel/preset-env'</span>]<br>              &#125;<br>            &#125;<br>          &#125;,<br>          &#123;<br>            test: <span class="hljs-regexp">/\.less$/i</span>,<br>            use: [<span class="hljs-string">'style-loader'</span>, <span class="hljs-string">'css-loader'</span>, <span class="hljs-string">'less-loader'</span>],<br>          &#125;,<br>          &#123;<br>            test: <span class="hljs-regexp">/\.css$/i</span>,<br>            use: [<span class="hljs-string">'style-loader'</span>, <span class="hljs-string">'css-loader'</span>],<br>          &#125;,<br>        ],<br>    &#125;,<br>    plugins: [<br>      <span class="hljs-keyword">new</span> CleanWebpackPlugin(),<br>      <span class="hljs-keyword">new</span> HtmlWebpackPlugin(&#123;<br>        inject: <span class="hljs-literal">true</span>,<br>        template: <span class="hljs-string">'/app/index.html'</span>,<br>      &#125;),<br>      <span class="hljs-keyword">new</span> WebpackManifestPlugin()<br>    ],<br>&#125;<br></code></pre></td></tr></table></figure>
+
+<h4 id="创建服务"><a href="#创建服务" class="headerlink" title="创建服务"></a>创建服务</h4><p>新建本地服务, 添加模块热更新, 这里我们使用<code>Express</code>启动服务</p>
+<p>我们在根目录创建一个<code>server</code>的文件夹, 创建一个<code>index.js</code>文件, 编写我们的启动脚本</p>
+<p>这里我们需要安装<code>webpack-dev-server</code> &nbsp;&nbsp;&nbsp; <code>webpack-dev-middleware</code></p>
+<figure class="highlight js"><table><tr><td class="code"><pre><code class="hljs js">yarn add express<br>yarn add webpack-dev-server --dev<br>yarn add webpack-dev-middleware --dev<br></code></pre></td></tr></table></figure>
+
+<figure class="highlight js"><table><tr><td class="code"><pre><code class="hljs js"><span class="hljs-comment">// /server/index.js</span><br><span class="hljs-keyword">const</span> express = <span class="hljs-built_in">require</span>(<span class="hljs-string">'express'</span>);<br><span class="hljs-keyword">const</span> webpack = <span class="hljs-built_in">require</span>(<span class="hljs-string">'webpack'</span>);<br><span class="hljs-keyword">const</span> webpackDevMiddleware = <span class="hljs-built_in">require</span>(<span class="hljs-string">'webpack-dev-middleware'</span>);<br><br><span class="hljs-keyword">const</span> app = express();<br><span class="hljs-keyword">const</span> config = <span class="hljs-built_in">require</span>(<span class="hljs-string">'./webpack.config.js'</span>);<br><span class="hljs-keyword">const</span> compiler = webpack(config);<br><br><span class="hljs-comment">// 告知 express 使用 webpack-dev-middleware，</span><br><span class="hljs-comment">// 以及将 webpack.config.js 配置文件作为基础配置。</span><br>app.use(<br>  webpackDevMiddleware(compiler, &#123;<br>    publicPath: config.output.publicPath,<br>  &#125;)<br>);<br><br><span class="hljs-comment">// 将文件 serve 到 port 3000。</span><br>app.listen(<span class="hljs-number">3000</span>, <span class="hljs-function"><span class="hljs-keyword">function</span> (<span class="hljs-params"></span>) </span>&#123;<br>  <span class="hljs-built_in">console</span>.log(<span class="hljs-string">'Example app listening on port 3000!\n'</span>);<br>&#125;);<br></code></pre></td></tr></table></figure>
+
+<p><code>webpack.config.js</code>文件添加<code>contentBase</code>,表明从哪里去寻找文件</p>
+<figure class="highlight js"><table><tr><td class="code"><pre><code class="hljs js">devServer: &#123;<br>    contentBase: <span class="hljs-string">'./dist'</span>, <span class="hljs-comment">// dist为我们的输出目录</span><br>&#125;,<br></code></pre></td></tr></table></figure>
+
+<h4 id="编写启动脚本"><a href="#编写启动脚本" class="headerlink" title="编写启动脚本"></a>编写启动脚本</h4><p>我们在<code>package.json</code>中编写一些脚本,便于我们启动服务和打包</p>
+<figure class="highlight"><table><tr><td class="code"><pre><code class="hljs json">"scripts": &#123;<br>    "test": "echo \"Error: no test specified\" &amp;&amp; exit 1",<br>    "build": "webpack --config webpack.config.js",<br>    "start": "node server/index.js"<br>&#125;,<br></code></pre></td></tr></table></figure>
+
+<p>这时候基本的需要已经搭建完成, 我们在<code>app.js</code>中随便写点东西</p>
+<figure class="highlight js"><table><tr><td class="code"><pre><code class="hljs js"><span class="hljs-built_in">console</span>.log(<span class="hljs-number">123</span>)<br></code></pre></td></tr></table></figure>
+<p><img src="webpack%E5%90%AF%E5%8A%A8.png" alt=""><br><img src="%E5%90%AF%E5%8A%A8%E9%A1%B5%E9%9D%A2.png" alt=""></p>
+<h3 id="解析jsx"><a href="#解析jsx" class="headerlink" title="解析jsx"></a>解析jsx</h3><p>到此为止我们已经可以正确打包js文件, 正确启动脚本, 安装了应用程序一些必要的依赖, 但是我们还无法解析<code>jsx</code>语法</p>
+<p>如果我们在app.js文件中写如下代码, 启动或编译</p>
+<figure class="highlight js"><table><tr><td class="code"><pre><code class="hljs js"><span class="hljs-comment">// app.js</span><br><br><span class="hljs-keyword">import</span> React <span class="hljs-keyword">from</span> <span class="hljs-string">'react'</span><br><span class="hljs-keyword">import</span> ReactDOM <span class="hljs-keyword">from</span> <span class="hljs-string">'react-dom'</span><br><br>ReactDOM.render(<span class="xml"><span class="hljs-tag">&lt;<span class="hljs-name">div</span>&gt;</span>111<span class="hljs-tag">&lt;/<span class="hljs-name">div</span>&gt;</span></span>, <span class="hljs-built_in">document</span>.getElementById(<span class="hljs-string">"app"</span>))<br></code></pre></td></tr></table></figure>
+<p>我们会看到如下报错<br><img src="jsx%E6%8A%A5%E9%94%99.png" alt=""></p>
+<p>因此我们需要安装<code>babel</code>转换jsx相关的插件</p>
+<figure class="highlight js"><table><tr><td class="code"><pre><code class="hljs js">yarn add @babel/preset-react --dev<br></code></pre></td></tr></table></figure>
+
+<p>按照<code>babel</code>官网的教程,在根目录下创建<code>babel.config.json</code></p>
+<p>此时项目结构如下</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><code class="hljs plain">├─ app<br>   |-app.js<br>├─ node_modules<br>    |- ......<br>├─ server<br>    ├─ index.js<br>├─ webpack.config.js<br>├─ babel.config.json<br>└─ package.json<br>└─ yarn.lock<br></code></pre></td></tr></table></figure>
+
+<p>在这里我们配一些基础的 <code>js</code> 转换的预设, 这里包括一个解析 <code>jsx</code> 的<code>babel</code>预设,一个<code>js</code>转换的预设, 这里 <code>module</code> 设置为 <code>false</code> 是根据当前的调用者判断其已经支持ES6模块语法，则默认的auto将自动选择<code>false</code>，否则将选择 <code>commonjs</code>, 这里手动设置为 <code>false</code> 将不支持将 <code>ES6</code> 模块语法转换为其他模块类型</p>
+<figure class="highlight json"><table><tr><td class="code"><pre><code class="hljs json"><span class="hljs-comment">// babel.config.json</span><br>&#123;<br>    <span class="hljs-attr">"presets"</span>: [<br>      [<br>        <span class="hljs-string">"@babel/env"</span>,<br>        &#123;<br>          <span class="hljs-attr">"useBuiltIns"</span>: <span class="hljs-string">"usage"</span>,<br>          <span class="hljs-attr">"module"</span>: <span class="hljs-literal">false</span><br>        &#125;<br>      ],<br>      [<span class="hljs-string">"@babel/preset-react"</span>, <br>        &#123;<br>          <span class="hljs-attr">"development"</span>: <span class="hljs-literal">true</span><br>        &#125;<br>      ]<br>    ],<br>&#125;<br></code></pre></td></tr></table></figure>
+<p>这里注意,<code>babel</code> 中<code>preset</code>顺序是从后往前执行,<code>plugin</code>的顺序是从后往前执行</p>
+<p>再次打包后成功<br><img src="babel%E8%A7%A3%E6%9E%90jsx.png" alt=""></p>
+<p>我们启动下试试看<br><img src="babel%E8%BD%AC%E6%8D%A2jsx%E6%88%90%E5%8A%9F" alt=""></p>
+<p>同样, 使用<code>class</code>的写法也能正确解析, 这里有个注意点, 针对类, 我们需要使用<code>@babel/plugin-proposal-class-properties</code>,否则如下代码无法编译</p>
+<figure class="highlight js"><table><tr><td class="code"><pre><code class="hljs js"><span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">A</span> </span>&#123;<br>    say = <span class="hljs-function"><span class="hljs-params">()</span> =&gt;</span> &#123;<br>        <span class="hljs-built_in">console</span>.log(<span class="hljs-string">'我说话了'</span>)<br>    &#125;<br>&#125;<br><br><span class="hljs-keyword">let</span> a = <span class="hljs-keyword">new</span> A()<br>a.say()<br></code></pre></td></tr></table></figure>
+
+<figure class="highlight js"><table><tr><td class="code"><pre><code class="hljs js">yarn add @babel/plugin-proposal-<span class="hljs-class"><span class="hljs-keyword">class</span>-<span class="hljs-title">properties</span> --<span class="hljs-title">dev</span></span><br></code></pre></td></tr></table></figure>
+
+<figure class="highlight json"><table><tr><td class="code"><pre><code class="hljs json"><span class="hljs-comment">// babel.config.json</span><br>&#123;<br>    <span class="hljs-attr">"presets"</span>: [<br>      [<br>        <span class="hljs-string">"@babel/env"</span>,<br>        &#123;<br>          <span class="hljs-attr">"useBuiltIns"</span>: <span class="hljs-string">"usage"</span>,<br>          <span class="hljs-attr">"module"</span>: <span class="hljs-literal">false</span><br>        &#125;<br>      ],<br>      [<span class="hljs-string">"@babel/preset-react"</span>, <br>        &#123;<br>          <span class="hljs-attr">"development"</span>: <span class="hljs-literal">true</span><br>        &#125;<br>      ]<br>    ],<br>    <span class="hljs-attr">"plugins"</span>: [<br>        [<span class="hljs-string">"@babel/plugin-proposal-class-properties"</span>, &#123; <span class="hljs-attr">"loose"</span>: <span class="hljs-literal">true</span> &#125;]<br>    ]<br>&#125;<br></code></pre></td></tr></table></figure>
+
+<h3 id="安装antd"><a href="#安装antd" class="headerlink" title="安装antd"></a>安装antd</h3><figure class="highlight js"><table><tr><td class="code"><pre><code class="hljs js">yarn add antd<br></code></pre></td></tr></table></figure>
+<p>我们修改<code>app.js</code>,导入<code>antd</code>的<code>Button</code>看看效果如何</p>
+<figure class="highlight js"><table><tr><td class="code"><pre><code class="hljs js"><span class="hljs-comment">// app.js</span><br><span class="hljs-keyword">import</span> React <span class="hljs-keyword">from</span> <span class="hljs-string">'react'</span><br><span class="hljs-keyword">import</span> ReactDOM <span class="hljs-keyword">from</span> <span class="hljs-string">'react-dom'</span><br><span class="hljs-keyword">import</span> &#123; Button &#125; <span class="hljs-keyword">from</span> <span class="hljs-string">'antd'</span><br><br><span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">MyDemo</span> <span class="hljs-keyword">extends</span> <span class="hljs-title">React</span>.<span class="hljs-title">Component</span></span>&#123;<br>    <span class="hljs-keyword">constructor</span>(props)&#123;<br>        <span class="hljs-keyword">super</span>(props)<br>        <span class="hljs-keyword">this</span>.state = &#123;<br>            buttonText: <span class="hljs-string">"我是按钮"</span><br>        &#125;<br>    &#125;<br><br>    render()&#123;<br>        <span class="hljs-keyword">return</span> <span class="xml"><span class="hljs-tag">&lt;<span class="hljs-name">Button</span>&gt;</span>&#123;this.state.buttonText&#125;<span class="hljs-tag">&lt;/<span class="hljs-name">Button</span>&gt;</span></span><br>    &#125;<br>&#125;<br><br>ReactDOM.render(<span class="xml"><span class="hljs-tag">&lt;<span class="hljs-name">MyDemo</span> /&gt;</span></span>, <span class="hljs-built_in">document</span>.getElementById(<span class="hljs-string">"app"</span>))<br></code></pre></td></tr></table></figure>
+<p>结果是确实引入了<code>antd</code>的组件,但是并未引入<code>antd</code>的样式</p>
+<p>我们选择使用<code>babel</code>动态导入的方法引入样式</p>
+<figure class="highlight shell"><table><tr><td class="code"><pre><code class="hljs shell">yarn add babel-plugin-import --dev<br></code></pre></td></tr></table></figure>
+
+<p>然后修改<code>babel.config.json</code>配置</p>
+<figure class="highlight json"><table><tr><td class="code"><pre><code class="hljs json"><span class="hljs-comment">// babel.config.json</span><br>&#123;<br>    <span class="hljs-attr">"presets"</span>: [<br>      [<br>        <span class="hljs-string">"@babel/env"</span>,<br>        &#123;<br>          <span class="hljs-attr">"useBuiltIns"</span>: <span class="hljs-string">"usage"</span>,<br>          <span class="hljs-attr">"modules"</span>: <span class="hljs-literal">false</span> <br>        &#125;<br>      ],<br>      [<span class="hljs-string">"@babel/preset-react"</span>, <br>        &#123;<br>          <span class="hljs-attr">"development"</span>: <span class="hljs-literal">true</span><br>        &#125;<br>      ]<br>    ],<br>    <span class="hljs-attr">"plugins"</span>: [<br>        [<span class="hljs-string">"@babel/plugin-proposal-class-properties"</span>, &#123; <span class="hljs-attr">"loose"</span>: <span class="hljs-literal">true</span> &#125;],<br>        [<span class="hljs-string">"import"</span>, &#123; <span class="hljs-attr">"libraryName"</span>: <span class="hljs-string">"antd"</span>, <span class="hljs-attr">"libraryDirectory"</span>: <span class="hljs-string">"es"</span>, <span class="hljs-attr">"style"</span>: <span class="hljs-string">"css"</span> &#125;]<br>    ]<br>&#125;<br></code></pre></td></tr></table></figure>
+<p>结果如下</p>
+<p><img src="antd%E6%A0%B7%E5%BC%8F%E6%B3%A8%E5%85%A5%E6%88%90%E5%8A%9F.png" alt=""></p>
+<h3 id="浏览器兼容"><a href="#浏览器兼容" class="headerlink" title="浏览器兼容"></a>浏览器兼容</h3><p>为了确保项目需要, 我们保持<code>ie10</code>及以上的兼容, <code>babel</code>会根据配置文件的<code>target</code>, <code>package.json</code>, 根目录<code>browserslist</code>依次去寻找浏览器版本.这里我们在 <code>package.json</code> 中配置 <code>browerslist</code></p>
+<figure class="highlight"><table><tr><td class="code"><pre><code class="hljs json">"browserslist": [<br>    "last 1 version",<br>    "&gt; 1%",<br>    <span class="hljs-string">"IE 10"</span><br>]<br></code></pre></td></tr></table></figure>
+
+<p>运行 <code>npx browerslist</code>得到如下图</p>
+<p><img src="%E6%B5%8F%E8%A7%88%E5%99%A8%E5%85%BC%E5%AE%B9.png" alt=""></p>
 ]]></content>
       <categories>
         <category>React</category>
@@ -320,6 +325,7 @@
       <tags>
         <tag>React</tag>
         <tag>前端</tag>
+        <tag>webpack</tag>
       </tags>
   </entry>
   <entry>
@@ -793,91 +799,86 @@
       </tags>
   </entry>
   <entry>
-    <title>手把手搭建一个React应用程序</title>
-    <url>/2021/01/10/%E6%90%AD%E5%BB%BA%E9%A1%B9%E7%9B%AE/</url>
-    <content><![CDATA[<p>本应用程序为<code>webpack5.0</code> + <code>React17</code> + <code>antd4.x</code></p>
-<h2 id="搭建环境"><a href="#搭建环境" class="headerlink" title="搭建环境"></a>搭建环境</h2><h3 id="初始化项目"><a href="#初始化项目" class="headerlink" title="初始化项目"></a>初始化项目</h3><h4 id="初始化包"><a href="#初始化包" class="headerlink" title="初始化包"></a>初始化包</h4><p>我们使用<code>npm</code>先创建一个<code>package.json</code>, 安装<code>webpack</code>&nbsp;&nbsp;&nbsp;  <code>webpack-cli</code> &nbsp;&nbsp;&nbsp;<code>react</code> &nbsp;&nbsp;&nbsp; <code>react-dom</code> &nbsp;&nbsp;&nbsp; <code>react-router-dom</code></p>
-<figure class="highlight js"><table><tr><td class="code"><pre><code class="hljs js">npm init -y<br><br>yarn add webpack webpack-cli --dev<br><br>yarn add react react-dom react-router-dom<br></code></pre></td></tr></table></figure>
-
-<p>根目录创建<code>webpack.config.js</code>(暂时只考虑<strong>开发环境</strong>)</p>
-<p>根目录下创建<code>app</code>文件夹作为我们的应用程序主入口,入口文件为<code>app.js</code></p>
-<p>项目结构如下</p>
-<figure class="highlight plain"><table><tr><td class="code"><pre><code class="hljs plain">├─ app<br>   |-app.js<br>├─ node_modules<br>    |- ......<br>├─ webpack.config.js<br>└─ package.json<br></code></pre></td></tr></table></figure>
-
+    <title>setState到底是同步还是异步的</title>
+    <url>/2020/07/25/setState/</url>
+    <content><![CDATA[<h4 id="setState同步还是异步"><a href="#setState同步还是异步" class="headerlink" title="setState同步还是异步"></a>setState同步还是异步</h4><ul>
+<li>setState有时表现出异步,有时表现出同步,在<strong>合成事件</strong>和<strong>钩子函数</strong>中表现异步</li>
+<li>setState批量更新优化是<strong>建立在合成事件和钩子函数</strong>之上的,在原生事件和setTimeout中不会发生异步.(顺序为setState =&gt; 钩子函数 =&gt; 合并更新状态)</li>
+</ul>
 <a id="more"></a>
+<hr>
+<h6 id="合成事件"><a href="#合成事件" class="headerlink" title="合成事件"></a>合成事件</h6><ul>
+<li>React通过事件冒泡,将事件冒泡到document上面,再统一分发给中间层SyntheticEvent去执行事件</li>
+</ul>
+<h6 id="钩子函数"><a href="#钩子函数" class="headerlink" title="钩子函数"></a>钩子函数</h6><ul>
+<li>钩子函数指生命周期的钩子</li>
+</ul>
+<hr>
+<p><a href="https://www.jianshu.com/p/8d8f9aa4b033" target="_blank" rel="noopener">合成事件和钩子函数参考文档</a></p>
+<h4 id="setState之后到底发生了什么"><a href="#setState之后到底发生了什么" class="headerlink" title="setState之后到底发生了什么"></a>setState之后到底发生了什么</h4><p>setState有两个注意事项:<br>官网提供:</p>
+<ol>
+<li>出于性能考虑，React 可能会把多个 setState() 调用<strong>合并成一个</strong>调用</li>
+<li>因为 this.props 和 this.state 可能会异步更新，所以你<strong>不要依赖他们的值</strong>来更新下一个状态<figure class="highlight javascript"><table><tr><td class="code"><pre><code class="hljs JavaScript">add() &#123;<br>    <span class="hljs-keyword">this</span>.setState(&#123;<span class="hljs-attr">count</span>:count + <span class="hljs-number">1</span>&#125;)<br>    <span class="hljs-keyword">this</span>.setState(&#123;<span class="hljs-attr">count</span>:count + <span class="hljs-number">1</span>&#125;)<br>&#125;<br>add()<br></code></pre></td></tr></table></figure></li>
+</ol>
+<ul>
+<li>上述连续两次在点击事件调用setState<h4 id="图例"><a href="#图例" class="headerlink" title="图例"></a>图例</h4><img src="setState%E6%B5%81%E7%A8%8B.png" alt=""><h5 id="执行顺序"><a href="#执行顺序" class="headerlink" title="执行顺序"></a>执行顺序</h5><h6 id="第一步"><a href="#第一步" class="headerlink" title="第一步"></a>第一步</h6></li>
+<li>首先调用实例的updater上的enqueueSetState</li>
+<li>目的是让setState入列<figure class="highlight javascript"><table><tr><td class="code"><pre><code class="hljs JavaScript">ReactComponent.prototype.setState = <span class="hljs-function"><span class="hljs-keyword">function</span> (<span class="hljs-params">partialState, callback</span>) </span>&#123;<br>  <span class="hljs-comment">//  将setState事务放进队列中</span><br>  <span class="hljs-keyword">this</span>.updater.enqueueSetState(<span class="hljs-keyword">this</span>, partialState);<br>  <span class="hljs-keyword">if</span> (callback) &#123;<br>      <span class="hljs-keyword">this</span>.updater.enqueueCallback(<span class="hljs-keyword">this</span>, callback, <span class="hljs-string">'setState'</span>);<br>  &#125;<br>&#125;;<br></code></pre></td></tr></table></figure>
+<h6 id="第二步"><a href="#第二步" class="headerlink" title="第二步"></a>第二步</h6></li>
+<li>将更新状态的组件也放入队列中</li>
+<li>将新的state放进数组里 </li>
+<li>用enqueueUpdate来处理将要更新的实例对象</li>
+</ul>
+<h6 id="目前达到的效果"><a href="#目前达到的效果" class="headerlink" title="目前达到的效果"></a>目前达到的效果</h6><ul>
+<li>setState在队列中</li>
+<li>在这个setState执行过程里 我们将state放入了一个队列 将要更新的组件也放入了一个队列<figure class="highlight javascript"><table><tr><td class="code"><pre><code class="hljs JavaScript"> enqueueSetState: <span class="hljs-function"><span class="hljs-keyword">function</span> (<span class="hljs-params">publicInstance, partialState</span>) </span>&#123;<br> <br> <span class="hljs-comment">// 获取当前组件的instance</span><br><span class="hljs-keyword">var</span> internalInstance = getInternalInstanceReadyForUpdate(publicInstance, <span class="hljs-string">'setState'</span>);<br><br> <span class="hljs-comment">// 将要更新的state放入一个数组里</span><br> <span class="hljs-keyword">var</span> queue = internalInstance._pendingStateQueue || (internalInstance._pendingStateQueue = []);<br>queue.push(partialState);<br><br><span class="hljs-comment">//  将要更新的component instance也放在一个队列里</span><br>enqueueUpdate(internalInstance);<br>  &#125;<br></code></pre></td></tr></table></figure>
 
-<h4 id="配置基本webpack"><a href="#配置基本webpack" class="headerlink" title="配置基本webpack"></a>配置基本webpack</h4><p>这里我们配置一些基本的<code>webpack</code>打包必须的配置项</p>
-<figure class="highlight js"><table><tr><td class="code"><pre><code class="hljs js"><span class="hljs-keyword">const</span> path = <span class="hljs-built_in">require</span>(<span class="hljs-string">"path"</span>)<br><br><span class="hljs-built_in">module</span>.exports = &#123;<br>    entry: &#123; <br>      index: &#123;<br>        <span class="hljs-keyword">import</span>: <span class="hljs-string">'/app/app.js'</span>,<br>      &#125;,<br>    &#125;,<br>    mode: <span class="hljs-string">"development"</span>,<br>    output: &#123;<br>        filename: <span class="hljs-string">'[name].[contenthash].bundle.js'</span>,<br>        chunkFilename: <span class="hljs-string">'[name].[id].js'</span>,<br>        publicPath: <span class="hljs-string">'/'</span>,<br>        path: path.resolve(__dirname, <span class="hljs-string">'dist'</span>),<br>    &#125;,<br>    devtool: <span class="hljs-string">'inline-source-map'</span>,<br>&#125;<br></code></pre></td></tr></table></figure>
-<h4 id="管理资源"><a href="#管理资源" class="headerlink" title="管理资源"></a>管理资源</h4><p>我们需要解析模块, 生成<code>bundle</code>, 这里我们使用<code>babel-loader</code>来转换js, <code>less-loader</code> &nbsp;&nbsp;&nbsp; <code>css-loader</code> &nbsp;&nbsp;&nbsp; <code>style-loader</code>来加载样式</p>
-<figure class="highlight js"><table><tr><td class="code"><pre><code class="hljs js">yarn add less less-loader --dev<br>yarn add babel-loader --dev<br>yarn add css-loader style-loader --dev<br></code></pre></td></tr></table></figure>
+</li>
+</ul>
+<h5 id="第三步"><a href="#第三步" class="headerlink" title="第三步"></a>第三步</h5><ul>
+<li>调用enqueueUpdate执行更新操作,如果处在更新,那么只是将组件放入脏组件队列中<figure class="highlight javascript"><table><tr><td class="code"><pre><code class="hljs JavaScript"><span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">enqueueUpdate</span>(<span class="hljs-params">component</span>) </span>&#123;<br>  <span class="hljs-comment">// 如果没有处于批量创建/更新组件的阶段，则处理update state事务</span><br>  <span class="hljs-keyword">if</span> (!batchingStrategy.isBatchingUpdates) &#123;<br>    batchingStrategy.batchedUpdates(enqueueUpdate, component);<br>    <span class="hljs-keyword">return</span>;<br>  &#125;<br>  <span class="hljs-comment">// 如果正处于批量创建/更新组件的过程，将当前的组件放在dirtyComponents数组中</span><br>  dirtyComponents.push(component);<br>&#125;<br></code></pre></td></tr></table></figure></li>
+<li>这个更新函数,接收一个组件的实例 首先判断是否处于更新阶段 如果不是 那么执行更新 如果处在更新阶段 那么我将组件的实例push到队列中 等待更新<h6 id="这个函数也说明了setState是一个异步的过程，它会集齐一批需要更新的组件然后一起更新"><a href="#这个函数也说明了setState是一个异步的过程，它会集齐一批需要更新的组件然后一起更新" class="headerlink" title="这个函数也说明了setState是一个异步的过程，它会集齐一批需要更新的组件然后一起更新"></a>这个函数也说明了setState是一个异步的过程，它会集齐一批需要更新的组件然后一起更新</h6></li>
+</ul>
+<h5 id="第三步拓展——批量更新策略-batchingStrategy"><a href="#第三步拓展——批量更新策略-batchingStrategy" class="headerlink" title="第三步拓展——批量更新策略(batchingStrategy)"></a>第三步拓展——批量更新策略(batchingStrategy)</h5><ul>
+<li>第三步中,如果不处在更新状态,就执行<code>batchingStrategy.batchedUpdates(enqueueUpdate,component)</code></li>
+</ul>
+<h6 id="批量更新策略所在的对象"><a href="#批量更新策略所在的对象" class="headerlink" title="批量更新策略所在的对象"></a>批量更新策略所在的对象</h6><ul>
+<li>batchedUpdates做了个判断,如果我处在更新状态,那么组件入列, 否则开启更新事务<figure class="highlight javascript"><table><tr><td class="code"><pre><code class="hljs JavaScript"><span class="hljs-keyword">var</span> ReactDefaultBatchingStrategy = &#123;<br>  <span class="hljs-comment">// 用于标记当前是否出于批量更新</span><br>  isBatchingUpdates: <span class="hljs-literal">false</span>,<br>  <span class="hljs-comment">// 当调用这个方法时，正式开始批量更新</span><br>  batchedUpdates: <span class="hljs-function"><span class="hljs-keyword">function</span> (<span class="hljs-params">callback, a, b, c, d, e</span>) </span>&#123;<br>    <span class="hljs-keyword">var</span> alreadyBatchingUpdates = ReactDefaultBatchingStrategy.isBatchingUpdates;<br><br>    ReactDefaultBatchingStrategy.isBatchingUpdates = <span class="hljs-literal">true</span>;<br><br><span class="hljs-comment">// 如果当前事务正在更新过程中，则调用enqueueUpdate</span><br>    <span class="hljs-keyword">if</span> (alreadyBatchingUpdates) &#123;<br>      <span class="hljs-keyword">return</span> callback(a, b, c, d, e);<br>    &#125; <span class="hljs-keyword">else</span> &#123;<br>    <span class="hljs-comment">// 否则执行更新事务</span><br>      <span class="hljs-keyword">return</span> transaction.perform(callback, <span class="hljs-literal">null</span>, a, b, c, d, e);<br>    &#125;<br>  &#125;<br>&#125;;<br></code></pre></td></tr></table></figure>
 
-<figure class="highlight js"><table><tr><td class="code"><pre><code class="hljs js"><span class="hljs-keyword">const</span> path = <span class="hljs-built_in">require</span>(<span class="hljs-string">"path"</span>)<br><br><span class="hljs-built_in">module</span>.exports = &#123;<br>    entry: &#123; <br>      index: &#123;<br>        <span class="hljs-keyword">import</span>: <span class="hljs-string">'/app/app.js'</span>,<br>      &#125;,<br>    &#125;,<br>    mode: <span class="hljs-string">"development"</span>,<br>    output: &#123;<br>        filename: <span class="hljs-string">'[name].[contenthash].bundle.js'</span>,<br>        chunkFilename: <span class="hljs-string">'[name].[id].js'</span>,<br>        publicPath: <span class="hljs-string">'/'</span>,<br>        path: path.resolve(__dirname, <span class="hljs-string">'dist'</span>),<br>    &#125;,<br>    devtool: <span class="hljs-string">'inline-source-map'</span>,<br>    <span class="hljs-built_in">module</span>: &#123;<br>        rules: [<br>          &#123;<br>            test: <span class="hljs-regexp">/\.js$/</span>,<br>            exclude: <span class="hljs-regexp">/(node_modules)/</span>,<br>            include: path.resolve(__dirname, <span class="hljs-string">'app'</span>),<br>            use: &#123;<br>              loader: <span class="hljs-string">'babel-loader'</span>,<br>              options: &#123;<br>                presets: [<span class="hljs-string">'@babel/preset-env'</span>]<br>              &#125;<br>            &#125;<br>          &#125;,<br>          &#123;<br>            test: <span class="hljs-regexp">/\.less$/i</span>,<br>            use: [<span class="hljs-string">'style-loader'</span>, <span class="hljs-string">'css-loader'</span>, <span class="hljs-string">'less-loader'</span>],<br>          &#125;,<br>          &#123;<br>            test: <span class="hljs-regexp">/\.css$/i</span>,<br>            use: [<span class="hljs-string">'style-loader'</span>, <span class="hljs-string">'css-loader'</span>],<br>          &#125;,<br>        ],<br>    &#125;<br>&#125;<br></code></pre></td></tr></table></figure>
+</li>
+</ul>
+<h5 id="第三步拓展——事务"><a href="#第三步拓展——事务" class="headerlink" title="第三步拓展——事务"></a>第三步拓展——事务</h5><ul>
+<li><p>所谓事务,就是把函数做一层包装,开始是做一些操作,结束时做一些操作</p>
+</li>
+<li><p>下面是一个简单的事务例子</p>
+<figure class="highlight javascript"><table><tr><td class="code"><pre><code class="hljs JavaScript"><span class="hljs-keyword">var</span> Transaction = <span class="hljs-built_in">require</span>(<span class="hljs-string">'./Transaction'</span>);<br><br><span class="hljs-comment">// 我们自己定义的 Transaction</span><br><span class="hljs-keyword">var</span> MyTransaction = <span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params"></span>) </span>&#123;<br>  <span class="hljs-comment">// do sth.</span><br>&#125;;<br><br><span class="hljs-built_in">Object</span>.assign(MyTransaction.prototype, Transaction.Mixin, &#123;<br>  getTransactionWrappers: <span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params"></span>) </span>&#123;<br>    <span class="hljs-keyword">return</span> [&#123;<br>      initialize: <span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params"></span>) </span>&#123;<br>        <span class="hljs-built_in">console</span>.log(<span class="hljs-string">'before method perform'</span>);<br>      &#125;,<br>      close: <span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params"></span>) </span>&#123;<br>        <span class="hljs-built_in">console</span>.log(<span class="hljs-string">'after method perform'</span>);<br>      &#125;<br>    &#125;];<br>  &#125;;<br>&#125;);<br><br><span class="hljs-keyword">var</span> transaction = <span class="hljs-keyword">new</span> MyTransaction();<br><span class="hljs-keyword">var</span> testMethod = <span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params"></span>) </span>&#123;<br>  <span class="hljs-built_in">console</span>.log(<span class="hljs-string">'test'</span>);<br>&#125;<br>transaction.perform(testMethod);<br><br><span class="hljs-comment">// before method perform</span><br><span class="hljs-comment">// test</span><br><span class="hljs-comment">// after method perform</span><br></code></pre></td></tr></table></figure>
+<p><img src="setState%E4%BA%8B%E5%8A%A1.png" alt=""></p>
+</li>
+<li><p>React源码的事务中有两个事务RESET_BATCHED_UPDATES(用于重置更新状态) FLUSH_BATCHED_UPDATES(再发起一个dom的批量更新,包括渲染和虚拟dom比对等等)</p>
+</li>
+<li><p>FLUSH_BATCHED_UPDATES这个事务的目的在于循环所有更新组件,执行update,调用组件更新的生命周期等等</p>
+<figure class="highlight javascript"><table><tr><td class="code"><pre><code class="hljs JavaScript"><span class="hljs-keyword">var</span> RESET_BATCHED_UPDATES = &#123;<br>  initialize: emptyFunction,<br>  close: <span class="hljs-function"><span class="hljs-keyword">function</span> (<span class="hljs-params"></span>) </span>&#123;<br>    ReactDefaultBatchingStrategy.isBatchingUpdates = <span class="hljs-literal">false</span>;<br>  &#125;<br>&#125;;<br><br><span class="hljs-keyword">var</span> FLUSH_BATCHED_UPDATES = &#123;<br>  initialize: emptyFunction,<br>  close: ReactUpdates.flushBatchedUpdates.bind(ReactUpdates)<br>&#125;;<br></code></pre></td></tr></table></figure>
 
-<p>由于用到了<code>babel</code>转换<code>js</code>,我们需要装一些<code>babel</code>的核心模块</p>
-<figure class="highlight js"><table><tr><td class="code"><pre><code class="hljs js">yarn add @babel/core @babel/cli @babel/preset-env --dev<br></code></pre></td></tr></table></figure>
 
-<h4 id="添加调试基础插件"><a href="#添加调试基础插件" class="headerlink" title="添加调试基础插件"></a>添加调试基础插件</h4><p>接下来装一些便于我们调试的基础插件<code>html-webpack-plugin</code> &nbsp;&nbsp;&nbsp;<code>clean-webpack-plugin</code> &nbsp;&nbsp;&nbsp;<code>webpack-manifest-plugin</code></p>
-<figure class="highlight js"><table><tr><td class="code"><pre><code class="hljs js">yarn add html-webpack-plugin clean-webpack-plugin webpack-manifest-plugin --dev<br></code></pre></td></tr></table></figure>
-
-<p>创建模板<code>index.html</code>, 并添加插件</p>
-<figure class="highlight html"><table><tr><td class="code"><pre><code class="hljs html"><span class="hljs-tag">&lt;<span class="hljs-name">html</span>&gt;</span><br>  <span class="hljs-tag">&lt;<span class="hljs-name">head</span>&gt;</span><br>    <span class="hljs-tag">&lt;<span class="hljs-name">meta</span> <span class="hljs-attr">charset</span>=<span class="hljs-string">"utf-8"</span> /&gt;</span><br>    <span class="hljs-tag">&lt;<span class="hljs-name">title</span>&gt;</span>起步<span class="hljs-tag">&lt;/<span class="hljs-name">title</span>&gt;</span><br>  <span class="hljs-tag">&lt;/<span class="hljs-name">head</span>&gt;</span><br>  <span class="hljs-tag">&lt;<span class="hljs-name">body</span>&gt;</span><br>    <span class="hljs-tag">&lt;<span class="hljs-name">div</span> <span class="hljs-attr">id</span>=<span class="hljs-string">"app"</span>&gt;</span><span class="hljs-tag">&lt;/<span class="hljs-name">div</span>&gt;</span><br>  <span class="hljs-tag">&lt;/<span class="hljs-name">body</span>&gt;</span><br><span class="hljs-tag">&lt;/<span class="hljs-name">html</span>&gt;</span><br></code></pre></td></tr></table></figure>
-<figure class="highlight js"><table><tr><td class="code"><pre><code class="hljs js"><span class="hljs-comment">// webpack.config.js</span><br><span class="hljs-keyword">const</span> HtmlWebpackPlugin = <span class="hljs-built_in">require</span>(<span class="hljs-string">'html-webpack-plugin'</span>);<br><span class="hljs-keyword">const</span> &#123; CleanWebpackPlugin &#125; = <span class="hljs-built_in">require</span>(<span class="hljs-string">'clean-webpack-plugin'</span>);<br><span class="hljs-keyword">const</span> &#123; WebpackManifestPlugin &#125; = <span class="hljs-built_in">require</span>(<span class="hljs-string">'webpack-manifest-plugin'</span>);<br><br><span class="hljs-built_in">module</span>.exports = &#123;<br>    entry: &#123; <br>      index: &#123;<br>        <span class="hljs-keyword">import</span>: <span class="hljs-string">'/app/app.js'</span>,<br>      &#125;,<br>    &#125;,<br>    mode: <span class="hljs-string">"development"</span>,<br>    output: &#123;<br>        filename: <span class="hljs-string">'[name].[contenthash].bundle.js'</span>,<br>        chunkFilename: <span class="hljs-string">'[name].[id].js'</span>,<br>        publicPath: <span class="hljs-string">'/'</span>,<br>        path: path.resolve(__dirname, <span class="hljs-string">'dist'</span>),<br>    &#125;,<br>    devtool: <span class="hljs-string">'eval-source-map'</span>,<br>    devServer: &#123;<br>      contentBase: <span class="hljs-string">'/dist'</span>,<br>    &#125;,<br>    <span class="hljs-built_in">module</span>: &#123;<br>        rules: [<br>          &#123;<br>            test: <span class="hljs-regexp">/\.js$/</span>,<br>            exclude: <span class="hljs-regexp">/(node_modules)/</span>,<br>            include: path.resolve(__dirname, <span class="hljs-string">'app'</span>),<br>            use: &#123;<br>              loader: <span class="hljs-string">'babel-loader'</span>,<br>              options: &#123;<br>                presets: [<span class="hljs-string">'@babel/preset-env'</span>]<br>              &#125;<br>            &#125;<br>          &#125;,<br>          &#123;<br>            test: <span class="hljs-regexp">/\.less$/i</span>,<br>            use: [<span class="hljs-string">'style-loader'</span>, <span class="hljs-string">'css-loader'</span>, <span class="hljs-string">'less-loader'</span>],<br>          &#125;,<br>          &#123;<br>            test: <span class="hljs-regexp">/\.css$/i</span>,<br>            use: [<span class="hljs-string">'style-loader'</span>, <span class="hljs-string">'css-loader'</span>],<br>          &#125;,<br>        ],<br>    &#125;,<br>    plugins: [<br>      <span class="hljs-keyword">new</span> CleanWebpackPlugin(),<br>      <span class="hljs-keyword">new</span> HtmlWebpackPlugin(&#123;<br>        inject: <span class="hljs-literal">true</span>,<br>        template: <span class="hljs-string">'/app/index.html'</span>,<br>      &#125;),<br>      <span class="hljs-keyword">new</span> WebpackManifestPlugin()<br>    ],<br>&#125;<br></code></pre></td></tr></table></figure>
-
-<h4 id="创建服务"><a href="#创建服务" class="headerlink" title="创建服务"></a>创建服务</h4><p>新建本地服务, 添加模块热更新, 这里我们使用<code>Express</code>启动服务</p>
-<p>我们在根目录创建一个<code>server</code>的文件夹, 创建一个<code>index.js</code>文件, 编写我们的启动脚本</p>
-<p>这里我们需要安装<code>webpack-dev-server</code> &nbsp;&nbsp;&nbsp; <code>webpack-dev-middleware</code></p>
-<figure class="highlight js"><table><tr><td class="code"><pre><code class="hljs js">yarn add express<br>yarn add webpack-dev-server --dev<br>yarn add webpack-dev-middleware --dev<br></code></pre></td></tr></table></figure>
-
-<figure class="highlight js"><table><tr><td class="code"><pre><code class="hljs js"><span class="hljs-comment">// /server/index.js</span><br><span class="hljs-keyword">const</span> express = <span class="hljs-built_in">require</span>(<span class="hljs-string">'express'</span>);<br><span class="hljs-keyword">const</span> webpack = <span class="hljs-built_in">require</span>(<span class="hljs-string">'webpack'</span>);<br><span class="hljs-keyword">const</span> webpackDevMiddleware = <span class="hljs-built_in">require</span>(<span class="hljs-string">'webpack-dev-middleware'</span>);<br><br><span class="hljs-keyword">const</span> app = express();<br><span class="hljs-keyword">const</span> config = <span class="hljs-built_in">require</span>(<span class="hljs-string">'./webpack.config.js'</span>);<br><span class="hljs-keyword">const</span> compiler = webpack(config);<br><br><span class="hljs-comment">// 告知 express 使用 webpack-dev-middleware，</span><br><span class="hljs-comment">// 以及将 webpack.config.js 配置文件作为基础配置。</span><br>app.use(<br>  webpackDevMiddleware(compiler, &#123;<br>    publicPath: config.output.publicPath,<br>  &#125;)<br>);<br><br><span class="hljs-comment">// 将文件 serve 到 port 3000。</span><br>app.listen(<span class="hljs-number">3000</span>, <span class="hljs-function"><span class="hljs-keyword">function</span> (<span class="hljs-params"></span>) </span>&#123;<br>  <span class="hljs-built_in">console</span>.log(<span class="hljs-string">'Example app listening on port 3000!\n'</span>);<br>&#125;);<br></code></pre></td></tr></table></figure>
-
-<p><code>webpack.config.js</code>文件添加<code>contentBase</code>,表明从哪里去寻找文件</p>
-<figure class="highlight js"><table><tr><td class="code"><pre><code class="hljs js">devServer: &#123;<br>    contentBase: <span class="hljs-string">'./dist'</span>, <span class="hljs-comment">// dist为我们的输出目录</span><br>&#125;,<br></code></pre></td></tr></table></figure>
-
-<h4 id="编写启动脚本"><a href="#编写启动脚本" class="headerlink" title="编写启动脚本"></a>编写启动脚本</h4><p>我们在<code>package.json</code>中编写一些脚本,便于我们启动服务和打包</p>
-<figure class="highlight"><table><tr><td class="code"><pre><code class="hljs json">"scripts": &#123;<br>    "test": "echo \"Error: no test specified\" &amp;&amp; exit 1",<br>    "build": "webpack --config webpack.config.js",<br>    "start": "node server/index.js"<br>&#125;,<br></code></pre></td></tr></table></figure>
-
-<p>这时候基本的需要已经搭建完成, 我们在<code>app.js</code>中随便写点东西</p>
-<figure class="highlight js"><table><tr><td class="code"><pre><code class="hljs js"><span class="hljs-built_in">console</span>.log(<span class="hljs-number">123</span>)<br></code></pre></td></tr></table></figure>
-<p><img src="webpack%E5%90%AF%E5%8A%A8.png" alt=""><br><img src="%E5%90%AF%E5%8A%A8%E9%A1%B5%E9%9D%A2.png" alt=""></p>
-<h3 id="解析jsx"><a href="#解析jsx" class="headerlink" title="解析jsx"></a>解析jsx</h3><p>到此为止我们已经可以正确打包js文件, 正确启动脚本, 安装了应用程序一些必要的依赖, 但是我们还无法解析<code>jsx</code>语法</p>
-<p>如果我们在app.js文件中写如下代码, 启动或编译</p>
-<figure class="highlight js"><table><tr><td class="code"><pre><code class="hljs js"><span class="hljs-comment">// app.js</span><br><br><span class="hljs-keyword">import</span> React <span class="hljs-keyword">from</span> <span class="hljs-string">'react'</span><br><span class="hljs-keyword">import</span> ReactDOM <span class="hljs-keyword">from</span> <span class="hljs-string">'react-dom'</span><br><br>ReactDOM.render(<span class="xml"><span class="hljs-tag">&lt;<span class="hljs-name">div</span>&gt;</span>111<span class="hljs-tag">&lt;/<span class="hljs-name">div</span>&gt;</span></span>, <span class="hljs-built_in">document</span>.getElementById(<span class="hljs-string">"app"</span>))<br></code></pre></td></tr></table></figure>
-<p>我们会看到如下报错<br><img src="jsx%E6%8A%A5%E9%94%99.png" alt=""></p>
-<p>因此我们需要安装<code>babel</code>转换jsx相关的插件</p>
-<figure class="highlight js"><table><tr><td class="code"><pre><code class="hljs js">yarn add @babel/preset-react --dev<br></code></pre></td></tr></table></figure>
-
-<p>按照<code>babel</code>官网的教程,在根目录下创建<code>babel.config.json</code></p>
-<p>此时项目结构如下</p>
-<figure class="highlight plain"><table><tr><td class="code"><pre><code class="hljs plain">├─ app<br>   |-app.js<br>├─ node_modules<br>    |- ......<br>├─ server<br>    ├─ index.js<br>├─ webpack.config.js<br>├─ babel.config.json<br>└─ package.json<br>└─ yarn.lock<br></code></pre></td></tr></table></figure>
-
-<p>在这里我们配一些基础的 <code>js</code> 转换的预设, 这里包括一个解析 <code>jsx</code> 的<code>babel</code>预设,一个<code>js</code>转换的预设, 这里 <code>module</code> 设置为 <code>false</code> 是根据当前的调用者判断其已经支持ES6模块语法，则默认的auto将自动选择<code>false</code>，否则将选择 <code>commonjs</code>, 这里手动设置为 <code>false</code> 将不支持将 <code>ES6</code> 模块语法转换为其他模块类型</p>
-<figure class="highlight json"><table><tr><td class="code"><pre><code class="hljs json"><span class="hljs-comment">// babel.config.json</span><br>&#123;<br>    <span class="hljs-attr">"presets"</span>: [<br>      [<br>        <span class="hljs-string">"@babel/env"</span>,<br>        &#123;<br>          <span class="hljs-attr">"useBuiltIns"</span>: <span class="hljs-string">"usage"</span>,<br>          <span class="hljs-attr">"module"</span>: <span class="hljs-literal">false</span><br>        &#125;<br>      ],<br>      [<span class="hljs-string">"@babel/preset-react"</span>, <br>        &#123;<br>          <span class="hljs-attr">"development"</span>: <span class="hljs-literal">true</span><br>        &#125;<br>      ]<br>    ],<br>&#125;<br></code></pre></td></tr></table></figure>
-<p>这里注意,<code>babel</code> 中<code>preset</code>顺序是从后往前执行,<code>plugin</code>的顺序是从后往前执行</p>
-<p>再次打包后成功<br><img src="babel%E8%A7%A3%E6%9E%90jsx.png" alt=""></p>
-<p>我们启动下试试看<br><img src="babel%E8%BD%AC%E6%8D%A2jsx%E6%88%90%E5%8A%9F" alt=""></p>
-<p>同样, 使用<code>class</code>的写法也能正确解析, 这里有个注意点, 针对类, 我们需要使用<code>@babel/plugin-proposal-class-properties</code>,否则如下代码无法编译</p>
-<figure class="highlight js"><table><tr><td class="code"><pre><code class="hljs js"><span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">A</span> </span>&#123;<br>    say = <span class="hljs-function"><span class="hljs-params">()</span> =&gt;</span> &#123;<br>        <span class="hljs-built_in">console</span>.log(<span class="hljs-string">'我说话了'</span>)<br>    &#125;<br>&#125;<br><br><span class="hljs-keyword">let</span> a = <span class="hljs-keyword">new</span> A()<br>a.say()<br></code></pre></td></tr></table></figure>
-
-<figure class="highlight js"><table><tr><td class="code"><pre><code class="hljs js">yarn add @babel/plugin-proposal-<span class="hljs-class"><span class="hljs-keyword">class</span>-<span class="hljs-title">properties</span> --<span class="hljs-title">dev</span></span><br></code></pre></td></tr></table></figure>
-
-<figure class="highlight json"><table><tr><td class="code"><pre><code class="hljs json"><span class="hljs-comment">// babel.config.json</span><br>&#123;<br>    <span class="hljs-attr">"presets"</span>: [<br>      [<br>        <span class="hljs-string">"@babel/env"</span>,<br>        &#123;<br>          <span class="hljs-attr">"useBuiltIns"</span>: <span class="hljs-string">"usage"</span>,<br>          <span class="hljs-attr">"module"</span>: <span class="hljs-literal">false</span><br>        &#125;<br>      ],<br>      [<span class="hljs-string">"@babel/preset-react"</span>, <br>        &#123;<br>          <span class="hljs-attr">"development"</span>: <span class="hljs-literal">true</span><br>        &#125;<br>      ]<br>    ],<br>    <span class="hljs-attr">"plugins"</span>: [<br>        [<span class="hljs-string">"@babel/plugin-proposal-class-properties"</span>, &#123; <span class="hljs-attr">"loose"</span>: <span class="hljs-literal">true</span> &#125;]<br>    ]<br>&#125;<br></code></pre></td></tr></table></figure>
-
-<h3 id="安装antd"><a href="#安装antd" class="headerlink" title="安装antd"></a>安装antd</h3><figure class="highlight js"><table><tr><td class="code"><pre><code class="hljs js">yarn add antd<br></code></pre></td></tr></table></figure>
-<p>我们修改<code>app.js</code>,导入<code>antd</code>的<code>Button</code>看看效果如何</p>
-<figure class="highlight js"><table><tr><td class="code"><pre><code class="hljs js"><span class="hljs-comment">// app.js</span><br><span class="hljs-keyword">import</span> React <span class="hljs-keyword">from</span> <span class="hljs-string">'react'</span><br><span class="hljs-keyword">import</span> ReactDOM <span class="hljs-keyword">from</span> <span class="hljs-string">'react-dom'</span><br><span class="hljs-keyword">import</span> &#123; Button &#125; <span class="hljs-keyword">from</span> <span class="hljs-string">'antd'</span><br><br><span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">MyDemo</span> <span class="hljs-keyword">extends</span> <span class="hljs-title">React</span>.<span class="hljs-title">Component</span></span>&#123;<br>    <span class="hljs-keyword">constructor</span>(props)&#123;<br>        <span class="hljs-keyword">super</span>(props)<br>        <span class="hljs-keyword">this</span>.state = &#123;<br>            buttonText: <span class="hljs-string">"我是按钮"</span><br>        &#125;<br>    &#125;<br><br>    render()&#123;<br>        <span class="hljs-keyword">return</span> <span class="xml"><span class="hljs-tag">&lt;<span class="hljs-name">Button</span>&gt;</span>&#123;this.state.buttonText&#125;<span class="hljs-tag">&lt;/<span class="hljs-name">Button</span>&gt;</span></span><br>    &#125;<br>&#125;<br><br>ReactDOM.render(<span class="xml"><span class="hljs-tag">&lt;<span class="hljs-name">MyDemo</span> /&gt;</span></span>, <span class="hljs-built_in">document</span>.getElementById(<span class="hljs-string">"app"</span>))<br></code></pre></td></tr></table></figure>
-<p>结果是确实引入了<code>antd</code>的组件,但是并未引入<code>antd</code>的样式</p>
-<p>我们选择使用<code>babel</code>动态导入的方法引入样式</p>
-<figure class="highlight shell"><table><tr><td class="code"><pre><code class="hljs shell">yarn add babel-plugin-import --dev<br></code></pre></td></tr></table></figure>
-
-<p>然后修改<code>babel.config.json</code>配置</p>
-<figure class="highlight json"><table><tr><td class="code"><pre><code class="hljs json"><span class="hljs-comment">// babel.config.json</span><br>&#123;<br>    <span class="hljs-attr">"presets"</span>: [<br>      [<br>        <span class="hljs-string">"@babel/env"</span>,<br>        &#123;<br>          <span class="hljs-attr">"useBuiltIns"</span>: <span class="hljs-string">"usage"</span>,<br>          <span class="hljs-attr">"modules"</span>: <span class="hljs-literal">false</span> <br>        &#125;<br>      ],<br>      [<span class="hljs-string">"@babel/preset-react"</span>, <br>        &#123;<br>          <span class="hljs-attr">"development"</span>: <span class="hljs-literal">true</span><br>        &#125;<br>      ]<br>    ],<br>    <span class="hljs-attr">"plugins"</span>: [<br>        [<span class="hljs-string">"@babel/plugin-proposal-class-properties"</span>, &#123; <span class="hljs-attr">"loose"</span>: <span class="hljs-literal">true</span> &#125;],<br>        [<span class="hljs-string">"import"</span>, &#123; <span class="hljs-attr">"libraryName"</span>: <span class="hljs-string">"antd"</span>, <span class="hljs-attr">"libraryDirectory"</span>: <span class="hljs-string">"es"</span>, <span class="hljs-attr">"style"</span>: <span class="hljs-string">"css"</span> &#125;]<br>    ]<br>&#125;<br></code></pre></td></tr></table></figure>
-<p>结果如下</p>
-<p><img src="antd%E6%A0%B7%E5%BC%8F%E6%B3%A8%E5%85%A5%E6%88%90%E5%8A%9F.png" alt=""></p>
-<h3 id="浏览器兼容"><a href="#浏览器兼容" class="headerlink" title="浏览器兼容"></a>浏览器兼容</h3><p>为了确保项目需要, 我们保持<code>ie10</code>及以上的兼容, <code>babel</code>会根据配置文件的<code>target</code>, <code>package.json</code>, 根目录<code>browserslist</code>依次去寻找浏览器版本.这里我们在 <code>package.json</code> 中配置 <code>browerslist</code></p>
-<figure class="highlight"><table><tr><td class="code"><pre><code class="hljs json">"browserslist": [<br>    "last 1 version",<br>    "&gt; 1%",<br>    <span class="hljs-string">"IE 10"</span><br>]<br></code></pre></td></tr></table></figure>
-
-<p>运行 <code>npx browerslist</code>得到如下图</p>
-<p><img src="%E6%B5%8F%E8%A7%88%E5%99%A8%E5%85%BC%E5%AE%B9.png" alt=""></p>
+</li>
+</ul>
+<h4 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h4><ul>
+<li>setState第一步:<strong>将state塞入数组,将组件交给更新队列</strong></li>
+<li>setState第二步:更新队列进行更新,如果更新队列<strong>正在更新</strong>,将组件<strong>塞入脏组件队列</strong>.否则<strong>执行批量更新策略</strong></li>
+<li>setState第三步:批量更新策略<strong>判断是否处在批量更新状态</strong>,如果<strong>正在更新</strong>,那么将<strong>更新组件塞入脏组件队列</strong>,否则把脏组件所有组件拿出来<strong>开启事务更新</strong></li>
+<li>setState第四步,批量更新结束事务,在事务结束前,会调用FLUSH_BATCHED_UPDATES<strong>计算最新的<code>state</code>和<code>props</code></strong>.然后关闭事务</li>
+<li>然后React可以拿到最新的state和props进行虚拟dom比对,虚拟dom比对完之后,会去渲染组件,此时如果有shouldUpdate,会进行一个是否渲染组件的判断</li>
+</ul>
+<h4 id="为什么setTimeout下setState是同步的"><a href="#为什么setTimeout下setState是同步的" class="headerlink" title="为什么setTimeout下setState是同步的"></a>为什么setTimeout下setState是同步的</h4><ul>
+<li>关键在于批量更新策略什么时候开启的</li>
+<li>React开启批量更新策略有两个位置,一个是钩子函数,一个是合成事件,可以将钩子函数和合成事件理解为一个大的事务,当触发时,React会开启批量更新策略.而当执行setTimeout的时候,大事务已经关闭,批量更新策略已经重置为false</li>
+<li>实际上,调用setState触发了两个批量更新事务,相当于同步更新的过程了.</li>
+</ul>
+<h4 id="面试问答"><a href="#面试问答" class="headerlink" title="面试问答"></a>面试问答</h4><ul>
+<li>问: setState过后到底发生了什么?</li>
+<li>答: 将组件交给更新队列,将state塞入数组,然后执行队列更新方法,如果队列正在更新,组件就塞入脏组件,否则执行批量更新策略, 批量更新策略会去判断是否正在批量更新,如果正在更新,会把队列放入脏组件,否则循环脏组件队列开启事务执行批量更新,然后在事务结束前计算最新state和props,React拿到他们去进行虚拟dom比对,组件渲染,判断shouldUpdate,进行更新.更新完执行componentDidUpdate…</li>
+</ul>
+<p><a href="https://juejin.im/post/5aa25967518825558251f61f" target="_blank" rel="noopener">React - setState源码分析（小白可读）</a><br><a href="https://imweb.io/topic/5b189d04d4c96b9b1b4c4ed6" target="_blank" rel="noopener">揭密React setState</a><br><a href="https://juejin.im/post/5d7f219a51882501734c2921" target="_blank" rel="noopener">react源码分析之-setState是异步还是同步？</a></p>
 ]]></content>
       <categories>
         <category>React</category>
@@ -885,7 +886,6 @@
       <tags>
         <tag>React</tag>
         <tag>前端</tag>
-        <tag>webpack</tag>
       </tags>
   </entry>
 </search>
