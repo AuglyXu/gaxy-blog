@@ -8,7 +8,7 @@
   <meta name="viewport"
         content="width=device-width, initial-scale=1.0, user-scalable=no">
   <title>
-    React_渲染阶段_beginWork | Gaxy
+    React-渲染阶段-beginWork | Gaxy
   </title>
   <meta name="description" content="专心学技术">
   
@@ -139,7 +139,7 @@
   </h3>
 
   <article class="post-content">
-    <h1>React_渲染阶段_beginWork</h1>
+    <h1>React-渲染阶段-beginWork</h1>
     <h2 id="概览"><a href="#概览" class="headerlink" title="概览"></a>概览</h2><p><code>React</code>在<code>16.8</code>版本之后, 使用<code>Fiber</code>提供了任务的优先级，中断可恢复的能力(开启<code>CM</code>模式). <code>React</code>通过<code>Scheduler</code>将高优先级的任务率先扔进<code>Reconciler</code>, <code>Reconcile</code>阶段创建了每个节点(其中可能经历<code>复用或者diff</code>等),生成<code>Fiber</code>树,并生成对应的<code>dom</code>树(暂未插入到页面),这个阶段我们称之为<code>render</code>阶段(渲染阶段)</p>
 <p><code>React Fiber</code>使用了双缓存机制, 提供了两棵<code>Fiber</code>树, 当前展示的这棵树我们称之为<code>current</code>树(本次更新的上一次更新的树), 还有一棵是首次更新或者触发更新后在内存中生成的树, 我们称之为<code>WorkInProgress</code>树</p>
 <h2 id="渲染阶段"><a href="#渲染阶段" class="headerlink" title="渲染阶段"></a>渲染阶段</h2><p><code>render</code>阶段开始于<code>performSyncWorkOnRoot</code>或<code>performConcurrentWorkOnRoot</code>,取决于当前的模式. 这个函数是<code>React</code>整个流程,包括<code>render阶段</code>和<code>commit阶段</code></p>
