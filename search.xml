@@ -173,6 +173,20 @@
       </tags>
   </entry>
   <entry>
+    <title>Redux</title>
+    <url>/2020/08/02/Redux/</url>
+    <content><![CDATA[<p>本文默认会使用基本的Redux, 主要对自己学习Redux中一些比较困难的点进行思考和学习.</p>
+<h2 id="Redux阅读和使用上遇到的一些难点"><a href="#Redux阅读和使用上遇到的一些难点" class="headerlink" title="Redux阅读和使用上遇到的一些难点"></a>Redux阅读和使用上遇到的一些难点</h2><h3 id="reducer"><a href="#reducer" class="headerlink" title="reducer"></a>reducer</h3><h2 id="实现一个简易的Redux"><a href="#实现一个简易的Redux" class="headerlink" title="实现一个简易的Redux"></a>实现一个简易的Redux</h2><h3 id="createStore"><a href="#createStore" class="headerlink" title="createStore"></a>createStore</h3><h3 id="Provider"><a href="#Provider" class="headerlink" title="Provider"></a>Provider</h3><h3 id="connect"><a href="#connect" class="headerlink" title="connect"></a>connect</h3><h3 id="middleWare"><a href="#middleWare" class="headerlink" title="middleWare"></a>middleWare</h3><h2 id="React-Redux-Hooks"><a href="#React-Redux-Hooks" class="headerlink" title="React-Redux Hooks"></a>React-Redux Hooks</h2><h3 id="useStore"><a href="#useStore" class="headerlink" title="useStore"></a>useStore</h3><h3 id="useSelect"><a href="#useSelect" class="headerlink" title="useSelect"></a>useSelect</h3><h3 id="useDispatch"><a href="#useDispatch" class="headerlink" title="useDispatch"></a>useDispatch</h3>]]></content>
+      <categories>
+        <category>React</category>
+      </categories>
+      <tags>
+        <tag>React</tag>
+        <tag>前端</tag>
+        <tag>Redux</tag>
+      </tags>
+  </entry>
+  <entry>
     <title>setState到底是同步还是异步的</title>
     <url>/2020/07/25/setState/</url>
     <content><![CDATA[<h4 id="setState同步还是异步"><a href="#setState同步还是异步" class="headerlink" title="setState同步还是异步"></a>setState同步还是异步</h4><ul>
@@ -260,20 +274,6 @@
       <tags>
         <tag>React</tag>
         <tag>前端</tag>
-      </tags>
-  </entry>
-  <entry>
-    <title>Redux</title>
-    <url>/2020/08/02/Redux/</url>
-    <content><![CDATA[<p>本文默认会使用基本的Redux, 主要对自己学习Redux中一些比较困难的点进行思考和学习.</p>
-<h2 id="Redux阅读和使用上遇到的一些难点"><a href="#Redux阅读和使用上遇到的一些难点" class="headerlink" title="Redux阅读和使用上遇到的一些难点"></a>Redux阅读和使用上遇到的一些难点</h2><h3 id="reducer"><a href="#reducer" class="headerlink" title="reducer"></a>reducer</h3><h2 id="实现一个简易的Redux"><a href="#实现一个简易的Redux" class="headerlink" title="实现一个简易的Redux"></a>实现一个简易的Redux</h2><h3 id="createStore"><a href="#createStore" class="headerlink" title="createStore"></a>createStore</h3><h3 id="Provider"><a href="#Provider" class="headerlink" title="Provider"></a>Provider</h3><h3 id="connect"><a href="#connect" class="headerlink" title="connect"></a>connect</h3><h3 id="middleWare"><a href="#middleWare" class="headerlink" title="middleWare"></a>middleWare</h3><h2 id="React-Redux-Hooks"><a href="#React-Redux-Hooks" class="headerlink" title="React-Redux Hooks"></a>React-Redux Hooks</h2><h3 id="useStore"><a href="#useStore" class="headerlink" title="useStore"></a>useStore</h3><h3 id="useSelect"><a href="#useSelect" class="headerlink" title="useSelect"></a>useSelect</h3><h3 id="useDispatch"><a href="#useDispatch" class="headerlink" title="useDispatch"></a>useDispatch</h3>]]></content>
-      <categories>
-        <category>React</category>
-      </categories>
-      <tags>
-        <tag>React</tag>
-        <tag>前端</tag>
-        <tag>Redux</tag>
       </tags>
   </entry>
   <entry>
