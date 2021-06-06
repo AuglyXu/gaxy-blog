@@ -235,93 +235,17 @@
       </tags>
   </entry>
   <entry>
-    <title>setState到底是同步还是异步的</title>
-    <url>/2020/07/25/setState/</url>
-    <content><![CDATA[<h4 id="setState同步还是异步"><a href="#setState同步还是异步" class="headerlink" title="setState同步还是异步"></a>setState同步还是异步</h4><ul>
-<li>setState有时表现出异步,有时表现出同步,在<strong>合成事件</strong>和<strong>钩子函数</strong>中表现异步</li>
-<li>setState批量更新优化是<strong>建立在合成事件和钩子函数</strong>之上的,在原生事件和setTimeout中不会发生异步.(顺序为setState =&gt; 钩子函数 =&gt; 合并更新状态)</li>
-</ul>
-<a id="more"></a>
-<hr>
-<h6 id="合成事件"><a href="#合成事件" class="headerlink" title="合成事件"></a>合成事件</h6><ul>
-<li>React通过事件冒泡,将事件冒泡到document上面,再统一分发给中间层SyntheticEvent去执行事件</li>
-</ul>
-<h6 id="钩子函数"><a href="#钩子函数" class="headerlink" title="钩子函数"></a>钩子函数</h6><ul>
-<li>钩子函数指生命周期的钩子</li>
-</ul>
-<hr>
-<p><a href="https://www.jianshu.com/p/8d8f9aa4b033" target="_blank" rel="noopener">合成事件和钩子函数参考文档</a></p>
-<h4 id="setState之后到底发生了什么"><a href="#setState之后到底发生了什么" class="headerlink" title="setState之后到底发生了什么"></a>setState之后到底发生了什么</h4><p>setState有两个注意事项:<br>官网提供:</p>
-<ol>
-<li>出于性能考虑，React 可能会把多个 setState() 调用<strong>合并成一个</strong>调用</li>
-<li>因为 this.props 和 this.state 可能会异步更新，所以你<strong>不要依赖他们的值</strong>来更新下一个状态<figure class="highlight javascript"><table><tr><td class="code"><pre><span class="line">add() &#123;</span><br><span class="line">    <span class="keyword">this</span>.setState(&#123;<span class="attr">count</span>:count + <span class="number">1</span>&#125;)</span><br><span class="line">    <span class="keyword">this</span>.setState(&#123;<span class="attr">count</span>:count + <span class="number">1</span>&#125;)</span><br><span class="line">&#125;</span><br><span class="line">add()</span><br></pre></td></tr></table></figure></li>
-</ol>
-<ul>
-<li>上述连续两次在点击事件调用setState<h4 id="图例"><a href="#图例" class="headerlink" title="图例"></a>图例</h4><img src="setState%E6%B5%81%E7%A8%8B.png" alt=""><h5 id="执行顺序"><a href="#执行顺序" class="headerlink" title="执行顺序"></a>执行顺序</h5><h6 id="第一步"><a href="#第一步" class="headerlink" title="第一步"></a>第一步</h6></li>
-<li>首先调用实例的updater上的enqueueSetState</li>
-<li>目的是让setState入列<figure class="highlight javascript"><table><tr><td class="code"><pre><span class="line">ReactComponent.prototype.setState = <span class="function"><span class="keyword">function</span> (<span class="params">partialState, callback</span>) </span>&#123;</span><br><span class="line">  <span class="comment">//  将setState事务放进队列中</span></span><br><span class="line">  <span class="keyword">this</span>.updater.enqueueSetState(<span class="keyword">this</span>, partialState);</span><br><span class="line">  <span class="keyword">if</span> (callback) &#123;</span><br><span class="line">      <span class="keyword">this</span>.updater.enqueueCallback(<span class="keyword">this</span>, callback, <span class="string">'setState'</span>);</span><br><span class="line">  &#125;</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
-<h6 id="第二步"><a href="#第二步" class="headerlink" title="第二步"></a>第二步</h6></li>
-<li>将更新状态的组件也放入队列中</li>
-<li>将新的state放进数组里 </li>
-<li>用enqueueUpdate来处理将要更新的实例对象</li>
-</ul>
-<h6 id="目前达到的效果"><a href="#目前达到的效果" class="headerlink" title="目前达到的效果"></a>目前达到的效果</h6><ul>
-<li>setState在队列中</li>
-<li>在这个setState执行过程里 我们将state放入了一个队列 将要更新的组件也放入了一个队列<figure class="highlight javascript"><table><tr><td class="code"><pre><span class="line"> enqueueSetState: <span class="function"><span class="keyword">function</span> (<span class="params">publicInstance, partialState</span>) </span>&#123;</span><br><span class="line"> </span><br><span class="line"> <span class="comment">// 获取当前组件的instance</span></span><br><span class="line"><span class="keyword">var</span> internalInstance = getInternalInstanceReadyForUpdate(publicInstance, <span class="string">'setState'</span>);</span><br><span class="line"></span><br><span class="line"> <span class="comment">// 将要更新的state放入一个数组里</span></span><br><span class="line"> <span class="keyword">var</span> queue = internalInstance._pendingStateQueue || (internalInstance._pendingStateQueue = []);</span><br><span class="line">queue.push(partialState);</span><br><span class="line"></span><br><span class="line"><span class="comment">//  将要更新的component instance也放在一个队列里</span></span><br><span class="line">enqueueUpdate(internalInstance);</span><br><span class="line">  &#125;</span><br></pre></td></tr></table></figure>
-
-</li>
-</ul>
-<h5 id="第三步"><a href="#第三步" class="headerlink" title="第三步"></a>第三步</h5><ul>
-<li>调用enqueueUpdate执行更新操作,如果处在更新,那么只是将组件放入脏组件队列中<figure class="highlight javascript"><table><tr><td class="code"><pre><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">enqueueUpdate</span>(<span class="params">component</span>) </span>&#123;</span><br><span class="line">  <span class="comment">// 如果没有处于批量创建/更新组件的阶段，则处理update state事务</span></span><br><span class="line">  <span class="keyword">if</span> (!batchingStrategy.isBatchingUpdates) &#123;</span><br><span class="line">    batchingStrategy.batchedUpdates(enqueueUpdate, component);</span><br><span class="line">    <span class="keyword">return</span>;</span><br><span class="line">  &#125;</span><br><span class="line">  <span class="comment">// 如果正处于批量创建/更新组件的过程，将当前的组件放在dirtyComponents数组中</span></span><br><span class="line">  dirtyComponents.push(component);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></li>
-<li>这个更新函数,接收一个组件的实例 首先判断是否处于更新阶段 如果不是 那么执行更新 如果处在更新阶段 那么我将组件的实例push到队列中 等待更新<h6 id="这个函数也说明了setState是一个异步的过程，它会集齐一批需要更新的组件然后一起更新"><a href="#这个函数也说明了setState是一个异步的过程，它会集齐一批需要更新的组件然后一起更新" class="headerlink" title="这个函数也说明了setState是一个异步的过程，它会集齐一批需要更新的组件然后一起更新"></a>这个函数也说明了setState是一个异步的过程，它会集齐一批需要更新的组件然后一起更新</h6></li>
-</ul>
-<h5 id="第三步拓展——批量更新策略-batchingStrategy"><a href="#第三步拓展——批量更新策略-batchingStrategy" class="headerlink" title="第三步拓展——批量更新策略(batchingStrategy)"></a>第三步拓展——批量更新策略(batchingStrategy)</h5><ul>
-<li>第三步中,如果不处在更新状态,就执行<code>batchingStrategy.batchedUpdates(enqueueUpdate,component)</code></li>
-</ul>
-<h6 id="批量更新策略所在的对象"><a href="#批量更新策略所在的对象" class="headerlink" title="批量更新策略所在的对象"></a>批量更新策略所在的对象</h6><ul>
-<li>batchedUpdates做了个判断,如果我处在更新状态,那么组件入列, 否则开启更新事务<figure class="highlight javascript"><table><tr><td class="code"><pre><span class="line"><span class="keyword">var</span> ReactDefaultBatchingStrategy = &#123;</span><br><span class="line">  <span class="comment">// 用于标记当前是否出于批量更新</span></span><br><span class="line">  isBatchingUpdates: <span class="literal">false</span>,</span><br><span class="line">  <span class="comment">// 当调用这个方法时，正式开始批量更新</span></span><br><span class="line">  batchedUpdates: <span class="function"><span class="keyword">function</span> (<span class="params">callback, a, b, c, d, e</span>) </span>&#123;</span><br><span class="line">    <span class="keyword">var</span> alreadyBatchingUpdates = ReactDefaultBatchingStrategy.isBatchingUpdates;</span><br><span class="line"></span><br><span class="line">    ReactDefaultBatchingStrategy.isBatchingUpdates = <span class="literal">true</span>;</span><br><span class="line"></span><br><span class="line"><span class="comment">// 如果当前事务正在更新过程中，则调用enqueueUpdate</span></span><br><span class="line">    <span class="keyword">if</span> (alreadyBatchingUpdates) &#123;</span><br><span class="line">      <span class="keyword">return</span> callback(a, b, c, d, e);</span><br><span class="line">    &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">    <span class="comment">// 否则执行更新事务</span></span><br><span class="line">      <span class="keyword">return</span> transaction.perform(callback, <span class="literal">null</span>, a, b, c, d, e);</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
-
-</li>
-</ul>
-<h5 id="第三步拓展——事务"><a href="#第三步拓展——事务" class="headerlink" title="第三步拓展——事务"></a>第三步拓展——事务</h5><ul>
-<li><p>所谓事务,就是把函数做一层包装,开始是做一些操作,结束时做一些操作</p>
-</li>
-<li><p>下面是一个简单的事务例子</p>
-<figure class="highlight javascript"><table><tr><td class="code"><pre><span class="line"><span class="keyword">var</span> Transaction = <span class="built_in">require</span>(<span class="string">'./Transaction'</span>);</span><br><span class="line"></span><br><span class="line"><span class="comment">// 我们自己定义的 Transaction</span></span><br><span class="line"><span class="keyword">var</span> MyTransaction = <span class="function"><span class="keyword">function</span>(<span class="params"></span>) </span>&#123;</span><br><span class="line">  <span class="comment">// do sth.</span></span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"><span class="built_in">Object</span>.assign(MyTransaction.prototype, Transaction.Mixin, &#123;</span><br><span class="line">  getTransactionWrappers: <span class="function"><span class="keyword">function</span>(<span class="params"></span>) </span>&#123;</span><br><span class="line">    <span class="keyword">return</span> [&#123;</span><br><span class="line">      initialize: <span class="function"><span class="keyword">function</span>(<span class="params"></span>) </span>&#123;</span><br><span class="line">        <span class="built_in">console</span>.log(<span class="string">'before method perform'</span>);</span><br><span class="line">      &#125;,</span><br><span class="line">      close: <span class="function"><span class="keyword">function</span>(<span class="params"></span>) </span>&#123;</span><br><span class="line">        <span class="built_in">console</span>.log(<span class="string">'after method perform'</span>);</span><br><span class="line">      &#125;</span><br><span class="line">    &#125;];</span><br><span class="line">  &#125;;</span><br><span class="line">&#125;);</span><br><span class="line"></span><br><span class="line"><span class="keyword">var</span> transaction = <span class="keyword">new</span> MyTransaction();</span><br><span class="line"><span class="keyword">var</span> testMethod = <span class="function"><span class="keyword">function</span>(<span class="params"></span>) </span>&#123;</span><br><span class="line">  <span class="built_in">console</span>.log(<span class="string">'test'</span>);</span><br><span class="line">&#125;</span><br><span class="line">transaction.perform(testMethod);</span><br><span class="line"></span><br><span class="line"><span class="comment">// before method perform</span></span><br><span class="line"><span class="comment">// test</span></span><br><span class="line"><span class="comment">// after method perform</span></span><br></pre></td></tr></table></figure>
-<p><img src="setState%E4%BA%8B%E5%8A%A1.png" alt=""></p>
-</li>
-<li><p>React源码的事务中有两个事务RESET_BATCHED_UPDATES(用于重置更新状态) FLUSH_BATCHED_UPDATES(再发起一个dom的批量更新,包括渲染和虚拟dom比对等等)</p>
-</li>
-<li><p>FLUSH_BATCHED_UPDATES这个事务的目的在于循环所有更新组件,执行update,调用组件更新的生命周期等等</p>
-<figure class="highlight javascript"><table><tr><td class="code"><pre><span class="line"><span class="keyword">var</span> RESET_BATCHED_UPDATES = &#123;</span><br><span class="line">  initialize: emptyFunction,</span><br><span class="line">  close: <span class="function"><span class="keyword">function</span> (<span class="params"></span>) </span>&#123;</span><br><span class="line">    ReactDefaultBatchingStrategy.isBatchingUpdates = <span class="literal">false</span>;</span><br><span class="line">  &#125;</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"><span class="keyword">var</span> FLUSH_BATCHED_UPDATES = &#123;</span><br><span class="line">  initialize: emptyFunction,</span><br><span class="line">  close: ReactUpdates.flushBatchedUpdates.bind(ReactUpdates)</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
-
-
-</li>
-</ul>
-<h4 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h4><ul>
-<li>setState第一步:<strong>将state塞入数组,将组件交给更新队列</strong></li>
-<li>setState第二步:更新队列进行更新,如果更新队列<strong>正在更新</strong>,将组件<strong>塞入脏组件队列</strong>.否则<strong>执行批量更新策略</strong></li>
-<li>setState第三步:批量更新策略<strong>判断是否处在批量更新状态</strong>,如果<strong>正在更新</strong>,那么将<strong>更新组件塞入脏组件队列</strong>,否则把脏组件所有组件拿出来<strong>开启事务更新</strong></li>
-<li>setState第四步,批量更新结束事务,在事务结束前,会调用FLUSH_BATCHED_UPDATES<strong>计算最新的<code>state</code>和<code>props</code></strong>.然后关闭事务</li>
-<li>然后React可以拿到最新的state和props进行虚拟dom比对,虚拟dom比对完之后,会去渲染组件,此时如果有shouldUpdate,会进行一个是否渲染组件的判断</li>
-</ul>
-<h4 id="为什么setTimeout下setState是同步的"><a href="#为什么setTimeout下setState是同步的" class="headerlink" title="为什么setTimeout下setState是同步的"></a>为什么setTimeout下setState是同步的</h4><ul>
-<li>关键在于批量更新策略什么时候开启的</li>
-<li>React开启批量更新策略有两个位置,一个是钩子函数,一个是合成事件,可以将钩子函数和合成事件理解为一个大的事务,当触发时,React会开启批量更新策略.而当执行setTimeout的时候,大事务已经关闭,批量更新策略已经重置为false</li>
-<li>实际上,调用setState触发了两个批量更新事务,相当于同步更新的过程了.</li>
-</ul>
-<h4 id="面试问答"><a href="#面试问答" class="headerlink" title="面试问答"></a>面试问答</h4><ul>
-<li>问: setState过后到底发生了什么?</li>
-<li>答: 将组件交给更新队列,将state塞入数组,然后执行队列更新方法,如果队列正在更新,组件就塞入脏组件,否则执行批量更新策略, 批量更新策略会去判断是否正在批量更新,如果正在更新,会把队列放入脏组件,否则循环脏组件队列开启事务执行批量更新,然后在事务结束前计算最新state和props,React拿到他们去进行虚拟dom比对,组件渲染,判断shouldUpdate,进行更新.更新完执行componentDidUpdate…</li>
-</ul>
-<p><a href="https://juejin.im/post/5aa25967518825558251f61f" target="_blank" rel="noopener">React - setState源码分析（小白可读）</a><br><a href="https://imweb.io/topic/5b189d04d4c96b9b1b4c4ed6" target="_blank" rel="noopener">揭密React setState</a><br><a href="https://juejin.im/post/5d7f219a51882501734c2921" target="_blank" rel="noopener">react源码分析之-setState是异步还是同步？</a></p>
-]]></content>
+    <title>Redux</title>
+    <url>/2020/08/02/Redux/</url>
+    <content><![CDATA[<p>本文默认会使用基本的Redux, 主要对自己学习Redux中一些比较困难的点进行思考和学习.</p>
+<h2 id="Redux阅读和使用上遇到的一些难点"><a href="#Redux阅读和使用上遇到的一些难点" class="headerlink" title="Redux阅读和使用上遇到的一些难点"></a>Redux阅读和使用上遇到的一些难点</h2><h3 id="reducer"><a href="#reducer" class="headerlink" title="reducer"></a>reducer</h3><h2 id="实现一个简易的Redux"><a href="#实现一个简易的Redux" class="headerlink" title="实现一个简易的Redux"></a>实现一个简易的Redux</h2><h3 id="createStore"><a href="#createStore" class="headerlink" title="createStore"></a>createStore</h3><h3 id="Provider"><a href="#Provider" class="headerlink" title="Provider"></a>Provider</h3><h3 id="connect"><a href="#connect" class="headerlink" title="connect"></a>connect</h3><h3 id="middleWare"><a href="#middleWare" class="headerlink" title="middleWare"></a>middleWare</h3><h2 id="React-Redux-Hooks"><a href="#React-Redux-Hooks" class="headerlink" title="React-Redux Hooks"></a>React-Redux Hooks</h2><h3 id="useStore"><a href="#useStore" class="headerlink" title="useStore"></a>useStore</h3><h3 id="useSelect"><a href="#useSelect" class="headerlink" title="useSelect"></a>useSelect</h3><h3 id="useDispatch"><a href="#useDispatch" class="headerlink" title="useDispatch"></a>useDispatch</h3>]]></content>
       <categories>
         <category>React</category>
       </categories>
       <tags>
         <tag>React</tag>
         <tag>前端</tag>
+        <tag>Redux</tag>
       </tags>
   </entry>
   <entry>
@@ -795,20 +719,6 @@
       </tags>
   </entry>
   <entry>
-    <title>Redux</title>
-    <url>/2020/08/02/Redux/</url>
-    <content><![CDATA[<p>本文默认会使用基本的Redux, 主要对自己学习Redux中一些比较困难的点进行思考和学习.</p>
-<h2 id="Redux阅读和使用上遇到的一些难点"><a href="#Redux阅读和使用上遇到的一些难点" class="headerlink" title="Redux阅读和使用上遇到的一些难点"></a>Redux阅读和使用上遇到的一些难点</h2><h3 id="reducer"><a href="#reducer" class="headerlink" title="reducer"></a>reducer</h3><h2 id="实现一个简易的Redux"><a href="#实现一个简易的Redux" class="headerlink" title="实现一个简易的Redux"></a>实现一个简易的Redux</h2><h3 id="createStore"><a href="#createStore" class="headerlink" title="createStore"></a>createStore</h3><h3 id="Provider"><a href="#Provider" class="headerlink" title="Provider"></a>Provider</h3><h3 id="connect"><a href="#connect" class="headerlink" title="connect"></a>connect</h3><h3 id="middleWare"><a href="#middleWare" class="headerlink" title="middleWare"></a>middleWare</h3><h2 id="React-Redux-Hooks"><a href="#React-Redux-Hooks" class="headerlink" title="React-Redux Hooks"></a>React-Redux Hooks</h2><h3 id="useStore"><a href="#useStore" class="headerlink" title="useStore"></a>useStore</h3><h3 id="useSelect"><a href="#useSelect" class="headerlink" title="useSelect"></a>useSelect</h3><h3 id="useDispatch"><a href="#useDispatch" class="headerlink" title="useDispatch"></a>useDispatch</h3>]]></content>
-      <categories>
-        <category>React</category>
-      </categories>
-      <tags>
-        <tag>React</tag>
-        <tag>前端</tag>
-        <tag>Redux</tag>
-      </tags>
-  </entry>
-  <entry>
     <title>手把手搭建一个React应用程序</title>
     <url>/2021/01/10/%E6%90%AD%E5%BB%BA%E9%A1%B9%E7%9B%AE/</url>
     <content><![CDATA[<p>本应用程序为<code>webpack5.0</code> + <code>React17</code> + <code>antd4.x</code></p>
@@ -902,6 +812,96 @@
         <tag>React</tag>
         <tag>前端</tag>
         <tag>webpack</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>setState到底是同步还是异步的</title>
+    <url>/2020/07/25/setState/</url>
+    <content><![CDATA[<h4 id="setState同步还是异步"><a href="#setState同步还是异步" class="headerlink" title="setState同步还是异步"></a>setState同步还是异步</h4><ul>
+<li>setState有时表现出异步,有时表现出同步,在<strong>合成事件</strong>和<strong>钩子函数</strong>中表现异步</li>
+<li>setState批量更新优化是<strong>建立在合成事件和钩子函数</strong>之上的,在原生事件和setTimeout中不会发生异步.(顺序为setState =&gt; 钩子函数 =&gt; 合并更新状态)</li>
+</ul>
+<a id="more"></a>
+<hr>
+<h6 id="合成事件"><a href="#合成事件" class="headerlink" title="合成事件"></a>合成事件</h6><ul>
+<li>React通过事件冒泡,将事件冒泡到document上面,再统一分发给中间层SyntheticEvent去执行事件</li>
+</ul>
+<h6 id="钩子函数"><a href="#钩子函数" class="headerlink" title="钩子函数"></a>钩子函数</h6><ul>
+<li>钩子函数指生命周期的钩子</li>
+</ul>
+<hr>
+<p><a href="https://www.jianshu.com/p/8d8f9aa4b033" target="_blank" rel="noopener">合成事件和钩子函数参考文档</a></p>
+<h4 id="setState之后到底发生了什么"><a href="#setState之后到底发生了什么" class="headerlink" title="setState之后到底发生了什么"></a>setState之后到底发生了什么</h4><p>setState有两个注意事项:<br>官网提供:</p>
+<ol>
+<li>出于性能考虑，React 可能会把多个 setState() 调用<strong>合并成一个</strong>调用</li>
+<li>因为 this.props 和 this.state 可能会异步更新，所以你<strong>不要依赖他们的值</strong>来更新下一个状态<figure class="highlight javascript"><table><tr><td class="code"><pre><span class="line">add() &#123;</span><br><span class="line">    <span class="keyword">this</span>.setState(&#123;<span class="attr">count</span>:count + <span class="number">1</span>&#125;)</span><br><span class="line">    <span class="keyword">this</span>.setState(&#123;<span class="attr">count</span>:count + <span class="number">1</span>&#125;)</span><br><span class="line">&#125;</span><br><span class="line">add()</span><br></pre></td></tr></table></figure></li>
+</ol>
+<ul>
+<li>上述连续两次在点击事件调用setState<h4 id="图例"><a href="#图例" class="headerlink" title="图例"></a>图例</h4><img src="setState%E6%B5%81%E7%A8%8B.png" alt=""><h5 id="执行顺序"><a href="#执行顺序" class="headerlink" title="执行顺序"></a>执行顺序</h5><h6 id="第一步"><a href="#第一步" class="headerlink" title="第一步"></a>第一步</h6></li>
+<li>首先调用实例的updater上的enqueueSetState</li>
+<li>目的是让setState入列<figure class="highlight javascript"><table><tr><td class="code"><pre><span class="line">ReactComponent.prototype.setState = <span class="function"><span class="keyword">function</span> (<span class="params">partialState, callback</span>) </span>&#123;</span><br><span class="line">  <span class="comment">//  将setState事务放进队列中</span></span><br><span class="line">  <span class="keyword">this</span>.updater.enqueueSetState(<span class="keyword">this</span>, partialState);</span><br><span class="line">  <span class="keyword">if</span> (callback) &#123;</span><br><span class="line">      <span class="keyword">this</span>.updater.enqueueCallback(<span class="keyword">this</span>, callback, <span class="string">'setState'</span>);</span><br><span class="line">  &#125;</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+<h6 id="第二步"><a href="#第二步" class="headerlink" title="第二步"></a>第二步</h6></li>
+<li>将更新状态的组件也放入队列中</li>
+<li>将新的state放进数组里 </li>
+<li>用enqueueUpdate来处理将要更新的实例对象</li>
+</ul>
+<h6 id="目前达到的效果"><a href="#目前达到的效果" class="headerlink" title="目前达到的效果"></a>目前达到的效果</h6><ul>
+<li>setState在队列中</li>
+<li>在这个setState执行过程里 我们将state放入了一个队列 将要更新的组件也放入了一个队列<figure class="highlight javascript"><table><tr><td class="code"><pre><span class="line"> enqueueSetState: <span class="function"><span class="keyword">function</span> (<span class="params">publicInstance, partialState</span>) </span>&#123;</span><br><span class="line"> </span><br><span class="line"> <span class="comment">// 获取当前组件的instance</span></span><br><span class="line"><span class="keyword">var</span> internalInstance = getInternalInstanceReadyForUpdate(publicInstance, <span class="string">'setState'</span>);</span><br><span class="line"></span><br><span class="line"> <span class="comment">// 将要更新的state放入一个数组里</span></span><br><span class="line"> <span class="keyword">var</span> queue = internalInstance._pendingStateQueue || (internalInstance._pendingStateQueue = []);</span><br><span class="line">queue.push(partialState);</span><br><span class="line"></span><br><span class="line"><span class="comment">//  将要更新的component instance也放在一个队列里</span></span><br><span class="line">enqueueUpdate(internalInstance);</span><br><span class="line">  &#125;</span><br></pre></td></tr></table></figure>
+
+</li>
+</ul>
+<h5 id="第三步"><a href="#第三步" class="headerlink" title="第三步"></a>第三步</h5><ul>
+<li>调用enqueueUpdate执行更新操作,如果处在更新,那么只是将组件放入脏组件队列中<figure class="highlight javascript"><table><tr><td class="code"><pre><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">enqueueUpdate</span>(<span class="params">component</span>) </span>&#123;</span><br><span class="line">  <span class="comment">// 如果没有处于批量创建/更新组件的阶段，则处理update state事务</span></span><br><span class="line">  <span class="keyword">if</span> (!batchingStrategy.isBatchingUpdates) &#123;</span><br><span class="line">    batchingStrategy.batchedUpdates(enqueueUpdate, component);</span><br><span class="line">    <span class="keyword">return</span>;</span><br><span class="line">  &#125;</span><br><span class="line">  <span class="comment">// 如果正处于批量创建/更新组件的过程，将当前的组件放在dirtyComponents数组中</span></span><br><span class="line">  dirtyComponents.push(component);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></li>
+<li>这个更新函数,接收一个组件的实例 首先判断是否处于更新阶段 如果不是 那么执行更新 如果处在更新阶段 那么我将组件的实例push到队列中 等待更新<h6 id="这个函数也说明了setState是一个异步的过程，它会集齐一批需要更新的组件然后一起更新"><a href="#这个函数也说明了setState是一个异步的过程，它会集齐一批需要更新的组件然后一起更新" class="headerlink" title="这个函数也说明了setState是一个异步的过程，它会集齐一批需要更新的组件然后一起更新"></a>这个函数也说明了setState是一个异步的过程，它会集齐一批需要更新的组件然后一起更新</h6></li>
+</ul>
+<h5 id="第三步拓展——批量更新策略-batchingStrategy"><a href="#第三步拓展——批量更新策略-batchingStrategy" class="headerlink" title="第三步拓展——批量更新策略(batchingStrategy)"></a>第三步拓展——批量更新策略(batchingStrategy)</h5><ul>
+<li>第三步中,如果不处在更新状态,就执行<code>batchingStrategy.batchedUpdates(enqueueUpdate,component)</code></li>
+</ul>
+<h6 id="批量更新策略所在的对象"><a href="#批量更新策略所在的对象" class="headerlink" title="批量更新策略所在的对象"></a>批量更新策略所在的对象</h6><ul>
+<li>batchedUpdates做了个判断,如果我处在更新状态,那么组件入列, 否则开启更新事务<figure class="highlight javascript"><table><tr><td class="code"><pre><span class="line"><span class="keyword">var</span> ReactDefaultBatchingStrategy = &#123;</span><br><span class="line">  <span class="comment">// 用于标记当前是否出于批量更新</span></span><br><span class="line">  isBatchingUpdates: <span class="literal">false</span>,</span><br><span class="line">  <span class="comment">// 当调用这个方法时，正式开始批量更新</span></span><br><span class="line">  batchedUpdates: <span class="function"><span class="keyword">function</span> (<span class="params">callback, a, b, c, d, e</span>) </span>&#123;</span><br><span class="line">    <span class="keyword">var</span> alreadyBatchingUpdates = ReactDefaultBatchingStrategy.isBatchingUpdates;</span><br><span class="line"></span><br><span class="line">    ReactDefaultBatchingStrategy.isBatchingUpdates = <span class="literal">true</span>;</span><br><span class="line"></span><br><span class="line"><span class="comment">// 如果当前事务正在更新过程中，则调用enqueueUpdate</span></span><br><span class="line">    <span class="keyword">if</span> (alreadyBatchingUpdates) &#123;</span><br><span class="line">      <span class="keyword">return</span> callback(a, b, c, d, e);</span><br><span class="line">    &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">    <span class="comment">// 否则执行更新事务</span></span><br><span class="line">      <span class="keyword">return</span> transaction.perform(callback, <span class="literal">null</span>, a, b, c, d, e);</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+
+</li>
+</ul>
+<h5 id="第三步拓展——事务"><a href="#第三步拓展——事务" class="headerlink" title="第三步拓展——事务"></a>第三步拓展——事务</h5><ul>
+<li><p>所谓事务,就是把函数做一层包装,开始是做一些操作,结束时做一些操作</p>
+</li>
+<li><p>下面是一个简单的事务例子</p>
+<figure class="highlight javascript"><table><tr><td class="code"><pre><span class="line"><span class="keyword">var</span> Transaction = <span class="built_in">require</span>(<span class="string">'./Transaction'</span>);</span><br><span class="line"></span><br><span class="line"><span class="comment">// 我们自己定义的 Transaction</span></span><br><span class="line"><span class="keyword">var</span> MyTransaction = <span class="function"><span class="keyword">function</span>(<span class="params"></span>) </span>&#123;</span><br><span class="line">  <span class="comment">// do sth.</span></span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"><span class="built_in">Object</span>.assign(MyTransaction.prototype, Transaction.Mixin, &#123;</span><br><span class="line">  getTransactionWrappers: <span class="function"><span class="keyword">function</span>(<span class="params"></span>) </span>&#123;</span><br><span class="line">    <span class="keyword">return</span> [&#123;</span><br><span class="line">      initialize: <span class="function"><span class="keyword">function</span>(<span class="params"></span>) </span>&#123;</span><br><span class="line">        <span class="built_in">console</span>.log(<span class="string">'before method perform'</span>);</span><br><span class="line">      &#125;,</span><br><span class="line">      close: <span class="function"><span class="keyword">function</span>(<span class="params"></span>) </span>&#123;</span><br><span class="line">        <span class="built_in">console</span>.log(<span class="string">'after method perform'</span>);</span><br><span class="line">      &#125;</span><br><span class="line">    &#125;];</span><br><span class="line">  &#125;;</span><br><span class="line">&#125;);</span><br><span class="line"></span><br><span class="line"><span class="keyword">var</span> transaction = <span class="keyword">new</span> MyTransaction();</span><br><span class="line"><span class="keyword">var</span> testMethod = <span class="function"><span class="keyword">function</span>(<span class="params"></span>) </span>&#123;</span><br><span class="line">  <span class="built_in">console</span>.log(<span class="string">'test'</span>);</span><br><span class="line">&#125;</span><br><span class="line">transaction.perform(testMethod);</span><br><span class="line"></span><br><span class="line"><span class="comment">// before method perform</span></span><br><span class="line"><span class="comment">// test</span></span><br><span class="line"><span class="comment">// after method perform</span></span><br></pre></td></tr></table></figure>
+<p><img src="setState%E4%BA%8B%E5%8A%A1.png" alt=""></p>
+</li>
+<li><p>React源码的事务中有两个事务RESET_BATCHED_UPDATES(用于重置更新状态) FLUSH_BATCHED_UPDATES(再发起一个dom的批量更新,包括渲染和虚拟dom比对等等)</p>
+</li>
+<li><p>FLUSH_BATCHED_UPDATES这个事务的目的在于循环所有更新组件,执行update,调用组件更新的生命周期等等</p>
+<figure class="highlight javascript"><table><tr><td class="code"><pre><span class="line"><span class="keyword">var</span> RESET_BATCHED_UPDATES = &#123;</span><br><span class="line">  initialize: emptyFunction,</span><br><span class="line">  close: <span class="function"><span class="keyword">function</span> (<span class="params"></span>) </span>&#123;</span><br><span class="line">    ReactDefaultBatchingStrategy.isBatchingUpdates = <span class="literal">false</span>;</span><br><span class="line">  &#125;</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"><span class="keyword">var</span> FLUSH_BATCHED_UPDATES = &#123;</span><br><span class="line">  initialize: emptyFunction,</span><br><span class="line">  close: ReactUpdates.flushBatchedUpdates.bind(ReactUpdates)</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+
+
+</li>
+</ul>
+<h4 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h4><ul>
+<li>setState第一步:<strong>将state塞入数组,将组件交给更新队列</strong></li>
+<li>setState第二步:更新队列进行更新,如果更新队列<strong>正在更新</strong>,将组件<strong>塞入脏组件队列</strong>.否则<strong>执行批量更新策略</strong></li>
+<li>setState第三步:批量更新策略<strong>判断是否处在批量更新状态</strong>,如果<strong>正在更新</strong>,那么将<strong>更新组件塞入脏组件队列</strong>,否则把脏组件所有组件拿出来<strong>开启事务更新</strong></li>
+<li>setState第四步,批量更新结束事务,在事务结束前,会调用FLUSH_BATCHED_UPDATES<strong>计算最新的<code>state</code>和<code>props</code></strong>.然后关闭事务</li>
+<li>然后React可以拿到最新的state和props进行虚拟dom比对,虚拟dom比对完之后,会去渲染组件,此时如果有shouldUpdate,会进行一个是否渲染组件的判断</li>
+</ul>
+<h4 id="为什么setTimeout下setState是同步的"><a href="#为什么setTimeout下setState是同步的" class="headerlink" title="为什么setTimeout下setState是同步的"></a>为什么setTimeout下setState是同步的</h4><ul>
+<li>关键在于批量更新策略什么时候开启的</li>
+<li>React开启批量更新策略有两个位置,一个是钩子函数,一个是合成事件,可以将钩子函数和合成事件理解为一个大的事务,当触发时,React会开启批量更新策略.而当执行setTimeout的时候,大事务已经关闭,批量更新策略已经重置为false</li>
+<li>实际上,调用setState触发了两个批量更新事务,相当于同步更新的过程了.</li>
+</ul>
+<h4 id="面试问答"><a href="#面试问答" class="headerlink" title="面试问答"></a>面试问答</h4><ul>
+<li>问: setState过后到底发生了什么?</li>
+<li>答: 将组件交给更新队列,将state塞入数组,然后执行队列更新方法,如果队列正在更新,组件就塞入脏组件,否则执行批量更新策略, 批量更新策略会去判断是否正在批量更新,如果正在更新,会把队列放入脏组件,否则循环脏组件队列开启事务执行批量更新,然后在事务结束前计算最新state和props,React拿到他们去进行虚拟dom比对,组件渲染,判断shouldUpdate,进行更新.更新完执行componentDidUpdate…</li>
+</ul>
+<p><a href="https://juejin.im/post/5aa25967518825558251f61f" target="_blank" rel="noopener">React - setState源码分析（小白可读）</a><br><a href="https://imweb.io/topic/5b189d04d4c96b9b1b4c4ed6" target="_blank" rel="noopener">揭密React setState</a><br><a href="https://juejin.im/post/5d7f219a51882501734c2921" target="_blank" rel="noopener">react源码分析之-setState是异步还是同步？</a></p>
+]]></content>
+      <categories>
+        <category>React</category>
+      </categories>
+      <tags>
+        <tag>React</tag>
+        <tag>前端</tag>
       </tags>
   </entry>
 </search>
