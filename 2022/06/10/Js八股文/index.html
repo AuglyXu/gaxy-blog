@@ -1,0 +1,472 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+    <meta charset="UTF-8">
+<meta name="viewport"
+      content="width=device-width, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+<meta http-equiv="X-UA-Compatible" content="ie=edge">
+
+    <meta name="author" content="王八吉吉">
+
+
+    <meta name="subtitle" content="前端小匠">
+
+
+    <meta name="description" content="专心学技术">
+
+
+    <meta name="keywords" content="前端">
+
+
+<title>Js八股文(持续更新) | Gaxy</title>
+
+
+
+    <link rel="icon" href="/favicon.png">
+
+
+
+
+    <!-- stylesheets list from _config.yml -->
+    
+    <link rel="stylesheet" href="/css/style.css">
+    
+
+
+
+    <!-- scripts list from _config.yml -->
+    
+    <script src="/js/script.js"></script>
+    
+    <script src="/js/tocbot.min.js"></script>
+    
+
+
+
+    
+    
+        
+    
+
+
+<meta name="generator" content="Hexo 4.2.1"></head>
+
+<body>
+    <script>
+        // this function is used to check current theme before page loaded.
+        (() => {
+            const currentTheme = window.localStorage && window.localStorage.getItem('theme') || '';
+            const isDark = currentTheme === 'dark';
+            const pagebody = document.getElementsByTagName('body')[0]
+            if (isDark) {
+                pagebody.classList.add('dark-theme');
+                // mobile
+                document.getElementById("mobile-toggle-theme").innerText = "· Dark"
+            } else {
+                pagebody.classList.remove('dark-theme');
+                // mobile
+                document.getElementById("mobile-toggle-theme").innerText = "· Light"
+            }
+        })();
+    </script>
+
+    <div class="wrapper">
+        <header>
+    <nav class="navbar">
+        <div class="container">
+            <div class="navbar-header header-logo"><a href="/">Gaxy</a></div>
+            <div class="menu navbar-right">
+                
+                    <a class="menu-item" href="/archives">归档</a>
+                
+                    <a class="menu-item" href="/category">分类</a>
+                
+                    <a class="menu-item" href="/tag">标签</a>
+                
+                    <a class="menu-item" href="/about">关于</a>
+                
+                <input id="switch_default" type="checkbox" class="switch_default">
+                <label for="switch_default" class="toggleBtn"></label>
+            </div>
+        </div>
+    </nav>
+
+    
+    <nav class="navbar-mobile" id="nav-mobile">
+        <div class="container">
+            <div class="navbar-header">
+                <div>
+                    <a href="/">Gaxy</a><a id="mobile-toggle-theme">·&nbsp;Light</a>
+                </div>
+                <div class="menu-toggle" onclick="mobileBtn()">&#9776; Menu</div>
+            </div>
+            <div class="menu" id="mobile-menu">
+                
+                    <a class="menu-item" href="/archives">归档</a>
+                
+                    <a class="menu-item" href="/category">分类</a>
+                
+                    <a class="menu-item" href="/tag">标签</a>
+                
+                    <a class="menu-item" href="/about">关于</a>
+                
+            </div>
+        </div>
+    </nav>
+
+</header>
+<script>
+    var mobileBtn = function f() {
+        var toggleMenu = document.getElementsByClassName("menu-toggle")[0];
+        var mobileMenu = document.getElementById("mobile-menu");
+        if(toggleMenu.classList.contains("active")){
+           toggleMenu.classList.remove("active")
+            mobileMenu.classList.remove("active")
+        }else{
+            toggleMenu.classList.add("active")
+            mobileMenu.classList.add("active")
+        }
+    }
+</script>
+            <div class="main">
+                <div class="container">
+    
+    
+        <div class="post-toc">
+    <div class="tocbot-list">
+    </div>
+    <div class="tocbot-list-menu">
+        <a class="tocbot-toc-expand" onclick="expand_toc()">Expand all</a>
+        <a onclick="go_top()">Back to top</a>
+        <a onclick="go_bottom()">Go to bottom</a>
+    </div>
+</div>
+
+<script>
+    var tocbot_timer;
+    var DEPTH_MAX = 6;    // 为 6 时展开所有
+    var tocbot_default_config = {
+        tocSelector: '.tocbot-list',
+        contentSelector: '.post-content',
+        headingSelector: 'h1, h2, h3, h4, h5',
+        orderedList: false,
+        scrollSmooth: true,
+        onClick: extend_click,
+    };
+
+    function extend_click() {
+        clearTimeout(tocbot_timer);
+        tocbot_timer = setTimeout(function () {
+            tocbot.refresh(obj_merge(tocbot_default_config, { hasInnerContainers: true }));
+        }, 420); // 这个值是由 tocbot 源码里定义的 scrollSmoothDuration 得来的
+    }
+
+    document.ready(function () {
+        tocbot.init(obj_merge(tocbot_default_config, { collapseDepth: 1 }));
+    });
+
+    function expandToc() {
+        var b = document.querySelector('.tocbot-toc-expand');
+        var expanded = b.getAttribute('data-expanded');
+        expanded ? b.removeAttribute('data-expanded') : b.setAttribute('data-expanded', true);
+        tocbot.refresh(obj_merge(tocbot_default_config, { collapseDepth: expanded ? 1 : DEPTH_MAX }));
+        b.innerText = expanded ? 'Expand all' : 'Collapse all';
+    }
+
+    function go_top() {
+        window.scrollTo(0, 0);
+    }
+
+    function go_bottom() {
+        window.scrollTo(0, document.body.scrollHeight);
+    }
+
+    function obj_merge(target, source) {
+        for (var item in source) {
+            if (source.hasOwnProperty(item)) {
+                target[item] = source[item];
+            }
+        }
+        return target;
+    }
+</script>
+    
+
+    
+    <article class="post-wrap">
+        <header class="post-header">
+            <h1 class="post-title">Js八股文(持续更新)</h1>
+            
+                <div class="post-meta">
+                    
+                        Author: <a itemprop="author" rel="author" href="/">王八吉吉</a>
+                    
+
+                    
+                        <span class="post-time">
+                        Date: <a href="#">六月 10, 2022&nbsp;&nbsp;22:14:05</a>
+                        </span>
+                    
+                    
+                        <span class="post-category">
+                    Category:
+                            
+                                <a href="/category/%E9%9D%A2%E8%AF%95/">面试</a>
+                            
+                        </span>
+                    
+                </div>
+            
+        </header>
+
+        <div class="post-content">
+            <p><em>只针对自己不太熟或者面试常问的有针对性的整理</em></p>
+<h1 id="数据类型和检测方式"><a href="#数据类型和检测方式" class="headerlink" title="数据类型和检测方式"></a>数据类型和检测方式</h1><h2 id="Symbol"><a href="#Symbol" class="headerlink" title="Symbol"></a>Symbol</h2><p><code>Symbol</code>是ES6新出的数据结构</p>
+<p>定义：<code>Symbol(&quot;key&quot;)</code></p>
+<p>特点： 每次<code>Symbol(&#39;key&#39;)</code>都会生成一个唯一的值</p>
+<p>获取：<code>Symbol.for(&#39;key&#39;)</code>，会先检查给定的<code>key</code>是否已经存在，如果不存在才会新建一个值</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">let</span> s1 = <span class="built_in">Symbol</span>.for(<span class="string">'foo'</span>);</span><br><span class="line"><span class="keyword">let</span> s2 = <span class="built_in">Symbol</span>.for(<span class="string">'foo'</span>);</span><br><span class="line">s1 === s2 <span class="comment">// true</span></span><br></pre></td></tr></table></figure>
+
+<h2 id="typeof"><a href="#typeof" class="headerlink" title="typeof"></a>typeof</h2><p><code>typeof</code>注意点：只能检测原始类型(除了<code>null</code>)，不能检测引用类型(均为<code>&quot;object&quot;</code>)<br>原因：<code>null</code>比较特殊，为<code>000000</code>, 对象存在在计算机中，都是以000开始的二进制存储，所以检测出来的结果是对象</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">typeof</span> <span class="literal">null</span> === <span class="string">"object"</span></span><br></pre></td></tr></table></figure>
+
+<h2 id="instanceof"><a href="#instanceof" class="headerlink" title="instanceof"></a>instanceof</h2><p><code>a instanceof b</code>就是在a原型链上找是否有b的原型，找到位true, 否则为false</p>
+<h3 id="手写instanceof"><a href="#手写instanceof" class="headerlink" title="手写instanceof"></a>手写instanceof</h3><figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">myInstanceof</span>(<span class="params">left, right</span>)</span>&#123;</span><br><span class="line">    <span class="keyword">let</span> node = left.__proto__</span><br><span class="line">    <span class="keyword">let</span> protoType = right.protoType</span><br><span class="line">    <span class="keyword">while</span>(node)&#123;</span><br><span class="line">        <span class="keyword">if</span>(node === protoType)&#123;</span><br><span class="line">            <span class="keyword">return</span> <span class="literal">true</span></span><br><span class="line">        &#125;</span><br><span class="line">        node = node.__proto__</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">return</span> <span class="literal">false</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h2 id="数据转换"><a href="#数据转换" class="headerlink" title="数据转换"></a>数据转换</h2><h3 id="对象转换规则"><a href="#对象转换规则" class="headerlink" title="对象转换规则"></a>对象转换规则</h3><ol>
+<li>调用<code>[[Symbol.toPrimitive]]</code></li>
+<li>调用<code>valueOf()</code></li>
+<li>调用<code>toString()</code></li>
+</ol>
+<p>如果都没有返回基础类型，会报错。</p>
+<h3 id="隐式类型转换"><a href="#隐式类型转换" class="headerlink" title="隐式类型转换(==)"></a>隐式类型转换(==)</h3><p>个人总结规则：</p>
+<ol>
+<li><strong>同类型不转换</strong></li>
+<li><strong>不同类型</strong>，一方为<code>string/number</code>, 另一方试图转换为<code>number</code>, 如果是对象，那么遵守上面的<strong>对象转换规则</strong></li>
+<li>如果一方是<code>null/undefined</code>, 另一方必须是<code>null/undefined</code>, 否则为<code>false</code></li>
+</ol>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">var</span> a = &#123;</span><br><span class="line">  value: <span class="number">0</span>,</span><br><span class="line">  valueOf: <span class="function"><span class="keyword">function</span>(<span class="params"></span>) </span>&#123;</span><br><span class="line">    <span class="keyword">this</span>.value++;</span><br><span class="line">    <span class="keyword">return</span> <span class="keyword">this</span>.value;</span><br><span class="line">  &#125;</span><br><span class="line">&#125;;</span><br><span class="line"><span class="comment">// 注意这里a又可以等于1、2、3</span></span><br><span class="line"><span class="built_in">console</span>.log(a == <span class="number">1</span> &amp;&amp; a == <span class="number">2</span> &amp;&amp; a ==<span class="number">3</span>);  <span class="comment">//true 连续调用规则二 Object隐式转换</span></span><br></pre></td></tr></table></figure>
+
+<h1 id="this指针"><a href="#this指针" class="headerlink" title="this指针"></a>this指针</h1><h2 id="指向问题"><a href="#指向问题" class="headerlink" title="指向问题"></a>指向问题</h2><ol>
+<li><p>谁调用它，<code>this</code>指向谁</p>
+</li>
+<li><p>箭头函数的<code>this</code>指向箭头函数上层第一个普通函数的<code>this</code></p>
+</li>
+<li><p><code>new</code>关键字调用的构造函数的<code>this</code>始终指向创建出来的实例</p>
+</li>
+<li><p><code>apply</code>, <code>bind</code>, <code>call</code>可以改变<code>this</code>指针的指向，指向传递进去的第一个对象。<strong>注意：构造函数无法修改指针指向</strong></p>
+</li>
+</ol>
+<h2 id="new相关"><a href="#new相关" class="headerlink" title="new相关"></a>new相关</h2><p><code>new</code>关键字执行以下几个步骤</p>
+<ol>
+<li><p>以构造函数的原型作为原型创建一个对象</p>
+</li>
+<li><p>将构造函数内部的<code>this</code>指向创建出来的对象，并调用构造函数</p>
+</li>
+<li><p>如果有返回值并且返回值为对象，那么返回， 否则将新创建出来的实例对象返回</p>
+</li>
+</ol>
+<h2 id="手写bind和apply"><a href="#手写bind和apply" class="headerlink" title="手写bind和apply"></a>手写bind和apply</h2><figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// bind原理</span></span><br><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">bind</span>(<span class="params">context, ...rest</span>)</span>&#123;</span><br><span class="line">    <span class="comment">// 没传就正常返回函数好了</span></span><br><span class="line">    <span class="keyword">if</span>(context === <span class="literal">undefined</span>) <span class="keyword">return</span> <span class="keyword">this</span>; </span><br><span class="line">    <span class="keyword">if</span>(!(context <span class="keyword">instanceof</span> <span class="built_in">Object</span>)) <span class="keyword">return</span> &#123;</span><br><span class="line">        <span class="keyword">throw</span> <span class="keyword">new</span> <span class="built_in">Error</span>(<span class="string">"上下文必须是对象"</span>)</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">const</span> _this = <span class="keyword">this</span>;</span><br><span class="line">    <span class="keyword">return</span> F()&#123;</span><br><span class="line">        <span class="comment">// 由于new出来的this指向的都是这个实例，实例 instanceof F为 true</span></span><br><span class="line">        <span class="keyword">if</span>(<span class="keyword">this</span> <span class="keyword">instanceof</span> F)&#123; <span class="comment">// 如果是构造函数</span></span><br><span class="line">            <span class="keyword">return</span> <span class="keyword">new</span> _this(...rest)</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">return</span> F.apply(context, rest)</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// apply原理</span></span><br><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">apply</span>(<span class="params">context, ...rest</span>)</span>&#123;</span><br><span class="line">    <span class="keyword">let</span> fn = <span class="keyword">this</span>;</span><br><span class="line">    <span class="keyword">const</span> symbol = <span class="built_in">Symbol</span>(<span class="string">"fn"</span>) <span class="comment">// 避免重复</span></span><br><span class="line">    context[symbol] = fn</span><br><span class="line">    <span class="keyword">const</span> res = context.fn(...rest); <span class="comment">// 保证this指向context</span></span><br><span class="line">    <span class="keyword">delete</span> context[symbol]</span><br><span class="line">    <span class="keyword">return</span> res</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h1 id="作用域相关"><a href="#作用域相关" class="headerlink" title="作用域相关"></a>作用域相关</h1><p>ES5有<em>全局作用域<em>和</em>函数作用域<em>，ES6新增</em>块级作用域</em></p>
+<p>这里要注意<code>let</code>,<code>const</code>,<code>var</code>，暂时性死区、变量提升相关，不再赘述</p>
+<h2 id="上下文"><a href="#上下文" class="headerlink" title="上下文"></a>上下文</h2><ol>
+<li><p><strong>编译阶段</strong>上下文已经形成</p>
+</li>
+<li><p>上下文中包括<em>变量对象VO</em>、<em>作用域链</em>、<em>this</em>指针的指向</p>
+</li>
+<li><p>作用域链保存在作用域<code>[[Scopes]]</code>属性中，即全局作用域就挂在window对象上，函数作用域保存在函数对象上</p>
+</li>
+</ol>
+<h2 id="闭包"><a href="#闭包" class="headerlink" title="闭包"></a>闭包</h2><p>定义：外部函数能够访问内部函数定义的变量</p>
+<p>本质：当前环境存在指向父级作用域的引用(全局作用域就是本身)</p>
+<p>这里分类讨论：</p>
+<ol>
+<li>在函数作用域下的闭包</li>
+</ol>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">a</span>(<span class="params"></span>)</span>&#123;</span><br><span class="line">    <span class="keyword">var</span> x = <span class="number">1</span></span><br><span class="line">    <span class="function"><span class="keyword">function</span> <span class="title">b</span>(<span class="params"></span>)</span>&#123;</span><br><span class="line">        <span class="built_in">console</span>.log(x)</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">return</span> b</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">var</span> f = a()</span><br><span class="line"><span class="built_in">console</span>.dir(f)</span><br><span class="line"></span><br><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment"> f函数上的[[Scopes]]如下</span></span><br><span class="line"><span class="comment"> [</span></span><br><span class="line"><span class="comment">     Closure:&#123;</span></span><br><span class="line"><span class="comment">         x: 1</span></span><br><span class="line"><span class="comment">     &#125;,</span></span><br><span class="line"><span class="comment">     Global:&#123;</span></span><br><span class="line"><span class="comment">         ...window相关变量</span></span><br><span class="line"><span class="comment">     &#125;</span></span><br><span class="line"><span class="comment"> ]</span></span><br><span class="line"><span class="comment"> * /</span></span><br></pre></td></tr></table></figure>
+
+<ol start="2">
+<li>在全局作用域下的闭包</li>
+</ol>
+<blockquote>
+<p>注意：可能有些人以为以下不是闭包，问题在于如下<br/><br><em>当前环境是否有指向父级作用域的变量(有！全局作用域的父级是本身)</em><br/><br><br/><br>因此他是闭包</p>
+</blockquote>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">var</span> x = <span class="number">1</span></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">b</span>(<span class="params"></span>)</span>&#123;</span><br><span class="line">    <span class="built_in">console</span>.log(x)</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="built_in">console</span>.dir(b)</span><br><span class="line"></span><br><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment"> f函数上的[[Scopes]]如下</span></span><br><span class="line"><span class="comment"> [</span></span><br><span class="line"><span class="comment">     Global:&#123;</span></span><br><span class="line"><span class="comment">          x: 1,</span></span><br><span class="line"><span class="comment">         ...window相关变量</span></span><br><span class="line"><span class="comment">     &#125;</span></span><br><span class="line"><span class="comment"> ]</span></span><br><span class="line"><span class="comment"> * /</span></span><br></pre></td></tr></table></figure>
+
+<h2 id="补充说明"><a href="#补充说明" class="headerlink" title="补充说明"></a>补充说明</h2><p><strong>全局作用域下</strong><code>let const</code>定义的变量比较特殊，在<code>[[Scopes]]</code>上的表现和其他不太一样，会单独定义一个对象<code>Script</code>, 存在那个上面</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">let</span> a = <span class="number">1</span>;</span><br><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">fn</span>(<span class="params"></span>)</span>&#123;</span><br><span class="line">    <span class="built_in">console</span>.log(a)</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">/* </span></span><br><span class="line"><span class="comment">fn的[[Scopes]]如下</span></span><br><span class="line"><span class="comment">[</span></span><br><span class="line"><span class="comment">    Script: &#123;</span></span><br><span class="line"><span class="comment">        a: 1</span></span><br><span class="line"><span class="comment">    &#125;,</span></span><br><span class="line"><span class="comment">    Global:&#123;</span></span><br><span class="line"><span class="comment">        fn,</span></span><br><span class="line"><span class="comment">        ...其他window对象</span></span><br><span class="line"><span class="comment">    &#125;</span></span><br><span class="line"><span class="comment">]</span></span><br><span class="line"><span class="comment">*/</span></span><br></pre></td></tr></table></figure>
+
+<h1 id="原型和原型链"><a href="#原型和原型链" class="headerlink" title="原型和原型链"></a>原型和原型链</h1><p>一张图解释</p>
+<p><img src="%E5%8E%9F%E5%9E%8B%E4%B8%8E%E5%8E%9F%E5%9E%8B%E9%93%BE.png" alt=""></p>
+<h1 id="模块化"><a href="#模块化" class="headerlink" title="模块化"></a>模块化</h1><h2 id="CommonJS"><a href="#CommonJS" class="headerlink" title="CommonJS"></a>CommonJS</h2><p><code>require</code>导入，<code>module.exports</code>导出</p>
+<p><code>module.exports</code>指向<code>exports</code></p>
+<p>导出的都是值拷贝, 即导出后，导入值改变不会影响已经导出的值</p>
+<h2 id="import和export"><a href="#import和export" class="headerlink" title="import和export"></a>import和export</h2><p><code>import</code> 导入 <code>export</code> 导出</p>
+<p>需要<code>babel</code>转换</p>
+<p>导出的都是引用拷贝, 即导出后，导入值改变会影响已经导出的值</p>
+<h2 id="CMD和AMD"><a href="#CMD和AMD" class="headerlink" title="CMD和AMD"></a>CMD和AMD</h2><p><code>CMD</code>和<code>AMD</code>用的比较少了，两者都是用来解决异步加载的问题<br>区别在于：</p>
+<ol>
+<li><code>CMD</code>是就近依赖，<code>AMD</code>是依赖前置</li>
+<li>依赖模块的执行实际，<code>AMD</code>已下载就执行(即<code>&#39;./a&#39;, &#39;./b&#39;</code>), <code>CMD</code>是需要的时候再执行。<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// CMD</span></span><br><span class="line">define(<span class="function"><span class="keyword">function</span>(<span class="params">require, exports, module</span>) </span>&#123;</span><br><span class="line">  <span class="keyword">var</span> a = <span class="built_in">require</span>(<span class="string">"./a"</span>);</span><br><span class="line">  a.doSomething();</span><br><span class="line">  <span class="comment">// 此处略去 100 行</span></span><br><span class="line">  <span class="keyword">var</span> b = <span class="built_in">require</span>(<span class="string">"./b"</span>); <span class="comment">// 依赖可以就近书写</span></span><br><span class="line">  b.doSomething();</span><br><span class="line">  <span class="comment">// ...</span></span><br><span class="line">&#125;);</span><br><span class="line"></span><br><span class="line"><span class="comment">// AMD 默认推荐</span></span><br><span class="line">define([<span class="string">"./a"</span>, <span class="string">"./b"</span>], <span class="function"><span class="keyword">function</span>(<span class="params">a, b</span>) </span>&#123;</span><br><span class="line">  <span class="comment">// 依赖必须一开始就写好</span></span><br><span class="line">  a.doSomething();</span><br><span class="line">  <span class="comment">// 此处略去 100 行</span></span><br><span class="line">  b.doSomething();</span><br><span class="line">  <span class="comment">// ...</span></span><br><span class="line">&#125;)</span><br></pre></td></tr></table></figure>
+
+</li>
+</ol>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line"><span class="keyword">const</span> isComplexStruct = <span class="function"><span class="params">obj</span> =&gt;</span> (<span class="keyword">typeof</span> obj === <span class="string">'object'</span> || <span class="keyword">typeof</span> obj === <span class="string">'function'</span>) &amp;&amp; obj !== <span class="literal">null</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">var</span> deepClone = <span class="function">(<span class="params">obj, hash = <span class="keyword">new</span> <span class="built_in">WeakMap</span>(</span>)) =&gt;</span> &#123;</span><br><span class="line">    <span class="keyword">if</span>(obj.constructor === <span class="built_in">Date</span>)&#123;</span><br><span class="line">        <span class="keyword">return</span> <span class="keyword">new</span> <span class="built_in">Date</span>(obj)</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">if</span>(obj.constructor === <span class="built_in">RegExp</span>)&#123;</span><br><span class="line">        <span class="keyword">return</span> <span class="keyword">new</span> <span class="built_in">RegExp</span>(obj)</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">if</span>(hash.has(obj))&#123;</span><br><span class="line">        <span class="keyword">return</span> hash.get(obj)</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 获取描述符</span></span><br><span class="line">    <span class="keyword">const</span> allDes = <span class="built_in">Object</span>.getOwnPropertyDescriptors(obj)</span><br><span class="line"></span><br><span class="line">    <span class="keyword">const</span> cloneObj = <span class="built_in">Object</span>.create(<span class="built_in">Object</span>.getPrototypeOf(obj), allDes)</span><br><span class="line"></span><br><span class="line">    hash.set(obj, cloneObj)</span><br><span class="line"></span><br><span class="line">    <span class="keyword">for</span>(<span class="keyword">var</span> key <span class="keyword">of</span> <span class="built_in">Reflect</span>.ownkeys(ownKeys))&#123;</span><br><span class="line">        cloneObj[key] = isComplexStruct(obj) ? deepClone(obj[key], hash) : obj[key]</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">return</span> cloneObj;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">debounce</span>(<span class="params">fn, wait</span>)</span>&#123;</span><br><span class="line">    <span class="keyword">var</span> timer = <span class="literal">null</span>;</span><br><span class="line">    <span class="keyword">return</span> <span class="function">(<span class="params">...rest</span>) =&gt;</span> &#123;</span><br><span class="line">        <span class="keyword">if</span>(timer)&#123;</span><br><span class="line">            clearTimeout(timer)</span><br><span class="line">            timer = <span class="literal">null</span></span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        timer = setTimeout(<span class="function"><span class="params">()</span> =&gt;</span> &#123;</span><br><span class="line">            fn(...rest)</span><br><span class="line">        &#125;, wait);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">throttle</span>(<span class="params">fn, delay</span>)</span>&#123;</span><br><span class="line">    <span class="keyword">var</span> preTime = <span class="built_in">Date</span>.now()</span><br><span class="line">    <span class="keyword">return</span> <span class="function">(<span class="params">...rest</span>) =&gt;</span> &#123;</span><br><span class="line">        <span class="keyword">var</span> nowTime = <span class="built_in">Date</span>.now()</span><br><span class="line">        <span class="keyword">if</span>(nowTime - preTime &gt;= delay)&#123;</span><br><span class="line">            preTime = <span class="built_in">Date</span>.now()</span><br><span class="line">            <span class="keyword">return</span> fn(...rest)</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h1 id="Iterator"><a href="#Iterator" class="headerlink" title="Iterator"></a>Iterator</h1><p>本质上是个接口，只要部署了<code>Symbol.iterator</code>的数据结构都是被认为是可遍历的，遍历的时候反复调用<code>next</code>方法</p>
+<p>这个接口需要返回一个对象，如下：</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">&#123;</span><br><span class="line">    next()&#123;</span><br><span class="line">        <span class="keyword">return</span> &#123;</span><br><span class="line">            value: xxx,</span><br><span class="line">            done: <span class="literal">false</span>,</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h1 id="Promise"><a href="#Promise" class="headerlink" title="Promise"></a>Promise</h1><ol>
+<li><p>解决异步编程的痛点(回调地狱)</p>
+</li>
+<li><p>一旦状态改变了就不会改回来</p>
+</li>
+<li><p><code>Promise</code>调用是同步的，<code>.then</code>是异步的, 个人理解是创建<code>.then返回的Promise</code>状态这个过程是异步的</p>
+</li>
+</ol>
+<p><img src="Promise.png" alt=""></p>
+<h2 id="手写Promise"><a href="#手写Promise" class="headerlink" title="手写Promise"></a>手写Promise</h2><p>以下写一个简易版本, 注意点如下:</p>
+<ol>
+<li><p><code>Promise</code>本身是同步的, 传入的函数需要同步调用</p>
+</li>
+<li><p><code>resolveCallback, rejectCallback</code>的回调数组是为了处理异步情况</p>
+</li>
+<li></li>
+</ol>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">MyPromise</span></span>&#123;</span><br><span class="line">    <span class="keyword">constructor</span>(fn)&#123;</span><br><span class="line">        <span class="keyword">this</span>.value = <span class="literal">null</span>;</span><br><span class="line">        <span class="keyword">this</span>.reason = <span class="literal">null</span>;</span><br><span class="line">        <span class="keyword">this</span>.status = <span class="string">'pending'</span></span><br><span class="line">        <span class="keyword">this</span>.onResolve = <span class="keyword">this</span>.onResolve.bind(<span class="keyword">this</span>);</span><br><span class="line">        <span class="keyword">this</span>.onReject = <span class="keyword">this</span>.onReject.bind(<span class="keyword">this</span>);</span><br><span class="line">        <span class="keyword">this</span>.resolveCallback = [];</span><br><span class="line">        <span class="keyword">this</span>.rejectCallback = [];</span><br><span class="line">        fn(<span class="keyword">this</span>.onResolve, <span class="keyword">this</span>.onReject)</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    onResolve(val)&#123;</span><br><span class="line">        <span class="keyword">if</span>(<span class="keyword">this</span>.pending === <span class="string">'pending'</span>)&#123;</span><br><span class="line">            <span class="keyword">this</span>.pending = <span class="string">'fulfilled'</span></span><br><span class="line">            <span class="keyword">this</span>.value = val</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">while</span>(<span class="keyword">this</span>.resolveCallback.length)&#123;</span><br><span class="line">            <span class="keyword">this</span>.resolveCallback.shift()(<span class="keyword">this</span>.value)</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    onReject(reason)&#123;</span><br><span class="line">        <span class="keyword">if</span>(<span class="keyword">this</span>.pending === <span class="string">'pending'</span>)&#123;</span><br><span class="line">            <span class="keyword">this</span>.pending = <span class="string">'reject'</span></span><br><span class="line">            <span class="keyword">this</span>.reason = reason</span><br><span class="line">        &#125;</span><br><span class="line">         <span class="keyword">while</span>(<span class="keyword">this</span>.rejectCallback.length)&#123;</span><br><span class="line">            <span class="keyword">this</span>.rejectCallback.shift()(<span class="keyword">this</span>.reason)</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">MyPromise.protoType.then = <span class="function">(<span class="params">onResolve, onReject</span>) =&gt;</span> &#123;</span><br><span class="line">    <span class="keyword">return</span> <span class="keyword">new</span> MyPromise(<span class="function"><span class="params">()</span> =&gt;</span> &#123;</span><br><span class="line">        <span class="keyword">if</span>(<span class="keyword">this</span>.pending === <span class="string">'fulfilled'</span>)&#123;</span><br><span class="line">            <span class="comment">// 这里处理开启微任务，等待返回的promise创建完成</span></span><br><span class="line">            <span class="comment">// queueMicrotask(() =&gt; &#123; // 这里暂时不展开了</span></span><br><span class="line">                onResolve(<span class="keyword">this</span>.value)</span><br><span class="line">            <span class="comment">// &#125;)</span></span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">if</span>(<span class="keyword">this</span>.pending === <span class="string">'reject'</span>)&#123;</span><br><span class="line">            onReject(<span class="keyword">this</span>.reason)</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">if</span>(<span class="keyword">this</span>.pending === <span class="string">'pending'</span>)&#123;</span><br><span class="line">            <span class="keyword">this</span>.resolveCallback.push(onResolve)</span><br><span class="line">            <span class="keyword">this</span>.rejectCallback.push(onReject)</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;)</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h1 id="async-await"><a href="#async-await" class="headerlink" title="async/await"></a>async/await</h1><p>可以认为是<code>Promise</code>的语法糖，也可以认为是<code>Generator</code>的语法糖</p>
+<p>注意点：</p>
+<ol>
+<li><p>没法处理并发的过程(需要<code>Promise.all</code>)</p>
+</li>
+<li><p>注意以下代码</p>
+</li>
+</ol>
+<p><code>a = a + 10</code>这个<code>a</code>尤其要注意b调用的时候是0，而不是1，只有遇到<code>await</code>才会开启协程与主线程合作。</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">var</span> a = <span class="number">0</span></span><br><span class="line"><span class="keyword">var</span> b = <span class="keyword">async</span> () =&gt; &#123;</span><br><span class="line">  a = a + <span class="keyword">await</span> <span class="number">10</span></span><br><span class="line">  <span class="built_in">console</span>.log(<span class="string">'2'</span>, a) <span class="comment">// -&gt; '2' 10</span></span><br><span class="line">  a = (<span class="keyword">await</span> <span class="number">10</span>) + a</span><br><span class="line">  <span class="built_in">console</span>.log(<span class="string">'3'</span>, a) <span class="comment">// -&gt; '3' 20</span></span><br><span class="line">&#125;</span><br><span class="line">b()</span><br><span class="line">a++</span><br><span class="line"><span class="built_in">console</span>.log(<span class="string">'1'</span>, a) <span class="comment">// -&gt; '1' 1</span></span><br></pre></td></tr></table></figure>
+
+<h1 id="事件循环"><a href="#事件循环" class="headerlink" title="事件循环"></a>事件循环</h1><p>以下不区分node环境还是浏览器环境</p>
+<p>微任务：<code>Promise.then MutationObserver process.nextTick Object.observe</code></p>
+<p>宏任务队列：<code>setTimeout setInterval 读写I/O setImmediate UI渲染</code></p>
+<p><code>js</code>线程与<code>GUI</code>互斥，可以使用<code>requestAnimationFrame</code>把这两件事情给关联起来, 这个 API 保证在<strong>下次浏览器渲染之前</strong>一定会被调用, 这个是浏览器自己去调节的</p>
+<h2 id="浏览器的事件循环"><a href="#浏览器的事件循环" class="headerlink" title="浏览器的事件循环"></a>浏览器的事件循环</h2><p>主线程 -&gt; 推入事件表, 注册回调函数（Event Table） -&gt; 主线程执行完毕 -&gt; 微任务队列 -&gt; GUI渲染 -&gt; 宏任务队列(满足条件的执行回调) -&gt; 宏任务对应的微任务</p>
+<h2 id="node的事件循环"><a href="#node的事件循环" class="headerlink" title="node的事件循环"></a>node的事件循环</h2><p><img src="Node%E4%BA%8B%E4%BB%B6%E5%BE%AA%E7%8E%AF.png" alt=""></p>
+<p>以上各阶段注意点：</p>
+<ol>
+<li><p><em>timer</em>阶段处理<code>setTimeout setInterval</code>等宏任务</p>
+</li>
+<li><p><em>poll</em>阶段处理<code>读写I/O</code></p>
+</li>
+<li><p><em>check</em>阶段处理<code>setImmediate</code></p>
+</li>
+<li><p><code>setTimeout(() =&gt; { console.log(&#39;setTimeout&#39;);}, 0);</code>和<code>setImmediate</code>到底谁先执行</p>
+<ul>
+<li>设置为0， 默认为1ms</li>
+<li>如果进入<code>eventLoop</code>都不到1ms, 那么触发了回调的条件，优先执行<code>setTimeout</code>，否则执行<code>setImmediate</code></li>
+</ul>
+</li>
+</ol>
+<h1 id="深浅拷贝"><a href="#深浅拷贝" class="headerlink" title="深浅拷贝"></a>深浅拷贝</h1><h2 id="手写深拷贝"><a href="#手写深拷贝" class="headerlink" title="手写深拷贝"></a>手写深拷贝</h2><p>注意以下几点：</p>
+<ol>
+<li><code>Date</code>对象</li>
+<li><code>正则</code>对象</li>
+<li>循环引用</li>
+<li>原型的拷贝</li>
+<li><code>Symbol</code>关键字</li>
+<li><code>函数</code></li>
+<li>原对象的<code>描述符</code>（可枚举，可写性等等）</li>
+</ol>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">isComplexStruct</span>(<span class="params">obj</span>)</span>&#123;</span><br><span class="line">    <span class="keyword">return</span> (<span class="keyword">typeof</span> obj === <span class="string">'object'</span> || <span class="keyword">typeof</span> obj === <span class="string">'function'</span>) &amp;&amp; obj !== <span class="literal">null</span></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">cloneDeep</span>(<span class="params">obj, hashMap = new WeakMap</span>)</span>&#123;</span><br><span class="line">    <span class="keyword">if</span>(obj.constructor === <span class="built_in">Date</span>)&#123;</span><br><span class="line">        <span class="keyword">return</span> <span class="keyword">new</span> <span class="built_in">Date</span>(obj)</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">if</span>(obj.constructor === <span class="built_in">RegExp</span>)&#123;</span><br><span class="line">        <span class="keyword">return</span> <span class="keyword">new</span> <span class="built_in">RegExp</span>(obj)</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">if</span>(hashMap.has(obj))&#123;</span><br><span class="line">        <span class="keyword">return</span> hashMap.get(obj)</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">const</span> allDes = <span class="built_in">Object</span>.getOwnPropertyDescriptors(obj)</span><br><span class="line"></span><br><span class="line">    <span class="keyword">const</span> cloneObj = <span class="built_in">Object</span>.create(<span class="built_in">Object</span>.getPrototypeOf(obj), allDes)</span><br><span class="line"></span><br><span class="line">    hashMap.set(obj, cloneObj)</span><br><span class="line"></span><br><span class="line">    <span class="keyword">for</span>(<span class="keyword">var</span> key <span class="keyword">of</span> <span class="built_in">Reflect</span>.ownKeys(obj))&#123;</span><br><span class="line">        cloneObj[key] = (isComplexStruct(obj[key]) &amp;&amp; <span class="keyword">typeof</span> obj[key] !== <span class="string">'function'</span>) ? cloneDeep(obj[key], hashMap) : obj[key]</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">return</span> cloneObj</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h1 id="防抖和节流"><a href="#防抖和节流" class="headerlink" title="防抖和节流"></a>防抖和节流</h1><p>防抖：事件触发n秒后再执行回调函数，如果期间又被触发，那么重新计时</p>
+<p>节流：在特定的时间段只执行一次</p>
+<h2 id="手写防抖"><a href="#手写防抖" class="headerlink" title="手写防抖"></a>手写防抖</h2><p>注意点：清空已有的定时器</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">debounce</span>(<span class="params">fn, wait</span>)</span>&#123;</span><br><span class="line">    <span class="keyword">var</span> timer = <span class="literal">null</span>;</span><br><span class="line">    <span class="keyword">return</span> <span class="function">(<span class="params">...rest</span>) =&gt;</span> &#123;</span><br><span class="line">        <span class="keyword">if</span>(timer)&#123;</span><br><span class="line">            clearTimeout(timer);</span><br><span class="line">            timer = <span class="literal">null</span>;</span><br><span class="line">        &#125;</span><br><span class="line">        timer = setTimeout(<span class="function"><span class="params">()</span> =&gt;</span> &#123;</span><br><span class="line">           <span class="keyword">return</span> fn(...rest)</span><br><span class="line">        &#125;, wait);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h2 id="手写节流"><a href="#手写节流" class="headerlink" title="手写节流"></a>手写节流</h2><p>注意点：用当前时间作为依据，判断是否在指定的时间区间内</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">throttle</span>(<span class="params">fn, delay</span>) </span>&#123;</span><br><span class="line">    <span class="keyword">var</span> preTime = <span class="built_in">Date</span>.now()</span><br><span class="line">    <span class="keyword">return</span> <span class="function">(<span class="params">...rest</span>) =&gt;</span> &#123;</span><br><span class="line">        <span class="keyword">if</span>(<span class="built_in">Date</span>.now() - preTime &gt;= delay)&#123;</span><br><span class="line">            preTime = <span class="built_in">Date</span>.now()</span><br><span class="line">            <span class="keyword">return</span> fn(...rest)</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h1 id="数组相关"><a href="#数组相关" class="headerlink" title="数组相关"></a>数组相关</h1><p>数组比较熟悉，主要有个常用的排序算法</p>
+<h2 id="快排"><a href="#快排" class="headerlink" title="快排"></a>快排</h2><p>思想：抽一个中间值，遍历数组，大的放右边，小的放左边，递归左右数组排序在合并</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">var</span> quickSort = <span class="function">(<span class="params">array</span>) =&gt;</span> &#123;</span><br><span class="line">    <span class="keyword">var</span> quick = <span class="function">(<span class="params">arr</span>) =&gt;</span> &#123;</span><br><span class="line">        <span class="keyword">if</span>(arr.length &lt;= <span class="number">1</span>) <span class="keyword">return</span> arr;</span><br><span class="line">        <span class="keyword">const</span> index = arr.length &gt;&gt; <span class="number">1</span>;</span><br><span class="line">        <span class="keyword">const</span> middleVal = arr.splice(index, <span class="number">1</span>);</span><br><span class="line">        <span class="keyword">const</span> left = [];</span><br><span class="line">        <span class="keyword">const</span> right = [];</span><br><span class="line">        <span class="keyword">for</span>(<span class="keyword">var</span> i = <span class="number">0</span>; i &lt; arr.length; i++)&#123;</span><br><span class="line">            <span class="keyword">if</span>(arr[i] &lt;= middle)&#123;</span><br><span class="line">                left.push(arr[i])</span><br><span class="line">            &#125;</span><br><span class="line">            <span class="keyword">if</span>(arr[i] &gt; middle)&#123;</span><br><span class="line">                right.push(arr[i])</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">return</span> quick(left).concat([middle], quick(right))</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">return</span> quick(array)</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h1 id="柯里化"><a href="#柯里化" class="headerlink" title="柯里化"></a>柯里化</h1><p>柯里化就是将一系列参数转换为一个或者多个参数，多次调用</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">var</span> curry = <span class="function"><span class="keyword">function</span>(<span class="params">fn, ...args</span>)</span>&#123;</span><br><span class="line">    <span class="keyword">const</span> length = fn.length</span><br><span class="line">    <span class="keyword">return</span> <span class="function"><span class="keyword">function</span>(<span class="params">...rest</span>)</span>&#123;</span><br><span class="line">        <span class="keyword">const</span> realLength = args.length + rest.length</span><br><span class="line">        <span class="keyword">if</span>(realLength &lt; length)&#123;</span><br><span class="line">            <span class="keyword">return</span> curry.call(<span class="keyword">this</span>, fn, ...[...args, ...rest])</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">else</span>&#123;</span><br><span class="line">            <span class="keyword">return</span> fn.apply(<span class="keyword">this</span>, [...args, ...rest])</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+        </div>
+
+        
+            <section class="post-copyright">
+                
+                    <p class="copyright-item">
+                        <span>Author:</span>
+                        <span>王八吉吉</span>
+                    </p>
+                
+                
+                    <p class="copyright-item">
+                        <span>Permalink:</span>
+                        <span><a href="http://auglyxu.github.io/2022/06/10/Js%E5%85%AB%E8%82%A1%E6%96%87/">http://auglyxu.github.io/2022/06/10/Js%E5%85%AB%E8%82%A1%E6%96%87/</a></span>
+                    </p>
+                
+                
+                    <p class="copyright-item">
+                        <span>License:</span>
+                        <span>Copyright (c) 2019 <a href="http://creativecommons.org/licenses/by-nc/4.0/" target="_blank" rel="noopener">CC-BY-NC-4.0</a> LICENSE</span>
+                    </p>
+                
+                
+                     <p class="copyright-item">
+                         <span>Slogan:</span>
+                         <span>享受当下</span>
+                     </p>
+                
+
+            </section>
+        
+        <section class="post-tags">
+            <div>
+                <span>Tag(s):</span>
+                <span class="tag">
+                    
+                    
+                        <a href="/tags/%E9%9D%A2%E8%AF%95/"># 面试</a>
+                    
+                        
+                </span>
+            </div>
+            <div>
+                <a href="javascript:window.history.back();">back</a>
+                <span>· </span>
+                <a href="/">home</a>
+            </div>
+        </section>
+        <section class="post-nav">
+            
+                <a class="prev" rel="prev" href="/2022/06/17/%E6%B5%8F%E8%A7%88%E5%99%A8%E5%85%AB%E8%82%A1%E6%96%87/">浏览器八股文(持续更新)</a>
+            
+            
+            <a class="next" rel="next" href="/2022/06/09/%E5%89%91%E6%8C%87offer/">剑指offer(持续更新)</a>
+            
+        </section>
+
+
+    </article>
+</div>
+
+            </div>
+            <footer id="footer" class="footer">
+    <div class="copyright">
+        <span>© 王八吉吉 | Powered by <a href="https://hexo.io" target="_blank">Hexo</a> & <a href="https://github.com/Siricee/hexo-theme-Chic" target="_blank">Chic</a></span>
+    </div>
+</footer>
+
+    </div>
+</body>
+
+</html>

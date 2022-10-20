@@ -1,0 +1,438 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+    <meta charset="UTF-8">
+<meta name="viewport"
+      content="width=device-width, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+<meta http-equiv="X-UA-Compatible" content="ie=edge">
+
+    <meta name="author" content="王八吉吉">
+
+
+    <meta name="subtitle" content="前端小匠">
+
+
+    <meta name="description" content="专心学技术">
+
+
+    <meta name="keywords" content="前端">
+
+
+<title>webpack基本配置 | Gaxy</title>
+
+
+
+    <link rel="icon" href="/favicon.png">
+
+
+
+
+    <!-- stylesheets list from _config.yml -->
+    
+    <link rel="stylesheet" href="/css/style.css">
+    
+
+
+
+    <!-- scripts list from _config.yml -->
+    
+    <script src="/js/script.js"></script>
+    
+    <script src="/js/tocbot.min.js"></script>
+    
+
+
+
+    
+    
+        
+    
+
+
+<meta name="generator" content="Hexo 4.2.1"></head>
+
+<body>
+    <script>
+        // this function is used to check current theme before page loaded.
+        (() => {
+            const currentTheme = window.localStorage && window.localStorage.getItem('theme') || '';
+            const isDark = currentTheme === 'dark';
+            const pagebody = document.getElementsByTagName('body')[0]
+            if (isDark) {
+                pagebody.classList.add('dark-theme');
+                // mobile
+                document.getElementById("mobile-toggle-theme").innerText = "· Dark"
+            } else {
+                pagebody.classList.remove('dark-theme');
+                // mobile
+                document.getElementById("mobile-toggle-theme").innerText = "· Light"
+            }
+        })();
+    </script>
+
+    <div class="wrapper">
+        <header>
+    <nav class="navbar">
+        <div class="container">
+            <div class="navbar-header header-logo"><a href="/">Gaxy</a></div>
+            <div class="menu navbar-right">
+                
+                    <a class="menu-item" href="/archives">归档</a>
+                
+                    <a class="menu-item" href="/category">分类</a>
+                
+                    <a class="menu-item" href="/tag">标签</a>
+                
+                    <a class="menu-item" href="/about">关于</a>
+                
+                <input id="switch_default" type="checkbox" class="switch_default">
+                <label for="switch_default" class="toggleBtn"></label>
+            </div>
+        </div>
+    </nav>
+
+    
+    <nav class="navbar-mobile" id="nav-mobile">
+        <div class="container">
+            <div class="navbar-header">
+                <div>
+                    <a href="/">Gaxy</a><a id="mobile-toggle-theme">·&nbsp;Light</a>
+                </div>
+                <div class="menu-toggle" onclick="mobileBtn()">&#9776; Menu</div>
+            </div>
+            <div class="menu" id="mobile-menu">
+                
+                    <a class="menu-item" href="/archives">归档</a>
+                
+                    <a class="menu-item" href="/category">分类</a>
+                
+                    <a class="menu-item" href="/tag">标签</a>
+                
+                    <a class="menu-item" href="/about">关于</a>
+                
+            </div>
+        </div>
+    </nav>
+
+</header>
+<script>
+    var mobileBtn = function f() {
+        var toggleMenu = document.getElementsByClassName("menu-toggle")[0];
+        var mobileMenu = document.getElementById("mobile-menu");
+        if(toggleMenu.classList.contains("active")){
+           toggleMenu.classList.remove("active")
+            mobileMenu.classList.remove("active")
+        }else{
+            toggleMenu.classList.add("active")
+            mobileMenu.classList.add("active")
+        }
+    }
+</script>
+            <div class="main">
+                <div class="container">
+    
+    
+        <div class="post-toc">
+    <div class="tocbot-list">
+    </div>
+    <div class="tocbot-list-menu">
+        <a class="tocbot-toc-expand" onclick="expand_toc()">Expand all</a>
+        <a onclick="go_top()">Back to top</a>
+        <a onclick="go_bottom()">Go to bottom</a>
+    </div>
+</div>
+
+<script>
+    var tocbot_timer;
+    var DEPTH_MAX = 6;    // 为 6 时展开所有
+    var tocbot_default_config = {
+        tocSelector: '.tocbot-list',
+        contentSelector: '.post-content',
+        headingSelector: 'h1, h2, h3, h4, h5',
+        orderedList: false,
+        scrollSmooth: true,
+        onClick: extend_click,
+    };
+
+    function extend_click() {
+        clearTimeout(tocbot_timer);
+        tocbot_timer = setTimeout(function () {
+            tocbot.refresh(obj_merge(tocbot_default_config, { hasInnerContainers: true }));
+        }, 420); // 这个值是由 tocbot 源码里定义的 scrollSmoothDuration 得来的
+    }
+
+    document.ready(function () {
+        tocbot.init(obj_merge(tocbot_default_config, { collapseDepth: 1 }));
+    });
+
+    function expandToc() {
+        var b = document.querySelector('.tocbot-toc-expand');
+        var expanded = b.getAttribute('data-expanded');
+        expanded ? b.removeAttribute('data-expanded') : b.setAttribute('data-expanded', true);
+        tocbot.refresh(obj_merge(tocbot_default_config, { collapseDepth: expanded ? 1 : DEPTH_MAX }));
+        b.innerText = expanded ? 'Expand all' : 'Collapse all';
+    }
+
+    function go_top() {
+        window.scrollTo(0, 0);
+    }
+
+    function go_bottom() {
+        window.scrollTo(0, document.body.scrollHeight);
+    }
+
+    function obj_merge(target, source) {
+        for (var item in source) {
+            if (source.hasOwnProperty(item)) {
+                target[item] = source[item];
+            }
+        }
+        return target;
+    }
+</script>
+    
+
+    
+    <article class="post-wrap">
+        <header class="post-header">
+            <h1 class="post-title">webpack基本配置</h1>
+            
+                <div class="post-meta">
+                    
+                        Author: <a itemprop="author" rel="author" href="/">王八吉吉</a>
+                    
+
+                    
+                        <span class="post-time">
+                        Date: <a href="#">十一月 29, 2020&nbsp;&nbsp;0:00:00</a>
+                        </span>
+                    
+                    
+                        <span class="post-category">
+                    Category:
+                            
+                                <a href="/category/webpack/">webpack</a>
+                            
+                        </span>
+                    
+                </div>
+            
+        </header>
+
+        <div class="post-content">
+            <h2 id="基本搭建"><a href="#基本搭建" class="headerlink" title="基本搭建"></a>基本搭建</h2><figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">npm init -y</span><br></pre></td></tr></table></figure>
+<p>一顿yes直接搭建好基本的node环境<br><img src="%E5%88%9D%E5%A7%8B%E5%8C%96.jpg" alt=""></p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">yarn install webpack webpack-cli --save-dev</span><br></pre></td></tr></table></figure>
+<p>安装webpack, webpack-cli, 由于是开发环境需要,加上–save-dev</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">module</span>.exports = &#123;</span><br><span class="line">    entry: <span class="string">"./index.js"</span>,</span><br><span class="line">    mode: <span class="string">"development"</span>,</span><br><span class="line">    output: &#123;</span><br><span class="line">        path: path.resolve(__dirname, <span class="string">'dist'</span>),</span><br><span class="line">    &#125;,</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>新建<code>index.js</code>, 新建<code>webpack.config.js</code>, <code>webpack</code>默认读取<code>webpack.config.js</code>导出的对象.</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">npx webpack</span><br></pre></td></tr></table></figure>
+<p><code>webpack</code>默认读取根路径下的<code>webpack.config.js</code>文件, <code>npm</code>5.2之后提供了自动安装<code>npx</code> ,会自动查找当前依赖包中的可执行文件并执行<br><img src="%E6%88%90%E5%8A%9F%E6%89%A7%E8%A1%8C.jpg" alt=""></p>
+<a id="more"></a>
+
+<hr>
+<h2 id="context"><a href="#context" class="headerlink" title="context"></a>context</h2><p>定义了打包的基础目录, 一旦设置, 那么接下来配置设置的根路径将会是配置的基础目录。</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">const</span> path = <span class="built_in">require</span>(<span class="string">'path'</span>);</span><br><span class="line"></span><br><span class="line"><span class="built_in">module</span>.exports = &#123;</span><br><span class="line">  <span class="comment">//...</span></span><br><span class="line">  context: path.resolve(__dirname, <span class="string">'app'</span>)</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+
+<hr>
+<h2 id="entry"><a href="#entry" class="headerlink" title="entry"></a>entry</h2><p>文件打包的起点</p>
+<ul>
+<li>可以传入数组, 传入数组从前往后依次进行打包, 包名为main</li>
+<li>可以传入对象, 每个键作为打包的包名， 值为打包的资源路径或者打包的描述符<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">module</span>.exports = &#123;</span><br><span class="line">  <span class="comment">//...</span></span><br><span class="line">  entry: <span class="string">'./index.js'</span></span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"><span class="comment">// 也可以自定义包名</span></span><br><span class="line"><span class="built_in">module</span>.exports = &#123;</span><br><span class="line">  <span class="comment">//...</span></span><br><span class="line">  entry: &#123;</span><br><span class="line">    app: <span class="string">'./app.js'</span>,</span><br><span class="line">    home: &#123; <span class="attr">import</span>: <span class="string">'./contact.js'</span>, <span class="attr">filename</span>: <span class="string">'pages/[name][ext]'</span> &#125;,</span><br><span class="line">    about: &#123; <span class="attr">import</span>: <span class="string">'./about.js'</span>, <span class="attr">filename</span>: <span class="string">'pages/[name][ext]'</span> &#125;</span><br><span class="line">  &#125;</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+多入口可以设置打包依赖， 减少包体积， 避免重复使用相同的包<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">module</span>.exports = &#123;</span><br><span class="line">  <span class="comment">//...</span></span><br><span class="line">  entry: &#123;</span><br><span class="line">    app: &#123; <span class="attr">import</span>: [<span class="string">'./app.js'</span>, <span class="string">'./app2.js'</span>], <span class="attr">dependOn</span>: <span class="string">'react-vendors'</span> &#125;,</span><br><span class="line">    <span class="string">'react-vendors'</span>: [<span class="string">'react'</span>, <span class="string">'react-dom'</span>, <span class="string">'prop-types'</span>]</span><br><span class="line">  &#125;</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+可以动态引入， 将在make事件中触发<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">module</span>.exports = &#123;</span><br><span class="line">  <span class="comment">//...</span></span><br><span class="line">  entry: <span class="function"><span class="params">()</span> =&gt;</span> <span class="string">'./demo'</span> <span class="comment">// () =&gt; new Promise((resolve) =&gt; resolve(['./demo', './demo2']))</span></span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+
+</li>
+</ul>
+<hr>
+<h2 id="mode"><a href="#mode" class="headerlink" title="mode"></a>mode</h2><p>打包模式分为<code>development</code>和<code>production</code></p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">module</span>.exports = &#123;</span><br><span class="line">  <span class="comment">//...</span></span><br><span class="line">  mode: <span class="string">'development'</span> <span class="comment">// 'production'</span></span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+<p>可以在打包时决定</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">npx webpack --mode&#x3D;development</span><br></pre></td></tr></table></figure>
+
+<p>如果我们需要在不同模式下进行定义不同的打包行为， 我们可以定义为函数， 使用方法如下。</p>
+<p><strong>开发环境打包文件<code>webpack.base.js</code></strong></p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">module</span>.exports = <span class="function">(<span class="params">options</span>) =&gt;</span> (&#123;</span><br><span class="line">    <span class="comment">// 这里注入基本配置</span></span><br><span class="line">&#125;)</span><br></pre></td></tr></table></figure>
+<p><strong>主打包文件<code>webpack.dev.js</code></strong></p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">module</span>.exports = <span class="built_in">require</span>(<span class="string">'./webpack.base.js'</span>)(&#123;</span><br><span class="line">    <span class="comment">// 这里将开发环境打包需要的配置注入</span></span><br><span class="line">&#125;)</span><br></pre></td></tr></table></figure>
+<p>通过配置进行打包， 选择对应的打包文件</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">webpack --config webpack.dev.js</span><br></pre></td></tr></table></figure>
+
+<hr>
+<h2 id="output"><a href="#output" class="headerlink" title="output"></a>output</h2><p>打包的输出形态， 包括bundle和静态文件</p>
+<h3 id="filename"><a href="#filename" class="headerlink" title="filename"></a>filename</h3><p><code>filename</code> 是一个很常见的配置，就是对应于 <code>entry</code> 里面的输入文件。</p>
+<p>这里可以使用可替换模板字符串的形式定义输出的打包文件名，浏览器存在缓存机制，如果名称相同，浏览器默认文件没有改变，这样打包文件名相同会使得获取文件出现问题，因此我们通过可替换模板字符串的形式定义输出的打包文件名。</p>
+<ul>
+<li>编译层<ul>
+<li>name： chunk文件名</li>
+</ul>
+</li>
+<li>chunk层<ul>
+<li>id: 内部chunk的id</li>
+<li>chunkhash：这个chunk的hash值</li>
+</ul>
+</li>
+<li>模块层<ul>
+<li>contenthash： 根据内容生成的hash</li>
+<li>id：模块id</li>
+<li>hash：模块的hash值</li>
+</ul>
+</li>
+<li>文件层：<ul>
+<li>file： 文件名称和路径</li>
+<li>query： 带前缀 ? 的 query</li>
+</ul>
+</li>
+<li>url层：<ul>
+<li>url</li>
+</ul>
+</li>
+</ul>
+<blockquote>
+<p>具体参照<a href="https://webpack.docschina.org/configuration/output/#outputfilename" target="_blank" rel="noopener">模板字符串替换</a></p>
+</blockquote>
+<h3 id="chunkFilename"><a href="#chunkFilename" class="headerlink" title="chunkFilename"></a>chunkFilename</h3><p><code>chunkFilename</code> 指未被列在 <code>entry</code> 中，却又需要被打包出来的 <code>chunk</code> 文件的名称。一般来说，这个 <code>chunk</code> 文件指的就是要懒加载的代码。</p>
+<p>注意点： 默认文件输出为<code>[id].js</code>或者遵循<code>output.filename</code>的设置，如果<code>output.filename</code>设置了<code>name</code>， 则会被预先替换为<code>id</code></p>
+<blockquote>
+<p>可以参照这篇文章看到<a href="https://www.cnblogs.com/skychx/p/webpack-filename-chunkFilename.html" target="_blank" rel="noopener">filename和chunkFilename的区别</a></p>
+</blockquote>
+<h3 id="path"><a href="#path" class="headerlink" title="path"></a>path</h3><p>打包文件路径</p>
+<h3 id="publicPath"><a href="#publicPath" class="headerlink" title="publicPath"></a>publicPath</h3><p>外部资源路径，通常以<code>/</code>结尾, 默认参照路径为HTML页面所在的路径为准</p>
+<p>例如如下配置，请求一个<code>chunk</code>就相当于请求<code>/assets/1.chunk.js</code></p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">module</span>.exports = &#123;</span><br><span class="line">  <span class="comment">//...</span></span><br><span class="line">  output: &#123;</span><br><span class="line">    publicPath: <span class="string">'/assets/'</span>,</span><br><span class="line">    chunkFilename: <span class="string">'[id].chunk.js'</span></span><br><span class="line">  &#125;</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+
+<h3 id="library"><a href="#library" class="headerlink" title="library"></a>library</h3><p>组织打包的模块，库开发使用</p>
+<h3 id="libraryTarget"><a href="#libraryTarget" class="headerlink" title="libraryTarget"></a>libraryTarget</h3><p>库打包引入的方式</p>
+<hr>
+<h2 id="Module"><a href="#Module" class="headerlink" title="Module"></a>Module</h2><p><code>module</code>对象用于模块的处理方式</p>
+<h3 id="rules"><a href="#rules" class="headerlink" title="rules"></a>rules</h3><h4 id="对应值为-Rule-数组"><a href="#对应值为-Rule-数组" class="headerlink" title="对应值为[Rule]数组"></a>对应值为<code>[Rule]</code>数组</h4><p><code>rules</code>作用在于提供模块的创建规则，提供对应的<code>loader</code>和解析器(<code>parser</code>)</p>
+<h4 id="Rule"><a href="#Rule" class="headerlink" title="Rule"></a>Rule</h4><p><code>Rule</code>是一个对象，这个对象分为三部分</p>
+<ul>
+<li>条件匹配： 条件匹配通过 <code>test</code> 、 <code>include</code> 、 <code>exclude</code> 和 <code>resource</code> 对资源进行匹配(这个资源指的是请求的资源)，并且属性 <code>issuer</code> 对 <code>issuer</code> 匹配, 这个 <code>issuer</code> 指的是请求者的文件绝对路径。是导入时的位置。</li>
+<li>应用规则： 对选中的文件使用 <code>use</code> 来应用 <code>loader</code>，按照从后往前的顺序应用， 并可以为loader传递参数。</li>
+<li>嵌套规则：父规则(文档这里没怎么理解, 在我看来是指一般的规则)、 <code>rule</code>、<code>oneOf</code>的顺序，可以通过<code>enforce</code>强制修改顺序。</li>
+</ul>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">module</span>.exports = &#123;</span><br><span class="line">  <span class="comment">//...</span></span><br><span class="line">  <span class="built_in">module</span>: &#123;</span><br><span class="line">    rules: [ <span class="comment">// 以下对象对应一个Rule</span></span><br><span class="line">      &#123;</span><br><span class="line">        test: <span class="regexp">/\\.css$/</span>, <span class="comment">// loader1</span></span><br><span class="line">      &#125;,</span><br><span class="line">      &#123;</span><br><span class="line">          test: <span class="regexp">/\\.js$/</span>, <span class="comment">// loader2</span></span><br><span class="line">      &#125;</span><br><span class="line">    ]</span><br><span class="line">  &#125;</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>注意： <code>loader</code> 顺序从右往左，从下往上执行，按照 <code>pitching</code> 顺序执行<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">|- a-loader <span class="string">`pitch`</span></span><br><span class="line">  |- b-loader <span class="string">`pitch`</span></span><br><span class="line">    |- c-loader <span class="string">`pitch`</span></span><br><span class="line">      |- requested <span class="built_in">module</span> is picked up <span class="keyword">as</span> a dependency</span><br><span class="line">    |- c-loader normal execution</span><br><span class="line">  |- b-loader normal execution</span><br><span class="line">|- a-loader normal execution</span><br></pre></td></tr></table></figure>
+
+</li>
+</ul>
+<h4 id="Rule-oneOf"><a href="#Rule-oneOf" class="headerlink" title="Rule.oneOf"></a>Rule.oneOf</h4><p>一旦匹配，就使用</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">module</span>.exports = &#123;</span><br><span class="line">  <span class="comment">//...</span></span><br><span class="line">  <span class="built_in">module</span>: &#123;</span><br><span class="line">    rules: [ <span class="comment">// 以下对象对应一个Rule</span></span><br><span class="line">      &#123;</span><br><span class="line">        test: <span class="regexp">/\\.css$/</span>,</span><br><span class="line">        oneOf: [</span><br><span class="line">            &#123;</span><br><span class="line">                resourceQuery: <span class="regexp">/inline/</span>, <span class="comment">// foo.css?inline</span></span><br><span class="line">                use: <span class="string">'url-loader'</span></span><br><span class="line">            &#125;,</span><br><span class="line">            &#123;</span><br><span class="line">                resourceQuery: <span class="regexp">/external/</span>, <span class="comment">// foo.css?external</span></span><br><span class="line">                use: <span class="string">'file-loader'</span></span><br><span class="line">            &#125;</span><br><span class="line">        ]</span><br><span class="line">      &#125;</span><br><span class="line">    ]</span><br><span class="line">  &#125;</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+
+<h4 id="Rule-use"><a href="#Rule-use" class="headerlink" title="Rule.use"></a>Rule.use</h4><p>提供一个 <code>loader</code> 数组, 从右往左进行匹配</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">module</span>.exports = &#123;</span><br><span class="line">  <span class="comment">//...</span></span><br><span class="line">  <span class="built_in">module</span>: &#123;</span><br><span class="line">    rules: [</span><br><span class="line">      &#123;</span><br><span class="line">        <span class="comment">//...</span></span><br><span class="line">        use: [</span><br><span class="line">          <span class="string">'style-loader'</span>,</span><br><span class="line">          &#123;</span><br><span class="line">            loader: <span class="string">'css-loader'</span>,</span><br><span class="line">            options: &#123;</span><br><span class="line">              importLoaders: <span class="number">1</span></span><br><span class="line">            &#125;</span><br><span class="line">          &#125;,</span><br><span class="line">          &#123;</span><br><span class="line">            loader: <span class="string">'less-loader'</span>,</span><br><span class="line">            options: &#123;</span><br><span class="line">              noIeCompat: <span class="literal">true</span></span><br><span class="line">            &#125;</span><br><span class="line">          &#125;</span><br><span class="line">        ]</span><br><span class="line">      &#125;</span><br><span class="line">    ]</span><br><span class="line">  &#125;</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+
+<h4 id="Rule-exclude-include"><a href="#Rule-exclude-include" class="headerlink" title="Rule.exclude/include"></a>Rule.exclude/include</h4><p>排除/包括 <code>loader</code> 加载某个模块</p>
+<h4 id="Rule-parse"><a href="#Rule-parse" class="headerlink" title="Rule.parse"></a>Rule.parse</h4><p>文件被 <code>loader</code> 执行后会转成一段js字符串， <code>parse</code>会将其转换为 <code>AST</code> 语法树，有了语法树就可以对代码为所欲为了，其中最重要的功能就是分析出这段代码依赖了哪些模块</p>
+<h4 id="Rule-sideEffect"><a href="#Rule-sideEffect" class="headerlink" title="Rule.sideEffect"></a>Rule.sideEffect</h4><p>模块是否包含副作用</p>
+<h4 id="Rule-type"><a href="#Rule-type" class="headerlink" title="Rule.type"></a>Rule.type</h4><p>设置匹配模块的类型，防止 <code>webpack</code> 自定义的行为发生，常用于自定义loader加载模块</p>
+<h4 id="Rule-resolve"><a href="#Rule-resolve" class="headerlink" title="Rule.resolve"></a>Rule.resolve</h4><p>模块解析可以在模块层被配置, <code>Rule</code>层面的 <code>resolve</code> 会覆盖顶层的 <code>resolve配置</code></p>
+<h3 id="UseEntry"><a href="#UseEntry" class="headerlink" title="UseEntry"></a>UseEntry</h3><p><code>Rule</code> 传入的形式，通常可以是对象或者一个函数, 一个必选的字符串形式的 <code>loader</code> 和一个可选的 <code>option</code></p>
+<p>函数形式则会接受一个加载模块的对象参数</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 对象形式</span></span><br><span class="line"><span class="built_in">module</span>.exports = &#123;</span><br><span class="line">  <span class="comment">//...</span></span><br><span class="line">  <span class="built_in">module</span>: &#123;</span><br><span class="line">    rules: [</span><br><span class="line">      &#123;</span><br><span class="line">        loader: <span class="string">'css-loader'</span>,</span><br><span class="line">        options: &#123;</span><br><span class="line">          modules: <span class="literal">true</span></span><br><span class="line">        &#125;</span><br><span class="line">      &#125;</span><br><span class="line">    ]</span><br><span class="line">  &#125;</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"><span class="comment">// 函数形式</span></span><br><span class="line"><span class="built_in">module</span>.exports = &#123;</span><br><span class="line">  <span class="comment">//...</span></span><br><span class="line">  <span class="built_in">module</span>: &#123;</span><br><span class="line">    rules: [</span><br><span class="line">      &#123;</span><br><span class="line">        loader: <span class="string">'file-loader'</span>,</span><br><span class="line">        options: &#123;</span><br><span class="line">          outputPath: <span class="string">'svgs'</span></span><br><span class="line">        &#125;</span><br><span class="line">      &#125;,</span><br><span class="line">      (info) =&gt; (&#123;</span><br><span class="line">        loader: <span class="string">'svgo-loader'</span>,</span><br><span class="line">        options: &#123;</span><br><span class="line">          plugins: [&#123;</span><br><span class="line">            cleanupIDs: &#123; <span class="attr">prefix</span>: basename(info.resource) &#125;</span><br><span class="line">          &#125;]</span><br><span class="line">        &#125;</span><br><span class="line">      &#125;)</span><br><span class="line">    ]</span><br><span class="line">  &#125;</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+
+<h3 id="noParse"><a href="#noParse" class="headerlink" title="noParse"></a>noParse</h3><p>不解析所传递的正则表达式匹配到的文件，这里特别注意不匹配的文件不能存在<code>require</code>和<code>import</code></p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">module</span>.exports = &#123;</span><br><span class="line">  <span class="comment">//...</span></span><br><span class="line">  <span class="built_in">module</span>: &#123;</span><br><span class="line">    noParse: <span class="regexp">/jquery|lodash/</span>,</span><br><span class="line">  &#125;</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+
+<h3 id="unsafeCache"><a href="#unsafeCache" class="headerlink" title="unsafeCache"></a>unsafeCache</h3><p>缓存模块是否需要解析， 首先得保证缓存开启。缓存未开启，默认为<code>false</code>。缓存开启，默认会解析<code>node_modules</code>的模块。</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">module</span>.exports = &#123;</span><br><span class="line">  <span class="comment">//...</span></span><br><span class="line">  <span class="built_in">module</span>: &#123;</span><br><span class="line">    cache: <span class="literal">true</span>,</span><br><span class="line">    <span class="comment">// unsafeCache</span></span><br><span class="line">  &#125;</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+
+<h2 id="Resolve"><a href="#Resolve" class="headerlink" title="Resolve"></a>Resolve</h2><p><code>resolve</code>的作用在于如何正确的识别模块，找到需要引入<code>bundle</code>的模块代码</p>
+<h3 id="alias"><a href="#alias" class="headerlink" title="alias"></a>alias</h3><p>创建别名，使得引入方式更加简单</p>
+<p>也可以在给定对象的键后的末尾添加 <code>$</code>，以表示精准匹配</p>
+<p>也可以使用 <code>{ &#39;路径&#39;: false }</code> 表示忽略路径的模块</p>
+<blockquote>
+<p>resolve.alias 优先级高于其它模块解析方式。 </p>
+</blockquote>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">const</span> path = <span class="built_in">require</span>(<span class="string">'path'</span>);</span><br><span class="line"></span><br><span class="line"><span class="built_in">module</span>.exports = &#123;</span><br><span class="line">  <span class="comment">//...</span></span><br><span class="line">  resolve: &#123;</span><br><span class="line">    alias: &#123;</span><br><span class="line">      Utilities: path.resolve(__dirname, <span class="string">'src/utilities/'</span>),</span><br><span class="line">      Templates: path.resolve(__dirname, <span class="string">'src/templates/'</span>),</span><br><span class="line">    &#125;,</span><br><span class="line">  &#125;,</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"><span class="comment">// 原本方式</span></span><br><span class="line"><span class="keyword">import</span> Utility <span class="keyword">from</span> <span class="string">'../../utilities/utility'</span>;</span><br><span class="line"></span><br><span class="line"><span class="comment">// 现阶段方式</span></span><br><span class="line"><span class="keyword">import</span> Utility <span class="keyword">from</span> <span class="string">'Utilities/utility'</span>;</span><br></pre></td></tr></table></figure>
+
+<h2 id="Optimization"><a href="#Optimization" class="headerlink" title="Optimization"></a>Optimization</h2><p>优化，会根据打包模式自动切换配置，也可以手动配置</p>
+<h3 id="minimize"><a href="#minimize" class="headerlink" title="minimize"></a>minimize</h3><p>开启表示需要压缩，需要配合 <code>TerserPlugin</code> 或其它在 <code>optimization.minimizer</code> 定义的插件压缩 <code>bundle</code></p>
+<h3 id="minimizer"><a href="#minimizer" class="headerlink" title="minimizer"></a>minimizer</h3><p>使用自定义压缩工具，覆盖默认压缩工具，通常使用 <code>TerserPlugin</code></p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">module</span>.exports = &#123;</span><br><span class="line">    optimization: &#123;</span><br><span class="line">    minimizer: [</span><br><span class="line">      <span class="keyword">new</span> TerserPlugin(&#123;</span><br><span class="line">        cache: <span class="literal">true</span>,</span><br><span class="line">        parallel: <span class="literal">true</span>,</span><br><span class="line">        sourceMap: <span class="literal">true</span>, <span class="comment">// 如果在生产环境中使用 source-maps，必须设置为 true</span></span><br><span class="line">        terserOptions: &#123;</span><br><span class="line">          <span class="comment">// https://github.com/webpack-contrib/terser-webpack-plugin#terseroptions</span></span><br><span class="line">        &#125;</span><br><span class="line">      &#125;),</span><br><span class="line">    ],</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>函数形式，形参为 <code>compiler</code></p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">module</span>.exports = &#123;</span><br><span class="line">  optimization: &#123;</span><br><span class="line">    minimizer: [</span><br><span class="line">      (compiler) =&gt; &#123;</span><br><span class="line">        <span class="keyword">const</span> TerserPlugin = <span class="built_in">require</span>(<span class="string">'terser-webpack-plugin'</span>);</span><br><span class="line">        <span class="keyword">new</span> TerserPlugin(&#123; <span class="comment">/* 你的选项 */</span> &#125;).apply(compiler);</span><br><span class="line">      &#125;</span><br><span class="line">    ],</span><br><span class="line">  &#125;</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+
+<h3 id="splitChunks"><a href="#splitChunks" class="headerlink" title="splitChunks"></a>splitChunks</h3><p>默认使用 <code>webpack4</code>默认的分块策略，具体手动配置参考 <a href="`https://webpack.docschina.org/plugins/split-chunks-plugin/`">splitChunkPlugin</a></p>
+<h3 id="runtimeChunk"><a href="#runtimeChunk" class="headerlink" title="runtimeChunk"></a>runtimeChunk</h3><p><code>runtimeChunk</code>作用在于将只含有<code>runtime</code>的入口文件单独打包一个文件， 所谓<code>runtime</code>就是指异步加载代码如<code>import(&#39;./utils&#39;) =&gt; {}</code></p>
+<h3 id="emitOnErrors"><a href="#emitOnErrors" class="headerlink" title="emitOnErrors"></a>emitOnErrors</h3><p>编译时每当有错误时，会被 <code>emit</code>， 关键错误会被 <code>emit</code> 到代码中</p>
+<p>todo</p>
+<h2 id="Plugins"><a href="#Plugins" class="headerlink" title="Plugins"></a>Plugins</h2><h2 id="DevServer"><a href="#DevServer" class="headerlink" title="DevServer"></a>DevServer</h2><h2 id="Devtool"><a href="#Devtool" class="headerlink" title="Devtool"></a>Devtool</h2><h2 id="Targets"><a href="#Targets" class="headerlink" title="Targets"></a>Targets</h2><h2 id="watch"><a href="#watch" class="headerlink" title="watch"></a>watch</h2><h2 id="externals"><a href="#externals" class="headerlink" title="externals"></a>externals</h2><h2 id="performance"><a href="#performance" class="headerlink" title="performance"></a>performance</h2><h2 id="Node"><a href="#Node" class="headerlink" title="Node"></a>Node</h2><h2 id="stats对象"><a href="#stats对象" class="headerlink" title="stats对象"></a>stats对象</h2><h2 id="cache"><a href="#cache" class="headerlink" title="cache"></a>cache</h2>
+        </div>
+
+        
+            <section class="post-copyright">
+                
+                    <p class="copyright-item">
+                        <span>Author:</span>
+                        <span>王八吉吉</span>
+                    </p>
+                
+                
+                    <p class="copyright-item">
+                        <span>Permalink:</span>
+                        <span><a href="http://auglyxu.github.io/2020/11/29/webpack/">http://auglyxu.github.io/2020/11/29/webpack/</a></span>
+                    </p>
+                
+                
+                    <p class="copyright-item">
+                        <span>License:</span>
+                        <span>Copyright (c) 2019 <a href="http://creativecommons.org/licenses/by-nc/4.0/" target="_blank" rel="noopener">CC-BY-NC-4.0</a> LICENSE</span>
+                    </p>
+                
+                
+                     <p class="copyright-item">
+                         <span>Slogan:</span>
+                         <span>享受当下</span>
+                     </p>
+                
+
+            </section>
+        
+        <section class="post-tags">
+            <div>
+                <span>Tag(s):</span>
+                <span class="tag">
+                    
+                    
+                        <a href="/tags/%E5%89%8D%E7%AB%AF/"># 前端</a>
+                    
+                        <a href="/tags/webpack/"># webpack</a>
+                    
+                        
+                </span>
+            </div>
+            <div>
+                <a href="javascript:window.history.back();">back</a>
+                <span>· </span>
+                <a href="/">home</a>
+            </div>
+        </section>
+        <section class="post-nav">
+            
+                <a class="prev" rel="prev" href="/2021/01/10/%E6%90%AD%E5%BB%BA%E9%A1%B9%E7%9B%AE/">手把手搭建一个React应用程序</a>
+            
+            
+            <a class="next" rel="next" href="/2020/08/02/Redux/">Redux</a>
+            
+        </section>
+
+
+    </article>
+</div>
+
+            </div>
+            <footer id="footer" class="footer">
+    <div class="copyright">
+        <span>© 王八吉吉 | Powered by <a href="https://hexo.io" target="_blank">Hexo</a> & <a href="https://github.com/Siricee/hexo-theme-Chic" target="_blank">Chic</a></span>
+    </div>
+</footer>
+
+    </div>
+</body>
+
+</html>

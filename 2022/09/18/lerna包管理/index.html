@@ -1,0 +1,369 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+    <meta charset="UTF-8">
+<meta name="viewport"
+      content="width=device-width, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+<meta http-equiv="X-UA-Compatible" content="ie=edge">
+
+    <meta name="author" content="王八吉吉">
+
+
+    <meta name="subtitle" content="前端小匠">
+
+
+    <meta name="description" content="专心学技术">
+
+
+    <meta name="keywords" content="前端">
+
+
+<title>lerna包管理 | Gaxy</title>
+
+
+
+    <link rel="icon" href="/favicon.png">
+
+
+
+
+    <!-- stylesheets list from _config.yml -->
+    
+    <link rel="stylesheet" href="/css/style.css">
+    
+
+
+
+    <!-- scripts list from _config.yml -->
+    
+    <script src="/js/script.js"></script>
+    
+    <script src="/js/tocbot.min.js"></script>
+    
+
+
+
+    
+    
+        
+    
+
+
+<meta name="generator" content="Hexo 4.2.1"></head>
+
+<body>
+    <script>
+        // this function is used to check current theme before page loaded.
+        (() => {
+            const currentTheme = window.localStorage && window.localStorage.getItem('theme') || '';
+            const isDark = currentTheme === 'dark';
+            const pagebody = document.getElementsByTagName('body')[0]
+            if (isDark) {
+                pagebody.classList.add('dark-theme');
+                // mobile
+                document.getElementById("mobile-toggle-theme").innerText = "· Dark"
+            } else {
+                pagebody.classList.remove('dark-theme');
+                // mobile
+                document.getElementById("mobile-toggle-theme").innerText = "· Light"
+            }
+        })();
+    </script>
+
+    <div class="wrapper">
+        <header>
+    <nav class="navbar">
+        <div class="container">
+            <div class="navbar-header header-logo"><a href="/">Gaxy</a></div>
+            <div class="menu navbar-right">
+                
+                    <a class="menu-item" href="/archives">归档</a>
+                
+                    <a class="menu-item" href="/category">分类</a>
+                
+                    <a class="menu-item" href="/tag">标签</a>
+                
+                    <a class="menu-item" href="/about">关于</a>
+                
+                <input id="switch_default" type="checkbox" class="switch_default">
+                <label for="switch_default" class="toggleBtn"></label>
+            </div>
+        </div>
+    </nav>
+
+    
+    <nav class="navbar-mobile" id="nav-mobile">
+        <div class="container">
+            <div class="navbar-header">
+                <div>
+                    <a href="/">Gaxy</a><a id="mobile-toggle-theme">·&nbsp;Light</a>
+                </div>
+                <div class="menu-toggle" onclick="mobileBtn()">&#9776; Menu</div>
+            </div>
+            <div class="menu" id="mobile-menu">
+                
+                    <a class="menu-item" href="/archives">归档</a>
+                
+                    <a class="menu-item" href="/category">分类</a>
+                
+                    <a class="menu-item" href="/tag">标签</a>
+                
+                    <a class="menu-item" href="/about">关于</a>
+                
+            </div>
+        </div>
+    </nav>
+
+</header>
+<script>
+    var mobileBtn = function f() {
+        var toggleMenu = document.getElementsByClassName("menu-toggle")[0];
+        var mobileMenu = document.getElementById("mobile-menu");
+        if(toggleMenu.classList.contains("active")){
+           toggleMenu.classList.remove("active")
+            mobileMenu.classList.remove("active")
+        }else{
+            toggleMenu.classList.add("active")
+            mobileMenu.classList.add("active")
+        }
+    }
+</script>
+            <div class="main">
+                <div class="container">
+    
+    
+        <div class="post-toc">
+    <div class="tocbot-list">
+    </div>
+    <div class="tocbot-list-menu">
+        <a class="tocbot-toc-expand" onclick="expand_toc()">Expand all</a>
+        <a onclick="go_top()">Back to top</a>
+        <a onclick="go_bottom()">Go to bottom</a>
+    </div>
+</div>
+
+<script>
+    var tocbot_timer;
+    var DEPTH_MAX = 6;    // 为 6 时展开所有
+    var tocbot_default_config = {
+        tocSelector: '.tocbot-list',
+        contentSelector: '.post-content',
+        headingSelector: 'h1, h2, h3, h4, h5',
+        orderedList: false,
+        scrollSmooth: true,
+        onClick: extend_click,
+    };
+
+    function extend_click() {
+        clearTimeout(tocbot_timer);
+        tocbot_timer = setTimeout(function () {
+            tocbot.refresh(obj_merge(tocbot_default_config, { hasInnerContainers: true }));
+        }, 420); // 这个值是由 tocbot 源码里定义的 scrollSmoothDuration 得来的
+    }
+
+    document.ready(function () {
+        tocbot.init(obj_merge(tocbot_default_config, { collapseDepth: 1 }));
+    });
+
+    function expandToc() {
+        var b = document.querySelector('.tocbot-toc-expand');
+        var expanded = b.getAttribute('data-expanded');
+        expanded ? b.removeAttribute('data-expanded') : b.setAttribute('data-expanded', true);
+        tocbot.refresh(obj_merge(tocbot_default_config, { collapseDepth: expanded ? 1 : DEPTH_MAX }));
+        b.innerText = expanded ? 'Expand all' : 'Collapse all';
+    }
+
+    function go_top() {
+        window.scrollTo(0, 0);
+    }
+
+    function go_bottom() {
+        window.scrollTo(0, document.body.scrollHeight);
+    }
+
+    function obj_merge(target, source) {
+        for (var item in source) {
+            if (source.hasOwnProperty(item)) {
+                target[item] = source[item];
+            }
+        }
+        return target;
+    }
+</script>
+    
+
+    
+    <article class="post-wrap">
+        <header class="post-header">
+            <h1 class="post-title">lerna包管理</h1>
+            
+                <div class="post-meta">
+                    
+                        Author: <a itemprop="author" rel="author" href="/">王八吉吉</a>
+                    
+
+                    
+                        <span class="post-time">
+                        Date: <a href="#">九月 18, 2022&nbsp;&nbsp;20:48:10</a>
+                        </span>
+                    
+                    
+                        <span class="post-category">
+                    Category:
+                            
+                                <a href="/category/%E5%B7%A5%E7%A8%8B%E5%8C%96/">工程化</a>
+                            
+                        </span>
+                    
+                </div>
+            
+        </header>
+
+        <div class="post-content">
+            <h1 id="lerna包管理"><a href="#lerna包管理" class="headerlink" title="lerna包管理"></a>lerna包管理</h1><h2 id="简述"><a href="#简述" class="headerlink" title="简述"></a>简述</h2><p>目前项目使用<code>lerna</code>来进行包管理，已经停止维护</p>
+<p>除了<code>lerna</code>以外，<code>Rush</code>也是一个非常不错的工具，<code>lerna</code>的停止维护目前看来是利好<code>Rush</code>的</p>
+<p><code>lerna</code>和<code>Rush</code>解决的都是采用<code>monorepo</code>管理模式的项目</p>
+<blockquote>
+<p><code>monorepo</code>管理模式：<code>monorepo</code>是一种将多个<code>package</code>放在一个<code>repo</code>中的代码管理模式，摒弃了传统的多个<code>package</code>多个<code>repo</code>的模式</p>
+</blockquote>
+<h3 id="解决的问题："><a href="#解决的问题：" class="headerlink" title="解决的问题："></a>解决的问题：</h3><ul>
+<li>多个包多个项目难以维护和发布</li>
+<li>模块的升级需要手动修改包信息</li>
+<li>公用<code>npm</code>包的<code>node_modules</code>占用大量空间</li>
+</ul>
+<h3 id="带来的问题"><a href="#带来的问题" class="headerlink" title="带来的问题:"></a>带来的问题:</h3><ul>
+<li>单包的权限控制无法实现</li>
+<li>单项目过大的体积</li>
+</ul>
+<h3 id="使用lerna管理的包"><a href="#使用lerna管理的包" class="headerlink" title="使用lerna管理的包"></a>使用lerna管理的包</h3><p>目前<code>Babel, React, Angular, Ember, Meteor, Jest</code>等许多开源项目都使用该种模式来管理代码。</p>
+<h2 id="lerna基本使用"><a href="#lerna基本使用" class="headerlink" title="lerna基本使用"></a>lerna基本使用</h2><p><a href="https://www.lernajs.cn/" target="_blank" rel="noopener">官方文档</a></p>
+<p>官网过于简单，结合了几篇教程以及自己的实践结果来搭一个较为完整的<code>monorepo</code></p>
+<h3 id="安装"><a href="#安装" class="headerlink" title="安装"></a>安装</h3><p><code>npm install lerna -g</code></p>
+<h3 id="初始化"><a href="#初始化" class="headerlink" title="初始化"></a>初始化</h3><h4 id="初始化git"><a href="#初始化git" class="headerlink" title="初始化git"></a>初始化git</h4><p>在自己的<code>github repositories</code>中提前创建了一个空文件夹，并<code>clone</code>下来</p>
+<h4 id="初始化lerna"><a href="#初始化lerna" class="headerlink" title="初始化lerna"></a>初始化lerna</h4><p>对应文件目录下执行<code>lerna init</code>, 对应生成两个文件一个文件夹</p>
+<p>根目录的<code>lerna.json</code>可以用来配置一些全局性的东西，比如<code>npmClient</code>，项目使用<code>yarn</code>，这里就给他配置为<code>yarn</code>，<code>pnpm</code>也是支持的，只需要正确配置包即可</p>
+<p>lerna.json</p>
+<figure class="highlight json"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">&#123;</span><br><span class="line">    </span><br><span class="line">  <span class="attr">"$schema"</span>: <span class="string">"node_modules/lerna/schemas/lerna-schema.json"</span>, <span class="comment">// IDE 或其它工具将会根据目标地址中的 schema 定义对 JSON 文件进行检查和智能提示等等</span></span><br><span class="line">  <span class="attr">"useNx"</span>: <span class="literal">true</span>, <span class="comment">// 搭配Nx使用</span></span><br><span class="line">  <span class="attr">"useWorkspaces"</span>: <span class="literal">true</span>, <span class="comment">// 使用 Workspaces</span></span><br><span class="line">  <span class="attr">"version"</span>: <span class="string">"0.0.0"</span>, <span class="comment">// 版本</span></span><br><span class="line">  <span class="attr">"npmClient"</span>: <span class="string">"yarn"</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+
+<p>package.json</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">&#123;</span><br><span class="line">  <span class="string">"name"</span>: <span class="string">"root"</span>,</span><br><span class="line">  <span class="string">"private"</span>: <span class="literal">true</span>, <span class="comment">// 主包不发布</span></span><br><span class="line">  <span class="string">"workspaces"</span>: [ <span class="comment">// 工作区范围</span></span><br><span class="line">    <span class="string">"packages/*"</span></span><br><span class="line">  ],</span><br><span class="line">  <span class="string">"devDependencies"</span>: &#123;</span><br><span class="line">    <span class="string">"lerna"</span>: <span class="string">"^5.5.0"</span></span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="创建工具包"><a href="#创建工具包" class="headerlink" title="创建工具包"></a>创建工具包</h3><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">lerna create public-package</span><br></pre></td></tr></table></figure>
+<h4 id="命令执行结果"><a href="#命令执行结果" class="headerlink" title="命令执行结果"></a>命令执行结果</h4><p><img src="%E5%88%9B%E5%BB%BA%E6%96%B0%E5%8C%85.png" alt=""></p>
+<h4 id="代码结果"><a href="#代码结果" class="headerlink" title="代码结果"></a>代码结果</h4><p><img src="%E5%88%9B%E5%BB%BA%E6%96%B0%E5%8C%85%E6%89%A7%E8%A1%8C%E7%BB%93%E6%9E%9C.png" alt=""></p>
+<h4 id="查看"><a href="#查看" class="headerlink" title="查看"></a>查看</h4><p>根目录下执行，即可查看自己创建的包</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">lerna list</span><br></pre></td></tr></table></figure>
+<p><img src="%E6%9F%A5%E7%9C%8B%E5%8C%85.png" alt=""></p>
+<h2 id="创建-导入项目"><a href="#创建-导入项目" class="headerlink" title="创建/导入项目"></a>创建/导入项目</h2><p>注意：导入和创建项目不会被计入<code>lerna</code>的包，即<code>lerna list</code>不会记录创建或导入的项目</p>
+<h3 id="全新的项目"><a href="#全新的项目" class="headerlink" title="全新的项目"></a>全新的项目</h3><p>可以直接<code>cd packages</code>去对应的包下创建文件夹<code>npm init -y</code>等等，或者直接使用脚手架<code>npx create-react-app main-app</code>创建新项目</p>
+<h3 id="已有的项目"><a href="#已有的项目" class="headerlink" title="已有的项目"></a>已有的项目</h3><p>使用如下命令</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">lerna import &lt;project url&gt;</span><br></pre></td></tr></table></figure>
+<p><img src="%E5%AF%BC%E5%85%A5%E6%96%B0%E5%8C%85.png" alt=""><br><img src="%E5%AF%BC%E5%85%A5%E6%96%B0%E5%8C%85%E7%BB%93%E6%9E%9C.png" alt=""></p>
+<h2 id="装包"><a href="#装包" class="headerlink" title="装包"></a>装包</h2><p>建立相互依赖的包之间的软连接并安装其他的依赖, 默认是<code>npm i</code>,因为我们指定过<code>yarn</code>，因此执行<code>yarn install</code>,会把所有包的依赖安装到根<code>node_modules</code>.</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">lerna bootstrap</span><br></pre></td></tr></table></figure>
+
+<h2 id="向项目中添加依赖"><a href="#向项目中添加依赖" class="headerlink" title="向项目中添加依赖"></a>向项目中添加依赖</h2><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">lerna add &lt;dependencies&gt; --scope=&lt;project&gt;</span><br></pre></td></tr></table></figure>
+
+<p><img src="%E6%B7%BB%E5%8A%A0%E4%BE%9D%E8%B5%96%E5%91%BD%E4%BB%A4%E6%89%A7%E8%A1%8C%E7%BB%93%E6%9E%9C.png" alt=""></p>
+<p><img src="%E6%B7%BB%E5%8A%A0%E4%BE%9D%E8%B5%96.png" alt=""></p>
+<h2 id="组织Workspaces"><a href="#组织Workspaces" class="headerlink" title="组织Workspaces"></a>组织Workspaces</h2><p>通常起项目的时候，最好能在根目录配置对应的命令，这里可以参考<a href="https://zhuanlan.zhihu.com/p/381794854" target="_blank" rel="noopener"><code>yarn workspaces</code></a>的组织方法</p>
+<p>根目录下<code>start</code>命令意味着执行<code>package.json</code>里<code>name</code>为<code>react-code-demo</code>的<code>start</code>命令</p>
+<p>根目录<code>package.json</code></p>
+<figure class="highlight json"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line">&#123;</span><br><span class="line">  <span class="attr">"name"</span>: <span class="string">"root"</span>,</span><br><span class="line">  <span class="attr">"private"</span>: <span class="literal">true</span>,</span><br><span class="line">  <span class="attr">"workspaces"</span>: [</span><br><span class="line">    <span class="string">"packages/*"</span></span><br><span class="line">  ],</span><br><span class="line">  <span class="attr">"devDependencies"</span>: &#123;</span><br><span class="line">    <span class="attr">"lerna"</span>: <span class="string">"^5.5.0"</span></span><br><span class="line">  &#125;,</span><br><span class="line">  <span class="attr">"scripts"</span>: &#123;</span><br><span class="line">    <span class="attr">"start"</span>: <span class="string">"yarn workspace react-code-demo start"</span></span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>项目<code>react-code-demo</code>的<code>package.json</code></p>
+<figure class="highlight"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">&#123;</span><br><span class="line">  <span class="attr">"name"</span>: <span class="string">"react-code-demo"</span>,</span><br><span class="line">  <span class="attr">"version"</span>: <span class="string">"0.1.0"</span>,</span><br><span class="line">  <span class="attr">"private"</span>: <span class="literal">true</span>,</span><br><span class="line">  <span class="attr">"scripts"</span>: &#123;</span><br><span class="line">    <span class="attr">"start"</span>: <span class="string">"react-scripts start"</span>,</span><br><span class="line">    <span class="attr">"build"</span>: <span class="string">"react-scripts build"</span>,</span><br><span class="line">    <span class="attr">"test"</span>: <span class="string">"react-scripts test"</span>,</span><br><span class="line">    <span class="attr">"eject"</span>: <span class="string">"react-scripts eject"</span></span><br><span class="line">  &#125;,</span><br><span class="line">  ... // 下面还有不展示了</span><br></pre></td></tr></table></figure>
+
+<p><img src="%E7%BB%84%E7%BB%87workspace.png" alt=""></p>
+<h2 id="动态更新"><a href="#动态更新" class="headerlink" title="动态更新"></a>动态更新</h2><p>修改包对应的代码，<em>无需重启，无需复制</em>，由于对应包<code>lerna</code>都是软链到根目录<code>node_modules</code>，修改包信息会直接同步到顶层<code>node_modules</code>，因此刷新即可生效</p>
+<h2 id="发布"><a href="#发布" class="headerlink" title="发布"></a>发布</h2><p><code>lerna</code>提供两个指令</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">lerna changed</span><br></pre></td></tr></table></figure>
+
+<p>列出下次发版<code>lerna publish</code>要更新的包。</p>
+<p>原理： 需要先<code>git add</code>,<code>git commit</code> 提交。 然后内部会运行<code>git diff --name-only v版本号</code>，搜集改动的包，就是下次要发布的，并不是网上人说的所有包都是同一个版全发布</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">lerna publish</span><br></pre></td></tr></table></figure>
+
+<p>首先对应的<code>package.json</code>要配置<code>publishConfig</code>，属于<code>npm</code>相关内容不再赘述，执行命令</p>
+<p>会打<code>tag</code>，上传<code>git</code>,上传<code>npm</code></p>
+<hr>
+<p>基本使用如下，开发者可以根据需求自定义命令，如清理<code>node_modules</code>、是否需要依据<code>package.lock.json</code>等安装，五花八门，等发现更有价值的持续更新。</p>
+<h2 id="参考链接："><a href="#参考链接：" class="headerlink" title="参考链接："></a>参考链接：</h2><blockquote>
+<p>Lerna 中文详解教程：<a href="https://juejin.cn/post/6844903856153821198#heading-21" target="_blank" rel="noopener">https://juejin.cn/post/6844903856153821198#heading-21</a><br>lerna.js：monorepos项目管理模式简单实践: <a href="https://developer.aliyun.com/article/1007301" target="_blank" rel="noopener">https://developer.aliyun.com/article/1007301</a></p>
+</blockquote>
+
+        </div>
+
+        
+            <section class="post-copyright">
+                
+                    <p class="copyright-item">
+                        <span>Author:</span>
+                        <span>王八吉吉</span>
+                    </p>
+                
+                
+                    <p class="copyright-item">
+                        <span>Permalink:</span>
+                        <span><a href="http://auglyxu.github.io/2022/09/18/lerna%E5%8C%85%E7%AE%A1%E7%90%86/">http://auglyxu.github.io/2022/09/18/lerna%E5%8C%85%E7%AE%A1%E7%90%86/</a></span>
+                    </p>
+                
+                
+                    <p class="copyright-item">
+                        <span>License:</span>
+                        <span>Copyright (c) 2019 <a href="http://creativecommons.org/licenses/by-nc/4.0/" target="_blank" rel="noopener">CC-BY-NC-4.0</a> LICENSE</span>
+                    </p>
+                
+                
+                     <p class="copyright-item">
+                         <span>Slogan:</span>
+                         <span>享受当下</span>
+                     </p>
+                
+
+            </section>
+        
+        <section class="post-tags">
+            <div>
+                <span>Tag(s):</span>
+                <span class="tag">
+                    
+                    
+                        <a href="/tags/%E5%B7%A5%E7%A8%8B%E5%8C%96/"># 工程化</a>
+                    
+                        <a href="/tags/%E5%8C%85%E7%AE%A1%E7%90%86%E5%B7%A5%E5%85%B7/"># 包管理工具</a>
+                    
+                        
+                </span>
+            </div>
+            <div>
+                <a href="javascript:window.history.back();">back</a>
+                <span>· </span>
+                <a href="/">home</a>
+            </div>
+        </section>
+        <section class="post-nav">
+            
+                <a class="prev" rel="prev" href="/2022/10/18/react-hook-form%E8%A7%A3%E5%86%B3%E6%96%B9%E6%A1%88/">react-hook-form解决方案</a>
+            
+            
+            <a class="next" rel="next" href="/2022/07/28/TS%E9%AB%98%E7%BA%A7%E7%B1%BB%E5%9E%8B/">TS高级类型</a>
+            
+        </section>
+
+
+    </article>
+</div>
+
+            </div>
+            <footer id="footer" class="footer">
+    <div class="copyright">
+        <span>© 王八吉吉 | Powered by <a href="https://hexo.io" target="_blank">Hexo</a> & <a href="https://github.com/Siricee/hexo-theme-Chic" target="_blank">Chic</a></span>
+    </div>
+</footer>
+
+    </div>
+</body>
+
+</html>

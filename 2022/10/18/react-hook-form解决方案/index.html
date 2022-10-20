@@ -1,0 +1,412 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+    <meta charset="UTF-8">
+<meta name="viewport"
+      content="width=device-width, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+<meta http-equiv="X-UA-Compatible" content="ie=edge">
+
+    <meta name="author" content="王八吉吉">
+
+
+    <meta name="subtitle" content="前端小匠">
+
+
+    <meta name="description" content="专心学技术">
+
+
+    <meta name="keywords" content="前端">
+
+
+<title>react-hook-form解决方案 | Gaxy</title>
+
+
+
+    <link rel="icon" href="/favicon.png">
+
+
+
+
+    <!-- stylesheets list from _config.yml -->
+    
+    <link rel="stylesheet" href="/css/style.css">
+    
+
+
+
+    <!-- scripts list from _config.yml -->
+    
+    <script src="/js/script.js"></script>
+    
+    <script src="/js/tocbot.min.js"></script>
+    
+
+
+
+    
+    
+        
+    
+
+
+<meta name="generator" content="Hexo 4.2.1"></head>
+
+<body>
+    <script>
+        // this function is used to check current theme before page loaded.
+        (() => {
+            const currentTheme = window.localStorage && window.localStorage.getItem('theme') || '';
+            const isDark = currentTheme === 'dark';
+            const pagebody = document.getElementsByTagName('body')[0]
+            if (isDark) {
+                pagebody.classList.add('dark-theme');
+                // mobile
+                document.getElementById("mobile-toggle-theme").innerText = "· Dark"
+            } else {
+                pagebody.classList.remove('dark-theme');
+                // mobile
+                document.getElementById("mobile-toggle-theme").innerText = "· Light"
+            }
+        })();
+    </script>
+
+    <div class="wrapper">
+        <header>
+    <nav class="navbar">
+        <div class="container">
+            <div class="navbar-header header-logo"><a href="/">Gaxy</a></div>
+            <div class="menu navbar-right">
+                
+                    <a class="menu-item" href="/archives">归档</a>
+                
+                    <a class="menu-item" href="/category">分类</a>
+                
+                    <a class="menu-item" href="/tag">标签</a>
+                
+                    <a class="menu-item" href="/about">关于</a>
+                
+                <input id="switch_default" type="checkbox" class="switch_default">
+                <label for="switch_default" class="toggleBtn"></label>
+            </div>
+        </div>
+    </nav>
+
+    
+    <nav class="navbar-mobile" id="nav-mobile">
+        <div class="container">
+            <div class="navbar-header">
+                <div>
+                    <a href="/">Gaxy</a><a id="mobile-toggle-theme">·&nbsp;Light</a>
+                </div>
+                <div class="menu-toggle" onclick="mobileBtn()">&#9776; Menu</div>
+            </div>
+            <div class="menu" id="mobile-menu">
+                
+                    <a class="menu-item" href="/archives">归档</a>
+                
+                    <a class="menu-item" href="/category">分类</a>
+                
+                    <a class="menu-item" href="/tag">标签</a>
+                
+                    <a class="menu-item" href="/about">关于</a>
+                
+            </div>
+        </div>
+    </nav>
+
+</header>
+<script>
+    var mobileBtn = function f() {
+        var toggleMenu = document.getElementsByClassName("menu-toggle")[0];
+        var mobileMenu = document.getElementById("mobile-menu");
+        if(toggleMenu.classList.contains("active")){
+           toggleMenu.classList.remove("active")
+            mobileMenu.classList.remove("active")
+        }else{
+            toggleMenu.classList.add("active")
+            mobileMenu.classList.add("active")
+        }
+    }
+</script>
+            <div class="main">
+                <div class="container">
+    
+    
+        <div class="post-toc">
+    <div class="tocbot-list">
+    </div>
+    <div class="tocbot-list-menu">
+        <a class="tocbot-toc-expand" onclick="expand_toc()">Expand all</a>
+        <a onclick="go_top()">Back to top</a>
+        <a onclick="go_bottom()">Go to bottom</a>
+    </div>
+</div>
+
+<script>
+    var tocbot_timer;
+    var DEPTH_MAX = 6;    // 为 6 时展开所有
+    var tocbot_default_config = {
+        tocSelector: '.tocbot-list',
+        contentSelector: '.post-content',
+        headingSelector: 'h1, h2, h3, h4, h5',
+        orderedList: false,
+        scrollSmooth: true,
+        onClick: extend_click,
+    };
+
+    function extend_click() {
+        clearTimeout(tocbot_timer);
+        tocbot_timer = setTimeout(function () {
+            tocbot.refresh(obj_merge(tocbot_default_config, { hasInnerContainers: true }));
+        }, 420); // 这个值是由 tocbot 源码里定义的 scrollSmoothDuration 得来的
+    }
+
+    document.ready(function () {
+        tocbot.init(obj_merge(tocbot_default_config, { collapseDepth: 1 }));
+    });
+
+    function expandToc() {
+        var b = document.querySelector('.tocbot-toc-expand');
+        var expanded = b.getAttribute('data-expanded');
+        expanded ? b.removeAttribute('data-expanded') : b.setAttribute('data-expanded', true);
+        tocbot.refresh(obj_merge(tocbot_default_config, { collapseDepth: expanded ? 1 : DEPTH_MAX }));
+        b.innerText = expanded ? 'Expand all' : 'Collapse all';
+    }
+
+    function go_top() {
+        window.scrollTo(0, 0);
+    }
+
+    function go_bottom() {
+        window.scrollTo(0, document.body.scrollHeight);
+    }
+
+    function obj_merge(target, source) {
+        for (var item in source) {
+            if (source.hasOwnProperty(item)) {
+                target[item] = source[item];
+            }
+        }
+        return target;
+    }
+</script>
+    
+
+    
+    <article class="post-wrap">
+        <header class="post-header">
+            <h1 class="post-title">react-hook-form解决方案</h1>
+            
+                <div class="post-meta">
+                    
+                        Author: <a itemprop="author" rel="author" href="/">王八吉吉</a>
+                    
+
+                    
+                        <span class="post-time">
+                        Date: <a href="#">十月 18, 2022&nbsp;&nbsp;16:42:10</a>
+                        </span>
+                    
+                    
+                        <span class="post-category">
+                    Category:
+                            
+                                <a href="/category/%E5%B7%A5%E7%A8%8B%E5%8C%96/">工程化</a>
+                            
+                        </span>
+                    
+                </div>
+            
+        </header>
+
+        <div class="post-content">
+            <h2 id="选择的原因"><a href="#选择的原因" class="headerlink" title="选择的原因"></a>选择的原因</h2><p>公司本身使用<code>reduxForm</code>处理表单，也讨论过使用<code>antd</code>的表单，思考许久有以下问题:</p>
+<p><strong>reduxForm</strong></p>
+<p>不排除我对<code>reduxForm</code>理解不够深</p>
+<ol>
+<li><p><code>reduxForm</code>已经停止维护，表单过重，打包体积过大(24kb)，<code>react-hook-form</code> 8k</p>
+</li>
+<li><p><code>reduxForm</code>处理联动逻辑比较麻烦，没有一个可靠的<code>form</code>实例</p>
+</li>
+<li><p><code>reduxForm</code>联动改变数值不触发校验，手动触发校验方式比较<code>hack</code>(针对每个<code>Form</code>组件拿到实例手动触发<code>onBlur</code>校验)，其次校验<code>render</code>时机不正确，导致错误文案没法展示，项目中使用<code>setTimeout</code>解决</p>
+</li>
+<li><p><code>reduxForm</code>文档比较难读，对<code>Typescript</code>支持不友好</p>
+</li>
+<li><p><code>reduxForm</code>是采用高阶组件，对逻辑复杂的表单的<code>onChange</code>会有性能问题(卡顿，输不了值)，目前已经有<code>FormComponent</code>出现此问题</p>
+</li>
+</ol>
+<p><strong>antd</strong></p>
+<ol>
+<li><p><code>antd</code>封装了一个完整的解决方案，底层使用<code>rc-field-form</code>，假如我们在<code>rc-field-form</code>到<code>Form</code>这个过程需要自定义业务，难以实现，并且有很多不需要的功能</p>
+</li>
+<li><p><code>antd</code>的表单再去封装动态表单难以实现，例如基于<code>antd</code>的<code>Form</code>去封装一个<code>ant-design-pro</code>的<code>ProForm</code>成本会激增</p>
+</li>
+<li><p><code>antd</code>的功能如果没有你想要的，无法去表单内部实现，只能通过其他方式，例如: <code>reduxForm</code>会对表单组件传递<code>dirty</code>判断数据是否被修改、<code>valid</code>判断校验是否通过(不触发<code>render</code>的情况下)</p>
+</li>
+<li><p><code>antd</code>是属于另一个<code>ui</code>库，与我们初始的<code>ui</code>选型不一致，<strong>无法单独引入<code>Form</code></strong>，<code>antd</code>的样式采用<code>module css</code>的方式，与<code>material-ui</code>的<code>css in js</code>的方式相违背，未来在<strong>主题</strong>上会出现很多问题</p>
+</li>
+</ol>
+<h2 id="实现的目标"><a href="#实现的目标" class="headerlink" title="实现的目标"></a>实现的目标</h2><h3 id="静态表单"><a href="#静态表单" class="headerlink" title="静态表单"></a>静态表单</h3><p>表单数据都是以组件形式自己编写</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">&lt;Form&gt;</span><br><span class="line">    &lt;Form.Item name=<span class="string">"xx"</span>&gt;</span><br><span class="line">        &lt;FormComponent /&gt;</span><br><span class="line">    &lt;<span class="regexp">/Form.Item&gt;</span></span><br><span class="line"><span class="regexp">&lt;/</span>Form&gt;</span><br></pre></td></tr></table></figure>
+
+<p>目标: </p>
+<p>借鉴<code>antd</code>，保留原项目<code>reduxForm</code>中好的东西，剔除<code>antd</code>不需要的功能，每一步流程都可以根据业务自定义</p>
+<p>对项目的<code>Form</code>表单实现<strong>统一校验、统一联动校验、统一/自定义样式布局、类似于<code>antd中</code>常用的基础功能</strong></p>
+<p>保留一定的可扩展性未来支持骨架屏，处理异步逻辑等等</p>
+<h3 id="动态表单"><a href="#动态表单" class="headerlink" title="动态表单"></a>动态表单</h3><p>表单数据以<code>JSON schema</code>的格式配置，统一渲染</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">const</span> formField = [</span><br><span class="line">    &#123;</span><br><span class="line">        type: <span class="string">'Input'</span></span><br><span class="line">        name: <span class="string">'xxx'</span>,</span><br><span class="line">        label: <span class="string">'xxx'</span>,</span><br><span class="line">        property: &#123;</span><br><span class="line">            ...<span class="comment">// 属性</span></span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">]</span><br><span class="line"></span><br><span class="line">&lt;HookForm formField=&#123;formField&#125; /&gt;</span><br></pre></td></tr></table></figure>
+
+<p>动态表单解决的问题:</p>
+<ol>
+<li><p><code>FormComponent</code>过多且布局较为统一</p>
+</li>
+<li><p>表单数据以<code>JSON Schema</code>的形式存储在后端</p>
+</li>
+</ol>
+<p>目标: </p>
+<p>功能上支持<strong>自定义校验、自定义组件配置、联动逻辑、表单动态的<code>props</code>传递</strong></p>
+<h2 id="静态表单实现方式"><a href="#静态表单实现方式" class="headerlink" title="静态表单实现方式"></a>静态表单实现方式</h2><h3 id="流程"><a href="#流程" class="headerlink" title="流程"></a>流程</h3><p><img src="%E9%9D%99%E6%80%81%E8%A1%A8%E5%8D%95.png" alt=""></p>
+<h3 id="Form"><a href="#Form" class="headerlink" title="Form"></a>Form</h3><ol>
+<li>处理<strong>用户对表单的全局监听</strong>，以及<code>hook-form</code>中提供的内置方法</li>
+</ol>
+<p><img src="%E8%87%AA%E5%B8%A6%E8%BF%94%E5%9B%9E%E5%80%BC.png" alt=""></p>
+<ol start="2">
+<li>处理<code>contextValue</code>，需要传递给<code>Form.Item</code>的全部放在contextValue下</li>
+</ol>
+<p><img src="context.png" alt=""></p>
+<ol start="3">
+<li>根据用户传递的<code>ref</code>，创建实例，抛出实例方法</li>
+</ol>
+<p><img src="form%E5%AE%9E%E4%BE%8B.png" alt=""></p>
+<h3 id="Form-Item"><a href="#Form-Item" class="headerlink" title="Form.Item"></a>Form.Item</h3><ol>
+<li>渲染<code>FormComponent</code>时对每一个<code>FormComponent</code>增加默认样式(<code>FieldWrap</code>)</li>
+</ol>
+<p><img src="fieldWrap.png" alt=""></p>
+<ol start="2">
+<li><p>针对没有提供<code>name</code>的<code>FormComponent</code>只渲染样式，数据不受<code>hook-form</code>控制</p>
+</li>
+<li><p>为用户提供单个<code>FormComponent</code>的监听(直接在<code>Form.Item</code>上传递<code>onChange</code>)</p>
+</li>
+<li><p>处理表单校验(默认校验、自定义校验)，<em>提供自定义校验会覆盖默认校验</em></p>
+</li>
+</ol>
+<p><img src="Item%E6%A0%B8%E5%BF%83.png" alt=""></p>
+<ol start="5">
+<li>讲<code>hook-form</code>保存的<code>value</code>传递到表单组件用于受控，将改变<code>hook-form``FormComponent</code>的<code>onChange</code>传递到对应表单(<strong>即受控组件常用的value和onChange</strong>)</li>
+</ol>
+<h2 id="动态表单实现方式"><a href="#动态表单实现方式" class="headerlink" title="动态表单实现方式"></a>动态表单实现方式</h2><h3 id="流程-1"><a href="#流程-1" class="headerlink" title="流程"></a>流程</h3><p><img src="%E5%8A%A8%E6%80%81%E8%A1%A8%E5%8D%95.png" alt=""></p>
+<h3 id="HookForm"><a href="#HookForm" class="headerlink" title="HookForm"></a>HookForm</h3><ol>
+<li><p><code>onTrigger</code>作为回调传递给<code>FieldRender</code>的<code>onChange</code>, 针对表单的每个<code>onChange</code>会判断是否满足联动逻辑<br><img src="HookForm.png" alt=""></p>
+<h3 id="FieldRender"><a href="#FieldRender" class="headerlink" title="FieldRender"></a>FieldRender</h3></li>
+<li><p>处理每个表单的统一校验，针对单个<code>FormComponent</code>的用户自定义校验</p>
+</li>
+<li><p>获取<code>FormComponent</code>的<code>props</code>, 包括了<code>JSON schema</code>中<code>property</code>属性下的、开发者<code>privateProps</code>以及全局的<code>publicProps</code></p>
+</li>
+</ol>
+<p><img src="FieldRender.png" alt=""></p>
+<h3 id="动态表单validate-ts"><a href="#动态表单validate-ts" class="headerlink" title="动态表单validate.ts"></a>动态表单validate.ts</h3><p>校验相关</p>
+<p><img src="%E5%8A%A8%E6%80%81%E8%A1%A8%E5%8D%95%E6%A0%A1%E9%AA%8C.png" alt=""></p>
+<h2 id="自定义表单组件"><a href="#自定义表单组件" class="headerlink" title="自定义表单组件"></a>自定义表单组件</h2><h3 id="编写方式"><a href="#编写方式" class="headerlink" title="编写方式"></a>编写方式</h3><p><strong>统一规定受控组件, 使用<code>TypeScript</code>编写</strong></p>
+<ol>
+<li><p><code>onChange</code>是<code>hook-form</code>的<code>onChange</code>, 用于改变表单的值</p>
+</li>
+<li><p><code>value</code>是<code>hook-form</code>数据池中的数据</p>
+</li>
+</ol>
+<p><img src="FormComponent.png" alt=""></p>
+<h3 id="FieldMap"><a href="#FieldMap" class="headerlink" title="FieldMap"></a>FieldMap</h3><p><img src="fieldMap.png" alt=""></p>
+<h3 id="validate-ts"><a href="#validate-ts" class="headerlink" title="validate.ts"></a>validate.ts</h3><p><img src="ComponentValidate.png" alt=""></p>
+<h2 id="TypeScript支持"><a href="#TypeScript支持" class="headerlink" title="TypeScript支持"></a>TypeScript支持</h2><ol>
+<li>对应自定义的<code>FormComponent</code>的类型</li>
+</ol>
+<p><img src="FormComponentType.png" alt=""></p>
+<ol start="2">
+<li>对应<code>Form</code>实例<code>Type</code></li>
+</ol>
+<p><img src="FormType.png" alt=""></p>
+<h2 id="不足与改进"><a href="#不足与改进" class="headerlink" title="不足与改进"></a>不足与改进</h2><ol>
+<li><p>由于二级表单形式五花八门，不支持二级表单，目前也没想好怎么支持</p>
+</li>
+<li><p>默认的表单数据的类型应该作为泛型传入，而不是内置<code>HookFormData</code>传入，这样导致<code>submit</code>返回的类型与外部定义的类型不兼容，需要类型断言。写完后才发现，看了<code>antd</code>的<code>Form</code>也是那么做的，但是改动量过大</p>
+</li>
+<li><p>假如<code>Button</code>的按钮提交根据<em>是否校验通过</em>和<em>是否修改过默认表单</em>数据来判断是否<code>disable</code>，目前只能<code>render</code>在<code>&lt;Form&gt;&lt;/Form&gt;</code>组件的最后，不能自定义渲染位置。<code>reduxForm</code>是采用高阶组件的模式，会渲染全表单，与<code>hook-form</code>设计思想违背，<code>hook-form</code>将每个<code>FormComponent</code>与自身数据池隔离提升性能。目前也没有想到最优解</p>
+</li>
+<li><p><code>defaultFormData</code>可能是异步的，目前必须在无数据的时候不渲染<code>Form</code>，不然默认值设置不上去， 如下：</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 假如 asyncDefaultFormData 是异步获取的</span></span><br><span class="line">!asyncDefaultFormData ? <span class="literal">null</span> : <span class="xml"><span class="tag">&lt;<span class="name">Form</span> <span class="attr">defaultFormData</span>=<span class="string">&#123;asyncDefaultFormData&#125;</span> /&gt;</span></span></span><br></pre></td></tr></table></figure></li>
+</ol>
+
+        </div>
+
+        
+            <section class="post-copyright">
+                
+                    <p class="copyright-item">
+                        <span>Author:</span>
+                        <span>王八吉吉</span>
+                    </p>
+                
+                
+                    <p class="copyright-item">
+                        <span>Permalink:</span>
+                        <span><a href="http://auglyxu.github.io/2022/10/18/react-hook-form%E8%A7%A3%E5%86%B3%E6%96%B9%E6%A1%88/">http://auglyxu.github.io/2022/10/18/react-hook-form%E8%A7%A3%E5%86%B3%E6%96%B9%E6%A1%88/</a></span>
+                    </p>
+                
+                
+                    <p class="copyright-item">
+                        <span>License:</span>
+                        <span>Copyright (c) 2019 <a href="http://creativecommons.org/licenses/by-nc/4.0/" target="_blank" rel="noopener">CC-BY-NC-4.0</a> LICENSE</span>
+                    </p>
+                
+                
+                     <p class="copyright-item">
+                         <span>Slogan:</span>
+                         <span>享受当下</span>
+                     </p>
+                
+
+            </section>
+        
+        <section class="post-tags">
+            <div>
+                <span>Tag(s):</span>
+                <span class="tag">
+                    
+                    
+                        <a href="/tags/React/"># React</a>
+                    
+                        <a href="/tags/%E5%B7%A5%E7%A8%8B%E5%8C%96/"># 工程化</a>
+                    
+                        <a href="/tags/Form/"># Form</a>
+                    
+                        
+                </span>
+            </div>
+            <div>
+                <a href="javascript:window.history.back();">back</a>
+                <span>· </span>
+                <a href="/">home</a>
+            </div>
+        </section>
+        <section class="post-nav">
+            
+            
+            <a class="next" rel="next" href="/2022/09/18/lerna%E5%8C%85%E7%AE%A1%E7%90%86/">lerna包管理</a>
+            
+        </section>
+
+
+    </article>
+</div>
+
+            </div>
+            <footer id="footer" class="footer">
+    <div class="copyright">
+        <span>© 王八吉吉 | Powered by <a href="https://hexo.io" target="_blank">Hexo</a> & <a href="https://github.com/Siricee/hexo-theme-Chic" target="_blank">Chic</a></span>
+    </div>
+</footer>
+
+    </div>
+</body>
+
+</html>

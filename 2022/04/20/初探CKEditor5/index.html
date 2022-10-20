@@ -1,0 +1,463 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+    <meta charset="UTF-8">
+<meta name="viewport"
+      content="width=device-width, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+<meta http-equiv="X-UA-Compatible" content="ie=edge">
+
+    <meta name="author" content="王八吉吉">
+
+
+    <meta name="subtitle" content="前端小匠">
+
+
+    <meta name="description" content="专心学技术">
+
+
+    <meta name="keywords" content="前端">
+
+
+<title>初探CKEditor5 | Gaxy</title>
+
+
+
+    <link rel="icon" href="/favicon.png">
+
+
+
+
+    <!-- stylesheets list from _config.yml -->
+    
+    <link rel="stylesheet" href="/css/style.css">
+    
+
+
+
+    <!-- scripts list from _config.yml -->
+    
+    <script src="/js/script.js"></script>
+    
+    <script src="/js/tocbot.min.js"></script>
+    
+
+
+
+    
+    
+        
+    
+
+
+<meta name="generator" content="Hexo 4.2.1"></head>
+
+<body>
+    <script>
+        // this function is used to check current theme before page loaded.
+        (() => {
+            const currentTheme = window.localStorage && window.localStorage.getItem('theme') || '';
+            const isDark = currentTheme === 'dark';
+            const pagebody = document.getElementsByTagName('body')[0]
+            if (isDark) {
+                pagebody.classList.add('dark-theme');
+                // mobile
+                document.getElementById("mobile-toggle-theme").innerText = "· Dark"
+            } else {
+                pagebody.classList.remove('dark-theme');
+                // mobile
+                document.getElementById("mobile-toggle-theme").innerText = "· Light"
+            }
+        })();
+    </script>
+
+    <div class="wrapper">
+        <header>
+    <nav class="navbar">
+        <div class="container">
+            <div class="navbar-header header-logo"><a href="/">Gaxy</a></div>
+            <div class="menu navbar-right">
+                
+                    <a class="menu-item" href="/archives">归档</a>
+                
+                    <a class="menu-item" href="/category">分类</a>
+                
+                    <a class="menu-item" href="/tag">标签</a>
+                
+                    <a class="menu-item" href="/about">关于</a>
+                
+                <input id="switch_default" type="checkbox" class="switch_default">
+                <label for="switch_default" class="toggleBtn"></label>
+            </div>
+        </div>
+    </nav>
+
+    
+    <nav class="navbar-mobile" id="nav-mobile">
+        <div class="container">
+            <div class="navbar-header">
+                <div>
+                    <a href="/">Gaxy</a><a id="mobile-toggle-theme">·&nbsp;Light</a>
+                </div>
+                <div class="menu-toggle" onclick="mobileBtn()">&#9776; Menu</div>
+            </div>
+            <div class="menu" id="mobile-menu">
+                
+                    <a class="menu-item" href="/archives">归档</a>
+                
+                    <a class="menu-item" href="/category">分类</a>
+                
+                    <a class="menu-item" href="/tag">标签</a>
+                
+                    <a class="menu-item" href="/about">关于</a>
+                
+            </div>
+        </div>
+    </nav>
+
+</header>
+<script>
+    var mobileBtn = function f() {
+        var toggleMenu = document.getElementsByClassName("menu-toggle")[0];
+        var mobileMenu = document.getElementById("mobile-menu");
+        if(toggleMenu.classList.contains("active")){
+           toggleMenu.classList.remove("active")
+            mobileMenu.classList.remove("active")
+        }else{
+            toggleMenu.classList.add("active")
+            mobileMenu.classList.add("active")
+        }
+    }
+</script>
+            <div class="main">
+                <div class="container">
+    
+    
+        <div class="post-toc">
+    <div class="tocbot-list">
+    </div>
+    <div class="tocbot-list-menu">
+        <a class="tocbot-toc-expand" onclick="expand_toc()">Expand all</a>
+        <a onclick="go_top()">Back to top</a>
+        <a onclick="go_bottom()">Go to bottom</a>
+    </div>
+</div>
+
+<script>
+    var tocbot_timer;
+    var DEPTH_MAX = 6;    // 为 6 时展开所有
+    var tocbot_default_config = {
+        tocSelector: '.tocbot-list',
+        contentSelector: '.post-content',
+        headingSelector: 'h1, h2, h3, h4, h5',
+        orderedList: false,
+        scrollSmooth: true,
+        onClick: extend_click,
+    };
+
+    function extend_click() {
+        clearTimeout(tocbot_timer);
+        tocbot_timer = setTimeout(function () {
+            tocbot.refresh(obj_merge(tocbot_default_config, { hasInnerContainers: true }));
+        }, 420); // 这个值是由 tocbot 源码里定义的 scrollSmoothDuration 得来的
+    }
+
+    document.ready(function () {
+        tocbot.init(obj_merge(tocbot_default_config, { collapseDepth: 1 }));
+    });
+
+    function expandToc() {
+        var b = document.querySelector('.tocbot-toc-expand');
+        var expanded = b.getAttribute('data-expanded');
+        expanded ? b.removeAttribute('data-expanded') : b.setAttribute('data-expanded', true);
+        tocbot.refresh(obj_merge(tocbot_default_config, { collapseDepth: expanded ? 1 : DEPTH_MAX }));
+        b.innerText = expanded ? 'Expand all' : 'Collapse all';
+    }
+
+    function go_top() {
+        window.scrollTo(0, 0);
+    }
+
+    function go_bottom() {
+        window.scrollTo(0, document.body.scrollHeight);
+    }
+
+    function obj_merge(target, source) {
+        for (var item in source) {
+            if (source.hasOwnProperty(item)) {
+                target[item] = source[item];
+            }
+        }
+        return target;
+    }
+</script>
+    
+
+    
+    <article class="post-wrap">
+        <header class="post-header">
+            <h1 class="post-title">初探CKEditor5</h1>
+            
+                <div class="post-meta">
+                    
+                        Author: <a itemprop="author" rel="author" href="/">王八吉吉</a>
+                    
+
+                    
+                        <span class="post-time">
+                        Date: <a href="#">四月 20, 2022&nbsp;&nbsp;16:22:21</a>
+                        </span>
+                    
+                    
+                        <span class="post-category">
+                    Category:
+                            
+                                <a href="/category/React/">React</a>
+                            
+                        </span>
+                    
+                </div>
+            
+        </header>
+
+        <div class="post-content">
+            <h2 id="选择的原因"><a href="#选择的原因" class="headerlink" title="选择的原因"></a>选择的原因</h2><p>这里将<code>wangEditor5</code>与<code>CkEditor5</code>作为比较</p>
+<ul>
+<li>CkEditor优势 <ol>
+<li>文档详细</li>
+<li>用户量大</li>
+<li>自定义插件扩展非常容易</li>
+</ol>
+</li>
+<li>CkEditor劣势 <ol>
+<li>纯英文文档，无翻译</li>
+<li>未解决的_issues_尚且较多</li>
+</ol>
+</li>
+</ul>
+<h3 id="npm月下载量比较"><a href="#npm月下载量比较" class="headerlink" title="npm月下载量比较"></a>npm月下载量比较</h3><p><code>CKEditor</code>月下载量如下图所示：<br><img src="ckeditor-using-quantity.png" alt="ckeditor-using-quantity.png"></p>
+<p><code>wangEditor</code>月下载量如下图所示：<br><img src="wang-editor-using-quantity.png" alt="wang-editor-using-quantity.png"></p>
+<p>结论：<code>CKEditor</code>的月下载量吊打了<code>wangEditor</code>，并且最新的<code>wangEditor5</code>月下载量不过1400，个人比较倾向于使用月下载量10000+的</p>
+<h3 id="github关键数据比较："><a href="#github关键数据比较：" class="headerlink" title="github关键数据比较："></a>github关键数据比较：</h3><p><code>CKEditor</code>的<code>GitHub</code>星星数与<code>issues</code>数量如下图所示：</p>
+<p><img src="ckeditor-star.png" alt="ckeditor-star.png"></p>
+<p><code>wangEditor</code>的<code>GitHub</code>星星数与<code>issues</code>数量如下图所示：</p>
+<p><img src="wangEditor-star.png" alt="wangEditor-star.png"></p>
+<p>结论：<code>wangEditor</code>在<code>star</code>上和处理问题的及时程度秒杀了<code>CKEditor</code>, 这一定程度可能也是<code>CKEditor</code>的<code>star</code>如此少的原因，但介于<code>wangEditor</code>是由国人开发，国人开发的特点是<code>star</code>量比较虚，实际使用量和其<code>star</code>量不成正比，参考字节跳动web infra团队开源的<code>Modern.js</code></p>
+<h3 id="打包体积比较"><a href="#打包体积比较" class="headerlink" title="打包体积比较"></a>打包体积比较</h3><p>相同功能的情况下<br><code>CKEditor</code>体积<br><img src="ckeditor-build.png" alt="ckeditor-build.png"></p>
+<p><code>wangEditor</code>体积<br><img src="wang-editor-build.png" alt="wang-editor-build.png"></p>
+<p>结论：</p>
+<ol>
+<li>同样的功能<code>CKEditor</code>的打包体积更小，B端要求不高，C端原则基本遵循满足需求的情况下，能使用小的就使用小的</li>
+<li><code>CKEditor</code>功能栏采取按需加载的方式，即我们如果不需要某些功能，那些功能文件就不会被打包，测试了一下如果只留一个<code>Bold</code>插件的情况下可以减少_42.2kb_的js体积</li>
+</ol>
+<a id="more"></a>
+<h3 id="功能比较"><a href="#功能比较" class="headerlink" title="功能比较"></a>功能比较</h3><p>主要功能大同小异，性能上的表现也几乎一致，<code>CKEditor</code>的亮点在于其插件化的扩展更加友好， 除了自己编写插件，还可以继承已有的插件，重写对应的插件方法，如果需要继承，官网的插件都是提供对应的方法的，重写方法就好。并且插件的编写方式类似于编写<code>webpack</code>的插件，提供了一系列的钩子在特定的条件下执行，后面会详细介绍。</p>
+<h2 id="CkEditor基本环境搭建"><a href="#CkEditor基本环境搭建" class="headerlink" title="CkEditor基本环境搭建"></a>CkEditor基本环境搭建</h2><p>根据业务需要, 使用<code>create-react-app</code>搭建项目, 使用<code>react-app-rewired</code>启动项目, 使用<code>customize-cra</code>修改<code>webpack</code>配置</p>
+<h3 id="安装"><a href="#安装" class="headerlink" title="安装"></a>安装</h3><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">yarn add --dev \</span><br><span class="line">    css-loader@5 \</span><br><span class="line">    postcss-loader@4 \</span><br><span class="line">    raw-loader@4 \</span><br><span class="line">    style-loader@2 \</span><br><span class="line">    webpack@5 \</span><br><span class="line">    webpack-cli@4</span><br></pre></td></tr></table></figure>
+<h3 id="webpack配置"><a href="#webpack配置" class="headerlink" title="webpack配置"></a>webpack配置</h3><p><code>CKEditor</code>集成到项目中需要重新定义某些文件的解析规则<br>否则会报<br><code>Error: Cannot read property &#39;getAttribute&#39; of null (ckeditor)</code><br><a href="https://stackoverflow.com/questions/66416928/error-cannot-read-property-getattribute-of-null-ckeditor" target="_blank" rel="noopener">https://stackoverflow.com/questions/66416928/error-cannot-read-property-getattribute-of-null-ckeditor</a></p>
+<p>需要做如下解析：</p>
+<ol>
+<li>内置的<code>svg</code>文件需要使用<code>raw-loader</code></li>
+<li>如果需要做<strong>视觉集成(主题)</strong>, 内置的<code>css</code>文件优先使用<code>postcss-loader</code>,并且引入<code>@ckeditor/ckeditor5-theme-lark</code>包, 主题将增加约_30kb_的打包体积, 开发者可以酌情考虑。链接如下：<br><a href="https://ckeditor.com/docs/ckeditor5/latest/examples/framework/theme-customization.html" target="_blank" rel="noopener">https://ckeditor.com/docs/ckeditor5/latest/examples/framework/theme-customization.html</a></li>
+<li>对于特定的<code>CKEditor</code>中的<code>css</code>样式，可以用如下的正则表达式判断</li>
+</ol>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line"><span class="keyword">const</span> CKERegex = &#123;</span><br><span class="line">    svg: <span class="regexp">/ckeditor5-[^/\\]+[/\\]theme[/\\]icons[/\\][^/\\]+\.svg$/</span>,</span><br><span class="line">    css: <span class="regexp">/ckeditor5-[^/\\]+[/\\]theme[/\\].+\.css/</span>,</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">&#123;</span><br><span class="line">    loader: <span class="string">'postcss-loader'</span>,</span><br><span class="line">    options: &#123;</span><br><span class="line">        postcssOptions: styles.getPostCssConfig(&#123;</span><br><span class="line">            themeImporter: &#123;</span><br><span class="line">                themePath: <span class="built_in">require</span>.resolve(<span class="string">'@ckeditor/ckeditor5-theme-lark'</span>)</span><br><span class="line">            &#125;,</span><br><span class="line">            minify: <span class="literal">true</span></span><br><span class="line">        &#125;)</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="富文本的模式"><a href="#富文本的模式" class="headerlink" title="富文本的模式"></a>富文本的模式</h3><ol>
+<li>经典模式如下</li>
+</ol>
+<p><code>npm install --save @ckeditor/ckeditor5-build-classic</code></p>
+<p><img src="editor-classic.png" alt="editor-classic.png"></p>
+<ol start="2">
+<li>内联模式</li>
+</ol>
+<p><code>npm install --save @ckeditor/ckeditor5-build-inline</code></p>
+<p><img src="editor-inline.png" alt="editor-inline.png"></p>
+<ol start="3">
+<li>气泡模式</li>
+</ol>
+<p><code>npm install --save @ckeditor/ckeditor5-build-balloon</code><br><img src="editor-balloon.png" alt="editor-balloon.png"></p>
+<ol start="4">
+<li>气泡块模式<br><code>npm install --save @ckeditor/ckeditor5-build-balloon-block</code></li>
+</ol>
+<p><img src="editor-balloon-block.png" alt="editor-balloon-block.png"></p>
+<ol start="5">
+<li>文档模式<br><code>npm install --save @ckeditor/ckeditor5-build-decoupled-document</code></li>
+</ol>
+<p><img src="editor-document.png" alt="editor-document.png"></p>
+<p>文档链接如下：<br><a href="https://ckeditor.com/docs/ckeditor5/latest/installation/advanced/alternative-setups/predefined-builds.html" target="_blank" rel="noopener">https://ckeditor.com/docs/ckeditor5/latest/installation/advanced/alternative-setups/predefined-builds.html</a></p>
+<h3 id="插件添加"><a href="#插件添加" class="headerlink" title="插件添加"></a>插件添加</h3><p>插件添加逻辑必须遵循官方文档<br>个人比较推荐从以下的网站进去，定义自己的模板<br><a href="https://ckeditor.com/ckeditor-5/online-builder/" target="_blank" rel="noopener">https://ckeditor.com/ckeditor-5/online-builder/</a></p>
+<p>按照指示下载完成后会有以下的文件，还有demo，如下图<br><img src="online-builder.png" alt="online-builder.png"></p>
+<p>也可以根据已有的插件集，像上图那样的自己去引用官方已有的插件, 对应的所有插件如下：<br><a href="https://ckeditor.com/docs/ckeditor5/latest/features/index.html" target="_blank" rel="noopener">https://ckeditor.com/docs/ckeditor5/latest/features/index.html</a></p>
+<h3 id="编写CkEditor组件"><a href="#编写CkEditor组件" class="headerlink" title="编写CkEditor组件"></a>编写CkEditor组件</h3><p>当前组件被<code>antd</code>的<code>Form</code>包裹，作为表单组件</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">CKEditor</span>(<span class="params">props</span>) </span>&#123;</span><br><span class="line">  <span class="keyword">const</span> &#123; onChange, readOnly, value, onError &#125; = props;</span><br><span class="line"></span><br><span class="line">  <span class="keyword">const</span> handleChange = useCallback(<span class="function">(<span class="params">event, editor</span>) =&gt;</span> &#123;</span><br><span class="line">    <span class="keyword">const</span> data = editor.getData();</span><br><span class="line">    onChange(data)</span><br><span class="line">  &#125;, [onChange])</span><br><span class="line"></span><br><span class="line">  <span class="keyword">const</span> handleBlur = useCallback(<span class="function">(<span class="params">event, editor</span>) =&gt;</span> &#123;</span><br><span class="line">    <span class="keyword">const</span> data = editor.getData();</span><br><span class="line">    onChange(data)</span><br><span class="line">  &#125;, [onChange])</span><br><span class="line"></span><br><span class="line">  <span class="keyword">return</span> (</span><br><span class="line">    &lt;CKEditorContext context=&#123;Context&#125;&gt;</span><br><span class="line">      &lt;CKEditor</span><br><span class="line">        editor=&#123;ClassicEditor&#125;</span><br><span class="line">        config=&#123;&#123;</span><br><span class="line">          <span class="comment">// 这里可以自定义配置项</span></span><br><span class="line">          removePlugins: [<span class="string">'link'</span>, <span class="string">'insertTable'</span>, <span class="string">'mediaEmbed'</span>],</span><br><span class="line">          toolbar: [<span class="string">'bold'</span>, <span class="string">'italic'</span>, <span class="string">'bulletedList'</span>, <span class="string">'numberedList'</span>, <span class="string">'imageUpload'</span>],</span><br><span class="line">          <span class="comment">// toolbar: ['bold', 'italic']</span></span><br><span class="line">        &#125;&#125;</span><br><span class="line">        disabled=&#123;readOnly&#125;</span><br><span class="line">        data=&#123;value || <span class="string">'&lt;p /&gt;'</span>&#125;</span><br><span class="line">        onReady=&#123;editor =&gt; &#123;</span><br><span class="line">          <span class="comment">// You can store the "editor" and use when it is needed.</span></span><br><span class="line">          <span class="built_in">console</span>.log(<span class="string">'Editor1 is ready to use!'</span>, editor);</span><br><span class="line">        &#125;&#125;</span><br><span class="line">        <span class="comment">// 相当于 editor.model.document.on("change:data", handleChange)</span></span><br><span class="line">        onChange=&#123;handleChange&#125;</span><br><span class="line">        onBlur=&#123;handleBlur&#125;</span><br><span class="line">        onError=&#123;onError || <span class="built_in">console</span>.error&#125;</span><br><span class="line">      /&gt;</span><br><span class="line">    &lt;<span class="regexp">/CKEditorContext&gt;</span></span><br><span class="line"><span class="regexp">  );</span></span><br><span class="line"><span class="regexp">&#125;</span></span><br><span class="line"><span class="regexp"></span></span><br><span class="line"><span class="regexp">export default CKEditor;</span></span><br></pre></td></tr></table></figure>
+
+<p>关键属性如下：</p>
+<ul>
+<li><code>editor</code>：使用的富文本编辑器模板</li>
+<li><code>config</code>：富文本编辑器的配置项，默认会用<code>Editor.defaultConfig</code>配置好的</li>
+<li><code>disabled</code>: 富文本是否可编辑</li>
+<li><code>data</code>: 富文本的<code>html</code>字符串</li>
+<li><code>onReady</code>: 编辑器刚构建好时会调用，官网推荐在这里将富文本做存储，避免重复构建</li>
+<li><code>onChange</code>: 改变时调用</li>
+<li><code>onBlur</code>: 焦点变化时调用</li>
+<li><code>onError</code>: 出现错误时调用<h4 id="常见问题"><a href="#常见问题" class="headerlink" title="常见问题"></a>常见问题</h4></li>
+</ul>
+<ol>
+<li>编辑器被重复引用：</li>
+</ol>
+<ul>
+<li>产生原因： <ul>
+<li><code>config</code>属性中有<code>plugins</code>属性，官网将对应的插件直接在组件引用</li>
+</ul>
+</li>
+</ul>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> Essentials <span class="keyword">from</span> <span class="string">'@ckeditor/ckeditor5-essentials/src/essentials'</span>;</span><br><span class="line"><span class="keyword">import</span> Bold <span class="keyword">from</span> <span class="string">'@ckeditor/ckeditor5-basic-styles/src/bold'</span>;</span><br><span class="line"><span class="keyword">import</span> Italic <span class="keyword">from</span> <span class="string">'@ckeditor/ckeditor5-basic-styles/src/italic'</span>;</span><br><span class="line"><span class="keyword">import</span> Paragraph <span class="keyword">from</span> <span class="string">'@ckeditor/ckeditor5-paragraph/src/paragraph'</span>;</span><br><span class="line"></span><br><span class="line"><span class="keyword">const</span> editorConfiguration = &#123;</span><br><span class="line">    plugins: [ Essentials, Bold, Italic, Paragraph ],</span><br><span class="line">    toolbar: [ <span class="string">'bold'</span>, <span class="string">'italic'</span> ]</span><br><span class="line">&#125;;</span><br><span class="line">    &lt;CKEditor</span><br><span class="line">    editor=&#123; ClassicEditor &#125;</span><br><span class="line">    config=&#123; editorConfiguration &#125;</span><br><span class="line">    ...其他属性</span><br><span class="line">/&gt;</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>问题链接:<a href="https://github.com/ckeditor/ckeditor5/issues/5776" target="_blank" rel="noopener">https://github.com/ckeditor/ckeditor5/issues/5776</a> </li>
+<li>解决方案：编写前文图例的<code>ckeditor.js</code>，然后将<code>CkEditor组件</code>需要的配置注入，实际编写的组件中引入对应<code>js</code>的文件，不需要的删除，目前没看到什么场景必须使用<code>config.plugins</code> </li>
+</ul>
+<ol start="2">
+<li>打包内存溢出(我没遇到过)<br>解决方案官网已经给出，链接如下：<br><a href="https://ckeditor.com/docs/ckeditor5/latest/installation/getting-started/frameworks/react.html#integrating-a-build-from-the-online-builder" target="_blank" rel="noopener">https://ckeditor.com/docs/ckeditor5/latest/installation/getting-started/frameworks/react.html#integrating-a-build-from-the-online-builder</a></li>
+</ol>
+<h3 id="中文包"><a href="#中文包" class="headerlink" title="中文包"></a>中文包</h3><p>全局引入</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> <span class="string">"@ckeditor/ckeditor5-build-classic/build/translations/zh-cn"</span></span><br></pre></td></tr></table></figure>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">Editor.defaultConfig.language = <span class="string">'zh-cn'</span></span><br></pre></td></tr></table></figure>
+
+<h3 id="自定义插件"><a href="#自定义插件" class="headerlink" title="自定义插件"></a>自定义插件</h3><h4 id="npm包的形式"><a href="#npm包的形式" class="headerlink" title="npm包的形式"></a>npm包的形式</h4><p>个人推荐使用<a href="https://www.npmjs.com/package/ckeditor5-package-generator" target="_blank" rel="noopener">ckeditor5-package-generator</a></p>
+<ol>
+<li><code>CkEditor5</code>要求所有的插件包都必须以<code>ckeditor5-</code>开头，中间字符为<code>0-9</code>、<code>a-z</code>、<code>. - _</code>，创建和打包的时候都会正则校验 </li>
+<li>上述插件会提供一个打包模板，我们可以在这个模板上扩展，会有一个已经编写好的插件 </li>
+</ol>
+<p>详细的编写方式可见<a href="https://ckeditor.com/docs/ckeditor5/latest/framework/guides/plugins/creating-simple-plugin.html" target="_blank" rel="noopener">参考链接</a></p>
+<p>简述如下：</p>
+<ol>
+<li>一个插件就是一个继承于<code>Plugin</code>的<code>class</code></li>
+<li><code>editor.ui.componentFactory</code>负责添加一个工具，可以使用模型层的监听器为用户对工具栏上自定义ui定义其操作</li>
+</ol>
+<p>注意点：<br>如果多个插件打包，并非工具生成的目录， 目录如下<br>可以直接打包，也可以使用<code>dll模式</code>，这里推荐直接打包，<code>webpack5</code>自带缓存，<code>dll</code>不会对打包速度有明显的效果</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br></pre></td><td class="code"><pre><span class="line">...</span><br><span class="line">|- src</span><br><span class="line">  |- ckeditor5-plugin1</span><br><span class="line">    |- lang</span><br><span class="line">      |- translations</span><br><span class="line">        |- zh-cn.po</span><br><span class="line">      |- contexts.json</span><br><span class="line">    |- src</span><br><span class="line">      |- index.js</span><br><span class="line">  |- ckeditor5-plugin2</span><br><span class="line">    |- lang</span><br><span class="line">      |- translations</span><br><span class="line">        |- zh-cn.po</span><br><span class="line">      |- contexts.json</span><br><span class="line">    |- src</span><br><span class="line">      |- index.js</span><br><span class="line">  |- ckeditor5-plugin3</span><br><span class="line">    |- lang</span><br><span class="line">      |- translations</span><br><span class="line">        |- zh-cn.po</span><br><span class="line">      |- contexts.json</span><br><span class="line">    |- src</span><br><span class="line">      |- index.js</span><br><span class="line">...</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> Plugin <span class="keyword">from</span> <span class="string">'@ckeditor/ckeditor5-core/src/plugin'</span>;</span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">InsertImage</span> <span class="keyword">extends</span> <span class="title">Plugin</span> </span>&#123;</span><br><span class="line">    init() &#123;</span><br><span class="line">        <span class="keyword">const</span> editor = <span class="keyword">this</span>.editor;</span><br><span class="line"></span><br><span class="line">          <span class="comment">// 为工具栏添加一个 insertImage，使用 imageIcon</span></span><br><span class="line">        editor.ui.componentFactory.add( <span class="string">'insertImage'</span>, locale =&gt; &#123;</span><br><span class="line">            <span class="keyword">const</span> view = <span class="keyword">new</span> ButtonView( locale );</span><br><span class="line">            view.set( &#123;</span><br><span class="line">                label: <span class="string">'Insert image'</span>,</span><br><span class="line">                icon: imageIcon,</span><br><span class="line">                tooltip: <span class="literal">true</span></span><br><span class="line">            &#125; );</span><br><span class="line"></span><br><span class="line">            <span class="comment">// 监听执行这个Button，会弹出输入url，监听模型层，根据输入的url展示对应的图片，并插入到模型层对应的鼠标 selection 节点上</span></span><br><span class="line">            view.on( <span class="string">'execute'</span>, () =&gt; &#123;</span><br><span class="line">                <span class="keyword">const</span> imageUrl = prompt( <span class="string">'Image URL'</span> );</span><br><span class="line"></span><br><span class="line">                editor.model.change( <span class="function"><span class="params">writer</span> =&gt;</span> &#123;</span><br><span class="line">                    <span class="keyword">const</span> imageElement = writer.createElement( <span class="string">'imageBlock'</span>, &#123;</span><br><span class="line">                        src: imageUrl</span><br><span class="line">                    &#125; );</span><br><span class="line"></span><br><span class="line">                    editor.model.insertContent( imageElement, editor.model.document.selection );</span><br><span class="line">                &#125; );</span><br><span class="line">            &#125; );</span><br><span class="line"></span><br><span class="line">            <span class="keyword">return</span> view;</span><br><span class="line">        &#125; );</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="自定义扩展"><a href="#自定义扩展" class="headerlink" title="自定义扩展"></a>自定义扩展</h3><p><a href="https://ckeditor.com/docs/ckeditor5/latest/framework/guides/deep-dive/upload-adapter.html" target="_blank" rel="noopener">完整文档可见</a><br><code>CKEditor</code>提供了自定义扩展，根据先有的<code>adapter</code>做扩展，以下都将用<code>Image Uploader</code>做举例</p>
+<p>例如： <code>Upload adapter</code>作用是在文件编辑器和文件上传服务器之间构建一个桥梁，我们可以自定义扩展用户上传的行为以及上传到服务器的接口等，这个<code>adapter</code>是基于<code>File repository plugin</code>创建的，像<code>image upload plugin</code>也是基于这个创建的，``File repository plugin`是整个上传的核心插件。</p>
+<p>区别：<br>自定义插件是完全从ui到功能的自定义实现<br>自定义扩展是基于已有的富文本编辑器功能，做一些替换或者功能的提升</p>
+<h4 id="工作流程"><a href="#工作流程" class="headerlink" title="工作流程"></a>工作流程</h4><ol>
+<li>首先，图像（或图像）需要进入富文本编辑器内容。有很多方法可以做到这一点，例如：</li>
+</ol>
+<ul>
+<li>从剪贴板粘贴图像</li>
+<li>从文件系统中拖动文件</li>
+<li>通过文件系统对话框选择图像，即选择上传</li>
+</ul>
+<p>这些行为都将被<code>image uploader plugin</code>插件捕获</p>
+<ol start="2">
+<li><p>对于每个上传的图像都会被<code>image upload plugin</code>创建出<code>file loader</code>的实例，通过<code>upload adapter</code>将其上传到服务器，并根据url正确的展示在编辑器内 </p>
+</li>
+<li><p>在上传图片时，<code>image upload plugin</code>会做以下事情 </p>
+</li>
+</ol>
+<ul>
+<li>创建图像的占位符</li>
+<li>插入到编辑器</li>
+<li>展示每一个图像的进度条</li>
+<li>上传完成前如果做了删除图片的操作，终止上传</li>
+</ul>
+<ol start="4">
+<li>图片上传完成，<code>upload adapter</code>通知<code>editor</code>（调用<code>Promise</code>），<code>image upload</code>创建的标签中的<code>src</code>和<code>srcset</code>将被替换</li>
+</ol>
+<h4 id="扩展方式"><a href="#扩展方式" class="headerlink" title="扩展方式"></a>扩展方式</h4><ol>
+<li><p><code>image upload</code>必须在编辑器中启用。它在所有官方版本中默认启用，如果正在自定义<code>CKEditor 5</code>编辑器，那么需要自己写这个插件</p>
+</li>
+<li><p>需要自定义<code>upload adapter</code>，我们可以根据使用已有的<code>upload adapter</code>，也可以自定义（建议自定义，将上传和回显操作控制在自己手中）</p>
+<h4 id="编写UploadAdapter"><a href="#编写UploadAdapter" class="headerlink" title="编写UploadAdapter"></a>编写UploadAdapter</h4></li>
+<li><p>自定义<code>UploadAdapter</code>，主要是自定义上传的服务器路径以及自定义回显方式 </p>
+</li>
+<li><p>根据<a href="https://ckeditor.com/docs/ckeditor5/latest/api/module_upload_filerepository-UploadAdapter.html" target="_blank" rel="noopener">UploadAdapter参考链接</a>`可以找到对应的方法 </p>
+</li>
+</ol>
+<ul>
+<li><code>upload()</code>返回一个<code>Promise</code> </li>
+<li><code>abort()</code>上传中止所做的操作 </li>
+</ul>
+<ol start="3">
+<li>通常我们使用<code>XMLHttpRequest</code>在这个<code>UploadAdapter</code>中，详细请见<a href="https://ckeditor.com/docs/ckeditor5/latest/framework/guides/deep-dive/upload-adapter.html#implementing-a-custom-upload-adapter" target="_blank" rel="noopener">创建一个简易的UploadAdapter</a>，完整代码如下</li>
+</ol>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">MyUploadAdapter</span> </span>&#123;</span><br><span class="line">    <span class="keyword">constructor</span>(loader) &#123;</span><br><span class="line">        <span class="comment">// The file loader instance to use during the upload.</span></span><br><span class="line">        <span class="keyword">this</span>.loader = loader;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// Starts the upload process.</span></span><br><span class="line">    upload() &#123;</span><br><span class="line">        <span class="keyword">return</span> <span class="keyword">this</span>.loader.file.then(</span><br><span class="line">            (file) =&gt;</span><br><span class="line">                <span class="keyword">new</span> <span class="built_in">Promise</span>(<span class="function">(<span class="params">resolve, reject</span>) =&gt;</span> &#123;</span><br><span class="line">                    <span class="keyword">this</span>.initRequest();</span><br><span class="line">                    <span class="keyword">this</span>.initListeners(resolve, reject, file);</span><br><span class="line">                    <span class="keyword">this</span>.sendRequest(file);</span><br><span class="line">                &#125;),</span><br><span class="line">        );</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// Aborts the upload process.</span></span><br><span class="line">    abort() &#123;</span><br><span class="line">        <span class="keyword">if</span> (<span class="keyword">this</span>.xhr) &#123;</span><br><span class="line">            <span class="keyword">this</span>.xhr.abort();</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// Initializes the XMLHttpRequest object using the URL passed to the constructor.</span></span><br><span class="line">    initRequest() &#123;</span><br><span class="line">        <span class="keyword">this</span>.xhr = <span class="keyword">new</span> XMLHttpRequest();</span><br><span class="line">        <span class="comment">// Note that your request may look different. It is up to you and your editor</span></span><br><span class="line">        <span class="comment">// integration to choose the right communication channel. This example uses</span></span><br><span class="line">        <span class="comment">// a POST request with JSON as a data structure but your configuration</span></span><br><span class="line">        <span class="comment">// could be different.</span></span><br><span class="line">        <span class="keyword">this</span>.xhr.open(<span class="string">'POST'</span>, <span class="string">'/api/img/upload'</span>, <span class="literal">true</span>);</span><br><span class="line">        <span class="keyword">this</span>.xhr.responseType = <span class="string">'json'</span>;</span><br><span class="line">        <span class="comment">// 设置请求头（权限控制）</span></span><br><span class="line">        <span class="keyword">this</span>.xhr.setRequestHeader(<span class="string">'AUTHENTICATION'</span>, <span class="string">'111'</span>);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// Initializes XMLHttpRequest listeners.</span></span><br><span class="line">    initListeners(resolve, reject, file) &#123;</span><br><span class="line">        <span class="keyword">const</span> &#123; xhr, loader &#125; = <span class="keyword">this</span>;</span><br><span class="line">        <span class="keyword">const</span> genericErrorText = <span class="string">`Couldn't upload file: <span class="subst">$&#123;file.name&#125;</span>.`</span>;</span><br><span class="line">        xhr.addEventListener(<span class="string">'error'</span>, () =&gt; reject(genericErrorText));</span><br><span class="line">        xhr.addEventListener(<span class="string">'abort'</span>, () =&gt; reject());</span><br><span class="line">        xhr.addEventListener(<span class="string">'load'</span>, () =&gt; &#123;</span><br><span class="line">            <span class="keyword">const</span> &#123; response &#125; = xhr;</span><br><span class="line"></span><br><span class="line">            <span class="comment">// This example assumes the XHR server's "response" object will come with</span></span><br><span class="line">            <span class="comment">// an "error" which has its own "message" that can be passed to reject()</span></span><br><span class="line">            <span class="comment">// in the upload promise.</span></span><br><span class="line">            <span class="comment">//</span></span><br><span class="line">            <span class="comment">// Your integration may handle upload errors in a different way so make sure</span></span><br><span class="line">            <span class="comment">// it is done properly. The reject() function must be called when the upload fails.</span></span><br><span class="line">            <span class="keyword">if</span> (!response || response.error) &#123;</span><br><span class="line">                <span class="keyword">return</span> reject(</span><br><span class="line">                    response &amp;&amp; response.error ? response.error.message : genericErrorText,</span><br><span class="line">                );</span><br><span class="line">            &#125;</span><br><span class="line"></span><br><span class="line">            <span class="comment">// If the upload is successful, resolve the upload promise with an object containing</span></span><br><span class="line">            <span class="comment">// at least the "default" URL, pointing to the image on the server.</span></span><br><span class="line">            <span class="comment">// This URL will be used to display the image in the content. Learn more in the</span></span><br><span class="line">            <span class="comment">// UploadAdapter#upload documentation.</span></span><br><span class="line">            <span class="keyword">return</span> resolve(&#123;</span><br><span class="line">                <span class="keyword">default</span>: response.data,</span><br><span class="line">            &#125;);</span><br><span class="line">        &#125;);</span><br><span class="line"></span><br><span class="line">        <span class="comment">// Upload progress when it is supported. The file loader has the #uploadTotal and #uploaded</span></span><br><span class="line">        <span class="comment">// properties which are used e.g. to display the upload progress bar in the editor</span></span><br><span class="line">        <span class="comment">// user interface.</span></span><br><span class="line">        <span class="keyword">if</span> (xhr.upload) &#123;</span><br><span class="line">            xhr.upload.addEventListener(<span class="string">'progress'</span>, (evt) =&gt; &#123;</span><br><span class="line">                <span class="keyword">if</span> (evt.lengthComputable) &#123;</span><br><span class="line">                    loader.uploadTotal = evt.total;</span><br><span class="line">                    loader.uploaded = evt.loaded;</span><br><span class="line">                &#125;</span><br><span class="line">            &#125;);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// Prepares the data and sends the request.</span></span><br><span class="line">    sendRequest(file) &#123;</span><br><span class="line">        <span class="comment">// Prepare the form data.</span></span><br><span class="line">        <span class="keyword">const</span> data = <span class="keyword">new</span> FormData();</span><br><span class="line"></span><br><span class="line">        data.append(<span class="string">'attach'</span>, file);</span><br><span class="line"></span><br><span class="line">        <span class="comment">// Important note: This is the right place to implement security mechanisms</span></span><br><span class="line">        <span class="comment">// like authentication and CSRF protection. For instance, you can use</span></span><br><span class="line">        <span class="comment">// XMLHttpRequest.setRequestHeader() to set the request headers containing</span></span><br><span class="line">        <span class="comment">// the CSRF token generated earlier by your application.</span></span><br><span class="line"></span><br><span class="line">        <span class="comment">// Send the request.</span></span><br><span class="line">        <span class="keyword">this</span>.xhr.send(data);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">export</span> <span class="keyword">default</span> MyUploadAdapter;</span><br></pre></td></tr></table></figure>
+
+        </div>
+
+        
+            <section class="post-copyright">
+                
+                    <p class="copyright-item">
+                        <span>Author:</span>
+                        <span>王八吉吉</span>
+                    </p>
+                
+                
+                    <p class="copyright-item">
+                        <span>Permalink:</span>
+                        <span><a href="http://auglyxu.github.io/2022/04/20/%E5%88%9D%E6%8E%A2CKEditor5/">http://auglyxu.github.io/2022/04/20/%E5%88%9D%E6%8E%A2CKEditor5/</a></span>
+                    </p>
+                
+                
+                    <p class="copyright-item">
+                        <span>License:</span>
+                        <span>Copyright (c) 2019 <a href="http://creativecommons.org/licenses/by-nc/4.0/" target="_blank" rel="noopener">CC-BY-NC-4.0</a> LICENSE</span>
+                    </p>
+                
+                
+                     <p class="copyright-item">
+                         <span>Slogan:</span>
+                         <span>享受当下</span>
+                     </p>
+                
+
+            </section>
+        
+        <section class="post-tags">
+            <div>
+                <span>Tag(s):</span>
+                <span class="tag">
+                    
+                    
+                        <a href="/tags/%E5%89%8D%E7%AB%AF/"># 前端</a>
+                    
+                        <a href="/tags/CKEditor/"># CKEditor</a>
+                    
+                        
+                </span>
+            </div>
+            <div>
+                <a href="javascript:window.history.back();">back</a>
+                <span>· </span>
+                <a href="/">home</a>
+            </div>
+        </section>
+        <section class="post-nav">
+            
+                <a class="prev" rel="prev" href="/2022/05/12/%E5%8F%91%E7%A5%A8%E5%8C%B9%E9%85%8D%E2%80%94%E2%80%94%E6%89%8B%E5%8A%A8%E5%BD%95%E5%85%A5%E5%BE%85%E5%AF%B9%E8%B4%A6%E6%98%8E%E7%BB%86%E6%8A%80%E6%9C%AF%E6%96%87%E6%A1%A3/">发票匹配(待对账明细匹配)</a>
+            
+            
+            <a class="next" rel="next" href="/2022/04/01/ErrorBoundary%E9%A2%84%E9%98%B2%E7%99%BD%E5%B1%8F/">ErrorBoundary预防白屏</a>
+            
+        </section>
+
+
+    </article>
+</div>
+
+            </div>
+            <footer id="footer" class="footer">
+    <div class="copyright">
+        <span>© 王八吉吉 | Powered by <a href="https://hexo.io" target="_blank">Hexo</a> & <a href="https://github.com/Siricee/hexo-theme-Chic" target="_blank">Chic</a></span>
+    </div>
+</footer>
+
+    </div>
+</body>
+
+</html>

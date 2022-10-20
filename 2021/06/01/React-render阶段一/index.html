@@ -1,0 +1,351 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+    <meta charset="UTF-8">
+<meta name="viewport"
+      content="width=device-width, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+<meta http-equiv="X-UA-Compatible" content="ie=edge">
+
+    <meta name="author" content="王八吉吉">
+
+
+    <meta name="subtitle" content="前端小匠">
+
+
+    <meta name="description" content="专心学技术">
+
+
+    <meta name="keywords" content="前端">
+
+
+<title>React-render阶段(一) | Gaxy</title>
+
+
+
+    <link rel="icon" href="/favicon.png">
+
+
+
+
+    <!-- stylesheets list from _config.yml -->
+    
+    <link rel="stylesheet" href="/css/style.css">
+    
+
+
+
+    <!-- scripts list from _config.yml -->
+    
+    <script src="/js/script.js"></script>
+    
+    <script src="/js/tocbot.min.js"></script>
+    
+
+
+
+    
+    
+        
+    
+
+
+<meta name="generator" content="Hexo 4.2.1"></head>
+
+<body>
+    <script>
+        // this function is used to check current theme before page loaded.
+        (() => {
+            const currentTheme = window.localStorage && window.localStorage.getItem('theme') || '';
+            const isDark = currentTheme === 'dark';
+            const pagebody = document.getElementsByTagName('body')[0]
+            if (isDark) {
+                pagebody.classList.add('dark-theme');
+                // mobile
+                document.getElementById("mobile-toggle-theme").innerText = "· Dark"
+            } else {
+                pagebody.classList.remove('dark-theme');
+                // mobile
+                document.getElementById("mobile-toggle-theme").innerText = "· Light"
+            }
+        })();
+    </script>
+
+    <div class="wrapper">
+        <header>
+    <nav class="navbar">
+        <div class="container">
+            <div class="navbar-header header-logo"><a href="/">Gaxy</a></div>
+            <div class="menu navbar-right">
+                
+                    <a class="menu-item" href="/archives">归档</a>
+                
+                    <a class="menu-item" href="/category">分类</a>
+                
+                    <a class="menu-item" href="/tag">标签</a>
+                
+                    <a class="menu-item" href="/about">关于</a>
+                
+                <input id="switch_default" type="checkbox" class="switch_default">
+                <label for="switch_default" class="toggleBtn"></label>
+            </div>
+        </div>
+    </nav>
+
+    
+    <nav class="navbar-mobile" id="nav-mobile">
+        <div class="container">
+            <div class="navbar-header">
+                <div>
+                    <a href="/">Gaxy</a><a id="mobile-toggle-theme">·&nbsp;Light</a>
+                </div>
+                <div class="menu-toggle" onclick="mobileBtn()">&#9776; Menu</div>
+            </div>
+            <div class="menu" id="mobile-menu">
+                
+                    <a class="menu-item" href="/archives">归档</a>
+                
+                    <a class="menu-item" href="/category">分类</a>
+                
+                    <a class="menu-item" href="/tag">标签</a>
+                
+                    <a class="menu-item" href="/about">关于</a>
+                
+            </div>
+        </div>
+    </nav>
+
+</header>
+<script>
+    var mobileBtn = function f() {
+        var toggleMenu = document.getElementsByClassName("menu-toggle")[0];
+        var mobileMenu = document.getElementById("mobile-menu");
+        if(toggleMenu.classList.contains("active")){
+           toggleMenu.classList.remove("active")
+            mobileMenu.classList.remove("active")
+        }else{
+            toggleMenu.classList.add("active")
+            mobileMenu.classList.add("active")
+        }
+    }
+</script>
+            <div class="main">
+                <div class="container">
+    
+    
+        <div class="post-toc">
+    <div class="tocbot-list">
+    </div>
+    <div class="tocbot-list-menu">
+        <a class="tocbot-toc-expand" onclick="expand_toc()">Expand all</a>
+        <a onclick="go_top()">Back to top</a>
+        <a onclick="go_bottom()">Go to bottom</a>
+    </div>
+</div>
+
+<script>
+    var tocbot_timer;
+    var DEPTH_MAX = 6;    // 为 6 时展开所有
+    var tocbot_default_config = {
+        tocSelector: '.tocbot-list',
+        contentSelector: '.post-content',
+        headingSelector: 'h1, h2, h3, h4, h5',
+        orderedList: false,
+        scrollSmooth: true,
+        onClick: extend_click,
+    };
+
+    function extend_click() {
+        clearTimeout(tocbot_timer);
+        tocbot_timer = setTimeout(function () {
+            tocbot.refresh(obj_merge(tocbot_default_config, { hasInnerContainers: true }));
+        }, 420); // 这个值是由 tocbot 源码里定义的 scrollSmoothDuration 得来的
+    }
+
+    document.ready(function () {
+        tocbot.init(obj_merge(tocbot_default_config, { collapseDepth: 1 }));
+    });
+
+    function expandToc() {
+        var b = document.querySelector('.tocbot-toc-expand');
+        var expanded = b.getAttribute('data-expanded');
+        expanded ? b.removeAttribute('data-expanded') : b.setAttribute('data-expanded', true);
+        tocbot.refresh(obj_merge(tocbot_default_config, { collapseDepth: expanded ? 1 : DEPTH_MAX }));
+        b.innerText = expanded ? 'Expand all' : 'Collapse all';
+    }
+
+    function go_top() {
+        window.scrollTo(0, 0);
+    }
+
+    function go_bottom() {
+        window.scrollTo(0, document.body.scrollHeight);
+    }
+
+    function obj_merge(target, source) {
+        for (var item in source) {
+            if (source.hasOwnProperty(item)) {
+                target[item] = source[item];
+            }
+        }
+        return target;
+    }
+</script>
+    
+
+    
+    <article class="post-wrap">
+        <header class="post-header">
+            <h1 class="post-title">React-render阶段(一)</h1>
+            
+                <div class="post-meta">
+                    
+                        Author: <a itemprop="author" rel="author" href="/">王八吉吉</a>
+                    
+
+                    
+                        <span class="post-time">
+                        Date: <a href="#">六月 1, 2021&nbsp;&nbsp;22:47:00</a>
+                        </span>
+                    
+                    
+                        <span class="post-category">
+                    Category:
+                            
+                                <a href="/category/React/">React</a>
+                            
+                        </span>
+                    
+                </div>
+            
+        </header>
+
+        <div class="post-content">
+            <h1 id="React-render阶段-一"><a href="#React-render阶段-一" class="headerlink" title="React-render阶段(一)"></a>React-render阶段(一)</h1><h2 id="概览"><a href="#概览" class="headerlink" title="概览"></a>概览</h2><p><code>React</code>在<code>16.8</code>版本之后, 使用<code>Fiber</code>提供了任务的优先级，中断可恢复的能力(开启<code>CM</code>模式). <code>React</code>通过<code>Scheduler</code>将高优先级的任务率先扔进<code>Reconciler</code>, <code>Reconcile</code>阶段创建了每个节点(其中可能经历<code>复用或者diff</code>等),生成<code>Fiber</code>树,并生成对应的<code>dom</code>树(暂未插入到页面),这个阶段我们称之为<code>render</code>阶段(渲染阶段)</p>
+<p><code>React Fiber</code>使用了双缓存机制, 提供了两棵<code>Fiber</code>树, 当前展示的这棵树我们称之为<code>current</code>树(本次更新的上一次更新的树), 还有一棵是首次更新或者触发更新后在内存中生成的树, 我们称之为<code>WorkInProgress</code>树</p>
+<h3 id="双缓存"><a href="#双缓存" class="headerlink" title="双缓存"></a>双缓存</h3><p><code>current</code>树: <code>current</code>树上的每一个工作单元展示了当前页面的<code>dom</code>情况, 首屏渲染时, <code>current</code>树只存在应用程序的根<code>rootFiber</code>节点</p>
+<p><code>workInProgress</code>树: <code>workInProgress</code>树上的每一个工作单元的形成会在内存中执行, 渲染<code>mount</code>或者<code>update</code>时的更新逻辑</p>
+<blockquote>
+<p>具体可以参考卡老师写的React揭秘中理念篇的Fiber结构的工作原理,来详细的理解双缓存的概念——<a href="https://react.iamkasong.com/process/doubleBuffer.html#%E4%BB%80%E4%B9%88%E6%98%AF-%E5%8F%8C%E7%BC%93%E5%AD%98" target="_blank" rel="noopener">什么是双缓存</a>。</p>
+</blockquote>
+<a id="more"></a>
+
+<h2 id="渲染阶段"><a href="#渲染阶段" class="headerlink" title="渲染阶段"></a>渲染阶段</h2><p><code>render</code>阶段开始于<code>performSyncWorkOnRoot</code>或<code>performConcurrentWorkOnRoot</code>,取决于当前的模式. 这个函数是<code>React</code>整个流程,包括<code>render阶段</code>和<code>commit阶段</code></p>
+<p><img src="%E6%BA%90%E7%A0%81%E8%B5%B7%E7%82%B9.png" alt=""></p>
+<p>上图红框标出三个断点, 第一个断点是<code>render阶段</code>的核心</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">renderRootSync</span>(<span class="params">root, lanes</span>) </span>&#123;</span><br><span class="line">  <span class="comment">// ......</span></span><br><span class="line">  <span class="keyword">if</span> (workInProgressRoot !== root || workInProgressRootRenderLanes !== lanes) &#123;</span><br><span class="line">    &#123;</span><br><span class="line">      <span class="keyword">if</span> (isDevToolsPresent) &#123;</span><br><span class="line">        <span class="keyword">var</span> memoizedUpdaters = root.memoizedUpdaters;</span><br><span class="line"></span><br><span class="line">        <span class="keyword">if</span> (memoizedUpdaters.size &gt; <span class="number">0</span>) &#123;</span><br><span class="line">          restorePendingUpdaters(root, workInProgressRootRenderLanes);</span><br><span class="line">          memoizedUpdaters.clear();</span><br><span class="line">        &#125; <span class="comment">// At this point, move Fibers that scheduled the upcoming work from the Map to the Set.</span></span><br><span class="line">        <span class="comment">// If we bailout on this work, we'll move them back (like above).</span></span><br><span class="line">        <span class="comment">// It's important to move them now in case the work spawns more work at the same priority with different updaters.</span></span><br><span class="line">        <span class="comment">// That way we can keep the current update and future updates separate.</span></span><br><span class="line"></span><br><span class="line"></span><br><span class="line">        movePendingFibersToMemoized(root, lanes);</span><br><span class="line">      &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="comment">// 重置调度队列,并从root节点(新的高优先级的节点)开始调度</span></span><br><span class="line">    prepareFreshStack(root, lanes);</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  &#123;</span><br><span class="line">    markRenderStarted(lanes);</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  <span class="keyword">do</span> &#123;</span><br><span class="line">    <span class="keyword">try</span> &#123;</span><br><span class="line">      <span class="comment">// 尝试循环创建工作单元</span></span><br><span class="line">      workLoopSync();</span><br><span class="line">      <span class="keyword">break</span>;</span><br><span class="line">    &#125; <span class="keyword">catch</span> (thrownValue) &#123;</span><br><span class="line">      handleError(root, thrownValue);</span><br><span class="line">    &#125;</span><br><span class="line">  &#125; <span class="keyword">while</span> (<span class="literal">true</span>);</span><br><span class="line"></span><br><span class="line"> <span class="comment">// .....</span></span><br><span class="line">  <span class="keyword">return</span> workInProgressRootExitStatus;</span><br><span class="line">&#125; <span class="comment">// Th</span></span><br></pre></td></tr></table></figure>
+<p>这个方法最重要的两个方法, 一个是<code>prepareFreshStack</code>, 这个方法是用于重置调度队列,并从<code>root</code>节点(新的高优先级的节点)开始调度, 这个函数内部调用了<code>createWorkInProgress</code>, 我们放到下面一会讲</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">workLoopSync</span>(<span class="params"></span>) </span>&#123;</span><br><span class="line">  <span class="keyword">while</span> (workInProgress !== <span class="literal">null</span>) &#123;</span><br><span class="line">    performUnitOfWork(workInProgress);</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// performConcurrentWorkOnRoot会调用该方法</span></span><br><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">workLoopConcurrent</span>(<span class="params"></span>) </span>&#123; </span><br><span class="line">  <span class="comment">//和上面的区别在于shouldYield, 这个代表是否存在剩余时间</span></span><br><span class="line">  <span class="keyword">while</span> (workInProgress !== <span class="literal">null</span> &amp;&amp; !shouldYield()) &#123;</span><br><span class="line">    performUnitOfWork(workInProgress);</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>还有一个是<code>workLoopSync</code>, 循环创建调用<code>performUnitOfWork</code>, 通过函数名可以看到是循环执行工作单元, 为遍历到的每个<code>Fiber</code>节点提供<code>beginWork</code></p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">performUnitOfWork</span>(<span class="params">unitOfWork</span>) </span>&#123;</span><br><span class="line">  <span class="keyword">var</span> current = unitOfWork.alternate;</span><br><span class="line">  setCurrentFiber(unitOfWork);</span><br><span class="line">  <span class="keyword">var</span> next;</span><br><span class="line">  <span class="keyword">if</span> ( (unitOfWork.mode &amp; ProfileMode) !== NoMode) &#123;</span><br><span class="line">    startProfilerTimer(unitOfWork);</span><br><span class="line">    <span class="comment">// 开始beginWork阶段, 主要是创建当前节点的子Fiber节点</span></span><br><span class="line">    next = beginWork$<span class="number">1</span>(current, unitOfWork, subtreeRenderLanes);</span><br><span class="line">    stopProfilerTimerIfRunningAndRecordDelta(unitOfWork, <span class="literal">true</span>);</span><br><span class="line">  &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">    next = beginWork$<span class="number">1</span>(current, unitOfWork, subtreeRenderLanes);</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  resetCurrentFiber();</span><br><span class="line">  unitOfWork.memoizedProps = unitOfWork.pendingProps;</span><br><span class="line"></span><br><span class="line">  <span class="keyword">if</span> (next === <span class="literal">null</span>) &#123;</span><br><span class="line">    <span class="comment">// 如果子节点为null, 那么直接把当前节点completeWork</span></span><br><span class="line">    completeUnitOfWork(unitOfWork);</span><br><span class="line">  &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">    workInProgress = next;</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  ReactCurrentOwner$<span class="number">2.</span>current = <span class="literal">null</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p><code>beginWork</code>的主要作用在于创建当前节点的子<code>Fiber</code>节点, 该方法为<code>render</code>阶段递归阶段<em>递</em>阶段的主要方法</p>
+<h3 id="beginWork"><a href="#beginWork" class="headerlink" title="beginWork"></a>beginWork</h3><figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">beginWork</span>(<span class="params">current, workInProgress, renderLanes</span>) </span>&#123;</span><br><span class="line">  <span class="keyword">var</span> updateLanes = workInProgress.lanes;</span><br><span class="line">  &#123;</span><br><span class="line">    <span class="keyword">if</span> (workInProgress._debugNeedsRemount &amp;&amp; current !== <span class="literal">null</span>) &#123;</span><br><span class="line">      <span class="comment">// This will restart the begin phase with a new fiber.</span></span><br><span class="line">      <span class="keyword">return</span> remountFiber(current, workInProgress, createFiberFromTypeAndProps(workInProgress.type, workInProgress.key, workInProgress.pendingProps, workInProgress._debugOwner || <span class="literal">null</span>, workInProgress.mode, workInProgress.lanes));</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  <span class="comment">// 当前的workInProgress树上正在工作的单元对应的alternate对应的Fiber节点</span></span><br><span class="line">  <span class="keyword">if</span> (current !== <span class="literal">null</span>) &#123;</span><br><span class="line">    <span class="keyword">var</span> oldProps = current.memoizedProps;</span><br><span class="line">    <span class="keyword">var</span> newProps = workInProgress.pendingProps;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">if</span> (oldProps !== newProps || hasContextChanged() || (</span><br><span class="line">     workInProgress.type !== current.type )) &#123;</span><br><span class="line">       <span class="comment">// props或者context变化, 有更新的逻辑</span></span><br><span class="line">      didReceiveUpdate = <span class="literal">true</span>;</span><br><span class="line">    &#125; <span class="keyword">else</span> <span class="keyword">if</span> (!includesSomeLane(renderLanes, updateLanes)) &#123;<span class="comment">// 当前fiber上是否存在更新，如果存在那么更新的优先级是否和本次整棵fiber树调度的优先级一致</span></span><br><span class="line">      <span class="comment">// 以下表示当前fiber上的更新与本颗fiber树上的更新不一致或者说当前fiber上不存在更新</span></span><br><span class="line">      didReceiveUpdate = <span class="literal">false</span>; </span><br><span class="line"></span><br><span class="line">      <span class="comment">// 这里主要是针对不接受更新的ReactElement对象, 进行复用, 针对不同的类型传递一些属性</span></span><br><span class="line">      <span class="keyword">switch</span> (workInProgress.tag) &#123; </span><br><span class="line">        <span class="keyword">case</span> HostRoot:</span><br><span class="line">          <span class="comment">// ...</span></span><br><span class="line">        <span class="keyword">case</span> <span class="comment">// ...</span></span><br><span class="line">      &#125;</span><br><span class="line"></span><br><span class="line">      <span class="keyword">return</span> bailoutOnAlreadyFinishedWork(current, workInProgress, renderLanes);</span><br><span class="line">    &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">      <span class="keyword">if</span> ((current.flags &amp; ForceUpdateForLegacySuspense) !== NoFlags) &#123;</span><br><span class="line">        <span class="comment">// 这个解决了context改变的时候suspense没有触发更新的问题</span></span><br><span class="line">        didReceiveUpdate = <span class="literal">true</span>;</span><br><span class="line">      &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">        didReceiveUpdate = <span class="literal">false</span>;</span><br><span class="line">      &#125;</span><br><span class="line">    &#125;</span><br><span class="line">  &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">    didReceiveUpdate = <span class="literal">false</span>;</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  workInProgress.lanes = NoLanes;</span><br><span class="line"></span><br><span class="line">  <span class="keyword">switch</span> (workInProgress.tag) &#123;</span><br><span class="line">    <span class="comment">// 根据tag判断当前工作单元的类型, 基于当前类型进入不同的逻辑</span></span><br><span class="line">    <span class="keyword">case</span> IndeterminateComponent:</span><br><span class="line">      <span class="comment">// ...</span></span><br><span class="line">    <span class="keyword">case</span> LazyComponent:</span><br><span class="line">      <span class="comment">// ...</span></span><br><span class="line"></span><br><span class="line">    <span class="keyword">case</span> FunctionComponent:</span><br><span class="line">      &#123;</span><br><span class="line">        <span class="keyword">var</span> _Component = workInProgress.type;</span><br><span class="line">        <span class="keyword">var</span> unresolvedProps = workInProgress.pendingProps;</span><br><span class="line">        <span class="keyword">var</span> resolvedProps = workInProgress.elementType === _Component ? unresolvedProps : resolveDefaultProps(_Component, unresolvedProps);</span><br><span class="line">        <span class="keyword">return</span> updateFunctionComponent(current, workInProgress, _Component, resolvedProps, renderLanes);</span><br><span class="line">      &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">case</span> ClassComponent:</span><br><span class="line">      &#123;</span><br><span class="line">        <span class="keyword">var</span> _Component2 = workInProgress.type;</span><br><span class="line">        <span class="keyword">var</span> _unresolvedProps = workInProgress.pendingProps;</span><br><span class="line"></span><br><span class="line">        <span class="keyword">var</span> _resolvedProps = workInProgress.elementType === _Component2 ? _unresolvedProps : resolveDefaultProps(_Component2, _unresolvedProps);</span><br><span class="line"></span><br><span class="line">        <span class="keyword">return</span> updateClassComponent(current, workInProgress, _Component2, _resolvedProps, renderLanes);</span><br><span class="line">      &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">case</span> HostRoot:</span><br><span class="line">      <span class="keyword">return</span> updateHostRoot(current, workInProgress, renderLanes);</span><br><span class="line"></span><br><span class="line">    <span class="keyword">case</span> HostComponent:</span><br><span class="line">      <span class="keyword">return</span> updateHostComponent(current, workInProgress, renderLanes);</span><br><span class="line"></span><br><span class="line">    <span class="keyword">case</span> xxxx:</span><br><span class="line">      <span class="comment">// ..........</span></span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>我们可以看到<code>beginWork</code>主要做了几件事情</p>
+<ol>
+<li>根据<code>current</code>判断这个工作单元处于挂载还是更新, 根据<code>新旧props</code>和<code>context</code>判断能否复用</li>
+<li>如果不能复用则更新, 根据当前工作单元的类型决定进入什么逻辑<ul>
+<li>工作单元类型可以在<code>src/react-reconciler/ReactWorkTags.js</code>中找到, <code>div</code>属于<code>HostComponent</code></li>
+</ul>
+</li>
+</ol>
+<h3 id="beginWork中的更新逻辑-以div举例"><a href="#beginWork中的更新逻辑-以div举例" class="headerlink" title="beginWork中的更新逻辑(以div举例)"></a>beginWork中的更新逻辑(以div举例)</h3><p>如果当前工作单元是<code>div</code>, 那么会进入<code>updateHostComponent</code>的更新逻辑</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">updateHostComponent</span>(<span class="params">current, workInProgress, renderLanes</span>) </span>&#123;</span><br><span class="line">  pushHostContext(workInProgress);</span><br><span class="line"></span><br><span class="line">  <span class="keyword">if</span> (current === <span class="literal">null</span>) &#123;</span><br><span class="line">    tryToClaimNextHydratableInstance(workInProgress);</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  <span class="keyword">var</span> type = workInProgress.type;</span><br><span class="line">  <span class="keyword">var</span> nextProps = workInProgress.pendingProps;</span><br><span class="line">  <span class="keyword">var</span> prevProps = current !== <span class="literal">null</span> ? current.memoizedProps : <span class="literal">null</span>;</span><br><span class="line">  <span class="keyword">var</span> nextChildren = nextProps.children;</span><br><span class="line">  <span class="keyword">var</span> isDirectTextChild = shouldSetTextContent(type, nextProps);</span><br><span class="line">  <span class="comment">// 文本节点的优化, 当div下只有一个单独的文本节点,那么react不会单独为这个Fiber节点创建子节点</span></span><br><span class="line">  <span class="keyword">if</span> (isDirectTextChild) &#123;</span><br><span class="line">    nextChildren = <span class="literal">null</span>;</span><br><span class="line">  &#125; <span class="keyword">else</span> <span class="keyword">if</span> (prevProps !== <span class="literal">null</span> &amp;&amp; shouldSetTextContent(type, prevProps)) &#123;</span><br><span class="line">    workInProgress.flags |= ContentReset;</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  markRef(current, workInProgress);</span><br><span class="line">  <span class="comment">// reconcileChildren是diff子节点, 如果current是null, 说明是mount, 否则是update</span></span><br><span class="line">  reconcileChildren(current, workInProgress, nextChildren, renderLanes);</span><br><span class="line">  <span class="keyword">return</span> workInProgress.child;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>针对<code>div</code>的更新, 主要调用了<code>reconcileChilren</code>的方法, 以下是<code>reconcileChilren</code>方法</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">reconcileChildren</span>(<span class="params">current, workInProgress, nextChildren, renderLanes</span>) </span>&#123;</span><br><span class="line">  <span class="keyword">if</span> (current === <span class="literal">null</span>) &#123;</span><br><span class="line">    <span class="comment">// mount时</span></span><br><span class="line">    workInProgress.child = mountChildFibers(workInProgress, <span class="literal">null</span>, nextChildren, renderLanes);</span><br><span class="line">  &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">    <span class="comment">// update时</span></span><br><span class="line">    workInProgress.child = reconcileChildFibers(workInProgress, current.child, nextChildren, renderLanes);</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p><code>reconcileChilren</code>在<code>mount</code>时调用了<code>mountChildFibers</code>, 在<code>update</code>时调用了<code>reconcileChildFibers</code>, 这两个方法都是调用的<code>ChildReconciler</code>, 返回一个节点并赋值给<code>workInProgress.child</code>, 因此可以验证<code>beginWork</code>的目的是创建当前节点的子<code>Fiber</code> 节点</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">var</span> reconcileChildFibers = ChildReconciler(<span class="literal">true</span>);</span><br><span class="line"><span class="keyword">var</span> mountChildFibers = ChildReconciler(<span class="literal">false</span>);</span><br></pre></td></tr></table></figure>
+<p><code>ChildReconciler</code>的参数的含义代表的是是否需要追踪副作用, <code>mount</code>时不需要追踪副作用,原因是我们只需要被插入一次, 如果追踪副作用, 那么每个节点都将被打上<code>effectTag</code>为<code>Placement</code>(插入), 这样commit阶段所有节点都会被插入一次, 这种频繁操作<code>dom</code>的行为显然是消耗性能且没有必要的</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">ChildReconciler</span>(<span class="params">shouldTrackSideEffects</span>) </span>&#123;</span><br><span class="line">  <span class="comment">// ......其他节点的diff算法</span></span><br><span class="line">  <span class="comment">// 这里只展示单一节点的diff算法的源码</span></span><br><span class="line">  <span class="function"><span class="keyword">function</span> <span class="title">reconcileSingleElement</span>(<span class="params">returnFiber, currentFirstChild, element, lanes</span>) </span>&#123;</span><br><span class="line">    <span class="keyword">var</span> key = element.key;</span><br><span class="line">    <span class="keyword">var</span> child = currentFirstChild;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">while</span> (child !== <span class="literal">null</span>) &#123;</span><br><span class="line">      <span class="comment">// <span class="doctag">TODO:</span> If key === null and child.key === null, then this only applies to</span></span><br><span class="line">      <span class="comment">// the first item in the list.</span></span><br><span class="line">      <span class="keyword">if</span> (child.key === key) &#123;</span><br><span class="line">        <span class="keyword">var</span> elementType = element.type;</span><br><span class="line"></span><br><span class="line">        <span class="keyword">if</span> (elementType === REACT_FRAGMENT_TYPE) &#123;</span><br><span class="line">          <span class="keyword">if</span> (child.tag === Fragment) &#123;</span><br><span class="line">            deleteRemainingChildren(returnFiber, child.sibling);</span><br><span class="line">            <span class="keyword">var</span> existing = useFiber(child, element.props.children);</span><br><span class="line">            existing.return = returnFiber;</span><br><span class="line"></span><br><span class="line">            &#123;</span><br><span class="line">              existing._debugSource = element._source;</span><br><span class="line">              existing._debugOwner = element._owner;</span><br><span class="line">            &#125;</span><br><span class="line"></span><br><span class="line">            <span class="keyword">return</span> existing;</span><br><span class="line">          &#125;</span><br><span class="line">        &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">          <span class="keyword">if</span> (child.elementType === elementType || ( <span class="comment">// Keep this check inline so it only runs on the false path:</span></span><br><span class="line">           isCompatibleFamilyForHotReloading(child, element) ) || <span class="comment">// Lazy types should reconcile their resolved type.</span></span><br><span class="line">          <span class="comment">// We need to do this after the Hot Reloading check above,</span></span><br><span class="line">          <span class="comment">// because hot reloading has different semantics than prod because</span></span><br><span class="line">          <span class="comment">// it doesn't resuspend. So we can't let the call below suspend.</span></span><br><span class="line">           <span class="keyword">typeof</span> elementType === <span class="string">'object'</span> &amp;&amp; elementType !== <span class="literal">null</span> &amp;&amp; elementType.$$<span class="keyword">typeof</span> === REACT_LAZY_TYPE &amp;&amp; resolveLazy(elementType) === child.type) &#123;</span><br><span class="line">            deleteRemainingChildren(returnFiber, child.sibling);</span><br><span class="line"></span><br><span class="line">            <span class="keyword">var</span> _existing = useFiber(child, element.props);</span><br><span class="line"></span><br><span class="line">            _existing.ref = coerceRef(returnFiber, child, element);</span><br><span class="line">            _existing.return = returnFiber;</span><br><span class="line"></span><br><span class="line">            &#123;</span><br><span class="line">              _existing._debugSource = element._source;</span><br><span class="line">              _existing._debugOwner = element._owner;</span><br><span class="line">            &#125;</span><br><span class="line"></span><br><span class="line">            <span class="keyword">return</span> _existing;</span><br><span class="line">          &#125;</span><br><span class="line">        &#125; <span class="comment">// Didn't match.</span></span><br><span class="line"></span><br><span class="line"></span><br><span class="line">        deleteRemainingChildren(returnFiber, child);</span><br><span class="line">        <span class="keyword">break</span>;</span><br><span class="line">      &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">        deleteChild(returnFiber, child);</span><br><span class="line">      &#125;</span><br><span class="line"></span><br><span class="line">      child = child.sibling;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">if</span> (element.type === REACT_FRAGMENT_TYPE) &#123;</span><br><span class="line">      <span class="keyword">var</span> created = createFiberFromFragment(element.props.children, returnFiber.mode, lanes, element.key);</span><br><span class="line">      created.return = returnFiber;</span><br><span class="line">      <span class="keyword">return</span> created;</span><br><span class="line">    &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">      <span class="keyword">var</span> _created4 = createFiberFromElement(element, returnFiber.mode, lanes);</span><br><span class="line"></span><br><span class="line">      _created4.ref = coerceRef(returnFiber, currentFirstChild, element);</span><br><span class="line">      _created4.return = returnFiber;</span><br><span class="line">      <span class="keyword">return</span> _created4;</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  <span class="function"><span class="keyword">function</span> <span class="title">reconcileChildFibers</span>(<span class="params">returnFiber, currentFirstChild, newChild, lanes</span>) </span>&#123;</span><br><span class="line">    <span class="keyword">var</span> isUnkeyedTopLevelFragment = <span class="keyword">typeof</span> newChild === <span class="string">'object'</span> &amp;&amp; newChild !== <span class="literal">null</span> &amp;&amp; newChild.type === REACT_FRAGMENT_TYPE &amp;&amp; newChild.key === <span class="literal">null</span>;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">if</span> (isUnkeyedTopLevelFragment) &#123;</span><br><span class="line">      newChild = newChild.props.children;</span><br><span class="line">    &#125; <span class="comment">// Handle object types</span></span><br><span class="line">    <span class="keyword">if</span> (<span class="keyword">typeof</span> newChild === <span class="string">'object'</span> &amp;&amp; newChild !== <span class="literal">null</span>) &#123;</span><br><span class="line">      <span class="keyword">switch</span> (newChild.$$<span class="keyword">typeof</span>) &#123;</span><br><span class="line">        <span class="keyword">case</span> REACT_ELEMENT_TYPE:</span><br><span class="line">          <span class="keyword">return</span> placeSingleChild(reconcileSingleElement(returnFiber, currentFirstChild, newChild, lanes));</span><br><span class="line"></span><br><span class="line">        <span class="keyword">case</span> REACT_PORTAL_TYPE:</span><br><span class="line">          <span class="keyword">return</span> placeSingleChild(reconcileSinglePortal(returnFiber, currentFirstChild, newChild, lanes));</span><br><span class="line"></span><br><span class="line">        <span class="keyword">case</span> REACT_LAZY_TYPE:</span><br><span class="line">          &#123;</span><br><span class="line">            <span class="keyword">var</span> payload = newChild._payload;</span><br><span class="line">            <span class="keyword">var</span> init = newChild._init; <span class="comment">// <span class="doctag">TODO:</span> This function is supposed to be non-recursive.</span></span><br><span class="line"></span><br><span class="line">            <span class="keyword">return</span> reconcileChildFibers(returnFiber, currentFirstChild, init(payload), lanes);</span><br><span class="line">          &#125;</span><br><span class="line"></span><br><span class="line">      &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="comment">// return deleteRemainingChildren(returnFiber, currentFirstChild);</span></span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  <span class="keyword">return</span> reconcileChildFibers;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>手动执行<code>ChildReconciler</code>会返回<code>reconcileChildFibers</code>, 这里巧妙的使用了闭包, 根据<code>newChild</code>中的<code>$$typeof</code>去进行不同逻辑.<br>参数的<code>newChild</code>可以看到向上追溯看到是当前<code>workInProgress.pendingProps.children</code>, 也就是当前工作单元<code>props</code>上的<code>children</code><br><code>reconcileSingleElement</code>代码已经展示在上面, 是单一节点的<code>diff</code>算法, 等讲到<code>diff</code>算法时在详细解读</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">placeSingleChild</span>(<span class="params">newFiber</span>) </span>&#123;</span><br><span class="line">  <span class="comment">// This is simpler for the single child case. We only need to do a</span></span><br><span class="line">  <span class="comment">// placement for inserting new children.</span></span><br><span class="line">  <span class="keyword">if</span> (shouldTrackSideEffects &amp;&amp; newFiber.alternate === <span class="literal">null</span>) &#123;</span><br><span class="line">    newFiber.flags |= Placement;</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  <span class="keyword">return</span> newFiber;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p><code>placeSingleChild</code>就是为新节点添加<code>Placement</code>操作(<code>mount</code>时不添加), 并将其返回并添加到<code>workInProgress.child</code>上</p>
+<p><em>以上为<code>beginWork</code>的完整流程, 目的在于创建当前工作单元的第一个子<code>Fiber</code>节点</em></p>
+<hr>
+<p>接下来补充一点逻辑, 为了方便调试, 并解决一些个人遇到的疑难困惑点</p>
+<h4 id="bailoutOnAlreadyFinishedWork"><a href="#bailoutOnAlreadyFinishedWork" class="headerlink" title="bailoutOnAlreadyFinishedWork"></a>bailoutOnAlreadyFinishedWork</h4><figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">bailoutOnAlreadyFinishedWork</span>(<span class="params">current, workInProgress, renderLanes</span>) </span>&#123;</span><br><span class="line">  <span class="keyword">if</span> (current !== <span class="literal">null</span>) &#123;</span><br><span class="line">    workInProgress.dependencies = current.dependencies;</span><br><span class="line">  &#125;</span><br><span class="line">  &#123;</span><br><span class="line">    stopProfilerTimerIfRunning();</span><br><span class="line">  &#125;</span><br><span class="line">  markSkippedUpdateLanes(workInProgress.lanes); <span class="comment">// Check if the children have any pending work.</span></span><br><span class="line"></span><br><span class="line">  <span class="keyword">if</span> (!includesSomeLane(renderLanes, workInProgress.childLanes)) &#123;</span><br><span class="line">    &#123;</span><br><span class="line">      <span class="keyword">return</span> <span class="literal">null</span>;</span><br><span class="line">    &#125;</span><br><span class="line">  cloneChildFibers(current, workInProgress);</span><br><span class="line">  <span class="keyword">return</span> workInProgress.child;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>这个函数的作用在于复用<code>Fiber</code>节点, 函数调用的时机仅仅会发生在<code>update</code>时, 根据双缓存机制, 当更新时, <code>current</code>树已经存在对应的<code>Fiber</code>节点, 在上文<code>beginWork</code>中有以下这么一段代码, 我们可以看到当<code>current</code>树不为<code>null</code>并且<em>新旧Props</em> <em><code>context</code>和<code>type</code>无变化</em>的时候, 会复用节点(即<code>return bailoutOnAlreadyFinishedWork</code>),<code>bailoutOnAlreadyFinishedWork</code>调用<code>cloneChildFibers</code></p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 当前的workInProgress树上正在工作的单元对应的alternate对应的Fiber节点</span></span><br><span class="line"><span class="keyword">if</span> (current !== <span class="literal">null</span>) &#123;</span><br><span class="line">  <span class="keyword">var</span> oldProps = current.memoizedProps;</span><br><span class="line">  <span class="keyword">var</span> newProps = workInProgress.pendingProps;</span><br><span class="line"></span><br><span class="line">  <span class="keyword">if</span> (oldProps !== newProps || hasContextChanged() || (</span><br><span class="line">   workInProgress.type !== current.type )) &#123;</span><br><span class="line">     <span class="comment">// props或者context变化, 有更新的逻辑</span></span><br><span class="line">    didReceiveUpdate = <span class="literal">true</span>;</span><br><span class="line">  &#125; <span class="keyword">else</span> <span class="keyword">if</span> (!includesSomeLane(renderLanes, updateLanes)) &#123;</span><br><span class="line">    didReceiveUpdate = <span class="literal">false</span>; </span><br><span class="line"></span><br><span class="line">    <span class="comment">// 这里主要是针对不接受更新的ReactElement对象, 进行复用, 针对不同的类型传递一些属性</span></span><br><span class="line">    <span class="keyword">switch</span> (workInProgress.tag) &#123; </span><br><span class="line">      <span class="keyword">case</span> HostRoot:</span><br><span class="line">        <span class="comment">// ...</span></span><br><span class="line">      <span class="keyword">case</span> <span class="comment">// ...</span></span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">return</span> bailoutOnAlreadyFinishedWork(current, workInProgress, renderLanes);</span><br><span class="line">  &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">    <span class="keyword">if</span> ((current.flags &amp; ForceUpdateForLegacySuspense) !== NoFlags) &#123;</span><br><span class="line">      <span class="comment">// 这个解决了context改变的时候suspense没有触发更新的问题</span></span><br><span class="line">      didReceiveUpdate = <span class="literal">true</span>;</span><br><span class="line">    &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">      didReceiveUpdate = <span class="literal">false</span>;</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;</span><br><span class="line">&#125; <span class="keyword">else</span> &#123;</span><br><span class="line">  didReceiveUpdate = <span class="literal">false</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h4 id="cloneChildFibers"><a href="#cloneChildFibers" class="headerlink" title="cloneChildFibers"></a>cloneChildFibers</h4><figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">cloneChildFibers</span>(<span class="params">current, workInProgress</span>) </span>&#123;</span><br><span class="line">  <span class="keyword">if</span> (!(current === <span class="literal">null</span> || workInProgress.child === current.child)) &#123;</span><br><span class="line">    &#123;</span><br><span class="line">      <span class="keyword">throw</span> <span class="built_in">Error</span>( <span class="string">"Resuming work not yet implemented."</span> );</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  <span class="keyword">if</span> (workInProgress.child === <span class="literal">null</span>) &#123;</span><br><span class="line">    <span class="keyword">return</span>;</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  <span class="keyword">var</span> currentChild = workInProgress.child;</span><br><span class="line">  <span class="keyword">var</span> newChild = createWorkInProgress(currentChild, currentChild.pendingProps);</span><br><span class="line">  workInProgress.child = newChild;</span><br><span class="line">  newChild.return = workInProgress;</span><br><span class="line"></span><br><span class="line">  <span class="keyword">while</span> (currentChild.sibling !== <span class="literal">null</span>) &#123;</span><br><span class="line">    currentChild = currentChild.sibling;</span><br><span class="line">    newChild = newChild.sibling = createWorkInProgress(currentChild, currentChild.pendingProps);</span><br><span class="line">    newChild.return = workInProgress;</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  newChild.sibling = <span class="literal">null</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>从名称可以读出, 这个函数的作用就是<code>clone</code>当前工作单元的子<code>Fiber</code>节点, 那么复用节点目的就是把<code>current</code>树上对应的现在<code>Fiber</code>节点的子<code>Fiber</code>节点保存到当前工作单元的<code>child</code>属性下, 这个方法会调用<code>createWorkInProgress</code>, 所以调用<code>createWorkInProgress</code>目的创建的不是当前工作单元, 而是当前工作单元的子工作单元</p>
+<h4 id="createWorkInProgress"><a href="#createWorkInProgress" class="headerlink" title="createWorkInProgress"></a>createWorkInProgress</h4><figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">createWorkInProgress</span>(<span class="params">current, pendingProps</span>) </span>&#123;</span><br><span class="line">  <span class="keyword">var</span> workInProgress = current.alternate;</span><br><span class="line"></span><br><span class="line">  <span class="keyword">if</span> (workInProgress === <span class="literal">null</span>) &#123;</span><br><span class="line">    <span class="comment">// 如果workInProgress是null, 那么为其创建一个Fiber节点</span></span><br><span class="line">    workInProgress = createFiber(current.tag, pendingProps, current.key, current.mode);</span><br><span class="line">    workInProgress.elementType = current.elementType;</span><br><span class="line">    workInProgress.type = current.type;</span><br><span class="line">    workInProgress.stateNode = current.stateNode;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// ...省略部分赋值</span></span><br><span class="line"></span><br><span class="line">    <span class="comment">// 连接两课Fiber树</span></span><br><span class="line">    workInProgress.alternate = current;</span><br><span class="line">    current.alternate = workInProgress;</span><br><span class="line">  &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">    workInProgress.pendingProps = pendingProps; <span class="comment">// Needed because Blocks store data on type.</span></span><br><span class="line"></span><br><span class="line">    workInProgress.type = current.type; <span class="comment">// We already have an alternate.</span></span><br><span class="line">    <span class="comment">// Reset the effect tag.</span></span><br><span class="line"></span><br><span class="line">    workInProgress.flags = NoFlags; <span class="comment">// The effects are no longer valid.</span></span><br><span class="line"></span><br><span class="line">    workInProgress.subtreeFlags = NoFlags;</span><br><span class="line">    workInProgress.deletions = <span class="literal">null</span>;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// ...省略部分代码</span></span><br><span class="line"></span><br><span class="line">  &#125; </span><br><span class="line"></span><br><span class="line">  workInProgress.flags = current.flags &amp; StaticMask;</span><br><span class="line">  workInProgress.childLanes = current.childLanes;</span><br><span class="line">  workInProgress.lanes = current.lanes;</span><br><span class="line">  workInProgress.child = current.child;</span><br><span class="line">  workInProgress.memoizedProps = current.memoizedProps;</span><br><span class="line">  workInProgress.memoizedState = current.memoizedState;</span><br><span class="line">  workInProgress.updateQueue = current.updateQueue; <span class="comment">// Clone the dependencies object. This is mutated during the render phase, so</span></span><br><span class="line">  <span class="comment">// it cannot be shared with the current fiber.</span></span><br><span class="line"></span><br><span class="line">  <span class="keyword">var</span> currentDependencies = current.dependencies;</span><br><span class="line">  workInProgress.dependencies = currentDependencies === <span class="literal">null</span> ? <span class="literal">null</span> : &#123;</span><br><span class="line">    lanes: currentDependencies.lanes,</span><br><span class="line">    firstContext: currentDependencies.firstContext</span><br><span class="line">  &#125;; <span class="comment">// These will be overridden during the parent's reconciliation</span></span><br><span class="line"></span><br><span class="line">  workInProgress.sibling = current.sibling;</span><br><span class="line">  workInProgress.index = current.index;</span><br><span class="line">  workInProgress.ref = current.ref;</span><br><span class="line"></span><br><span class="line">  <span class="comment">// ...省略部分代码</span></span><br><span class="line"></span><br><span class="line">  <span class="keyword">return</span> workInProgress;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p><code>createWorkInProgress</code>从名称可以看出作用在于创建<code>workInProgress</code>节点, 这个函数的调用时机在<code>cloneChildFibers</code>或者<code>prepareFreshStack</code>中. 这个函数首先判断<code>current.alternate</code>是否为空, 这里解释一下, <code>current.alternate</code>为空说明当前工作单元的子工作单元是更新后新创建的, 这个时候我们会为新的工作单元创建一个<code>Fiber</code>节点, 否则我们对子工作单元进行一个赋值操作即可</p>
+<h2 id="全流程"><a href="#全流程" class="headerlink" title="全流程"></a>全流程</h2><p>这里梳理一下上述所说的全流程</p>
+<p><img src="React-render%E9%98%B6%E6%AE%B5_%E9%80%92%E9%98%B6%E6%AE%B5%E5%AE%8C%E6%95%B4%E6%B5%81%E7%A8%8B.png" alt=""></p>
+
+        </div>
+
+        
+            <section class="post-copyright">
+                
+                    <p class="copyright-item">
+                        <span>Author:</span>
+                        <span>王八吉吉</span>
+                    </p>
+                
+                
+                    <p class="copyright-item">
+                        <span>Permalink:</span>
+                        <span><a href="http://auglyxu.github.io/2021/06/01/React-render%E9%98%B6%E6%AE%B5%E4%B8%80/">http://auglyxu.github.io/2021/06/01/React-render%E9%98%B6%E6%AE%B5%E4%B8%80/</a></span>
+                    </p>
+                
+                
+                    <p class="copyright-item">
+                        <span>License:</span>
+                        <span>Copyright (c) 2019 <a href="http://creativecommons.org/licenses/by-nc/4.0/" target="_blank" rel="noopener">CC-BY-NC-4.0</a> LICENSE</span>
+                    </p>
+                
+                
+                     <p class="copyright-item">
+                         <span>Slogan:</span>
+                         <span>享受当下</span>
+                     </p>
+                
+
+            </section>
+        
+        <section class="post-tags">
+            <div>
+                <span>Tag(s):</span>
+                <span class="tag">
+                    
+                    
+                        <a href="/tags/%E5%89%8D%E7%AB%AF/"># 前端</a>
+                    
+                        <a href="/tags/React/"># React</a>
+                    
+                        <a href="/tags/%E6%BA%90%E7%A0%81%E7%B3%BB%E5%88%97/"># 源码系列</a>
+                    
+                        
+                </span>
+            </div>
+            <div>
+                <a href="javascript:window.history.back();">back</a>
+                <span>· </span>
+                <a href="/">home</a>
+            </div>
+        </section>
+        <section class="post-nav">
+            
+                <a class="prev" rel="prev" href="/2021/06/12/React-render%E9%98%B6%E6%AE%B5%E4%BA%8C/">React-render阶段(二)</a>
+            
+            
+            <a class="next" rel="next" href="/2021/01/10/%E6%90%AD%E5%BB%BA%E9%A1%B9%E7%9B%AE/">手把手搭建一个React应用程序</a>
+            
+        </section>
+
+
+    </article>
+</div>
+
+            </div>
+            <footer id="footer" class="footer">
+    <div class="copyright">
+        <span>© 王八吉吉 | Powered by <a href="https://hexo.io" target="_blank">Hexo</a> & <a href="https://github.com/Siricee/hexo-theme-Chic" target="_blank">Chic</a></span>
+    </div>
+</footer>
+
+    </div>
+</body>
+
+</html>

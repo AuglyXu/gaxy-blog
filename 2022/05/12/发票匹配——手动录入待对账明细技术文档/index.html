@@ -1,0 +1,334 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+    <meta charset="UTF-8">
+<meta name="viewport"
+      content="width=device-width, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+<meta http-equiv="X-UA-Compatible" content="ie=edge">
+
+    <meta name="author" content="王八吉吉">
+
+
+    <meta name="subtitle" content="前端小匠">
+
+
+    <meta name="description" content="专心学技术">
+
+
+    <meta name="keywords" content="前端">
+
+
+<title>发票匹配(待对账明细匹配) | Gaxy</title>
+
+
+
+    <link rel="icon" href="/favicon.png">
+
+
+
+
+    <!-- stylesheets list from _config.yml -->
+    
+    <link rel="stylesheet" href="/css/style.css">
+    
+
+
+
+    <!-- scripts list from _config.yml -->
+    
+    <script src="/js/script.js"></script>
+    
+    <script src="/js/tocbot.min.js"></script>
+    
+
+
+
+    
+    
+        
+    
+
+
+<meta name="generator" content="Hexo 4.2.1"></head>
+
+<body>
+    <script>
+        // this function is used to check current theme before page loaded.
+        (() => {
+            const currentTheme = window.localStorage && window.localStorage.getItem('theme') || '';
+            const isDark = currentTheme === 'dark';
+            const pagebody = document.getElementsByTagName('body')[0]
+            if (isDark) {
+                pagebody.classList.add('dark-theme');
+                // mobile
+                document.getElementById("mobile-toggle-theme").innerText = "· Dark"
+            } else {
+                pagebody.classList.remove('dark-theme');
+                // mobile
+                document.getElementById("mobile-toggle-theme").innerText = "· Light"
+            }
+        })();
+    </script>
+
+    <div class="wrapper">
+        <header>
+    <nav class="navbar">
+        <div class="container">
+            <div class="navbar-header header-logo"><a href="/">Gaxy</a></div>
+            <div class="menu navbar-right">
+                
+                    <a class="menu-item" href="/archives">归档</a>
+                
+                    <a class="menu-item" href="/category">分类</a>
+                
+                    <a class="menu-item" href="/tag">标签</a>
+                
+                    <a class="menu-item" href="/about">关于</a>
+                
+                <input id="switch_default" type="checkbox" class="switch_default">
+                <label for="switch_default" class="toggleBtn"></label>
+            </div>
+        </div>
+    </nav>
+
+    
+    <nav class="navbar-mobile" id="nav-mobile">
+        <div class="container">
+            <div class="navbar-header">
+                <div>
+                    <a href="/">Gaxy</a><a id="mobile-toggle-theme">·&nbsp;Light</a>
+                </div>
+                <div class="menu-toggle" onclick="mobileBtn()">&#9776; Menu</div>
+            </div>
+            <div class="menu" id="mobile-menu">
+                
+                    <a class="menu-item" href="/archives">归档</a>
+                
+                    <a class="menu-item" href="/category">分类</a>
+                
+                    <a class="menu-item" href="/tag">标签</a>
+                
+                    <a class="menu-item" href="/about">关于</a>
+                
+            </div>
+        </div>
+    </nav>
+
+</header>
+<script>
+    var mobileBtn = function f() {
+        var toggleMenu = document.getElementsByClassName("menu-toggle")[0];
+        var mobileMenu = document.getElementById("mobile-menu");
+        if(toggleMenu.classList.contains("active")){
+           toggleMenu.classList.remove("active")
+            mobileMenu.classList.remove("active")
+        }else{
+            toggleMenu.classList.add("active")
+            mobileMenu.classList.add("active")
+        }
+    }
+</script>
+            <div class="main">
+                <div class="container">
+    
+    
+        <div class="post-toc">
+    <div class="tocbot-list">
+    </div>
+    <div class="tocbot-list-menu">
+        <a class="tocbot-toc-expand" onclick="expand_toc()">Expand all</a>
+        <a onclick="go_top()">Back to top</a>
+        <a onclick="go_bottom()">Go to bottom</a>
+    </div>
+</div>
+
+<script>
+    var tocbot_timer;
+    var DEPTH_MAX = 6;    // 为 6 时展开所有
+    var tocbot_default_config = {
+        tocSelector: '.tocbot-list',
+        contentSelector: '.post-content',
+        headingSelector: 'h1, h2, h3, h4, h5',
+        orderedList: false,
+        scrollSmooth: true,
+        onClick: extend_click,
+    };
+
+    function extend_click() {
+        clearTimeout(tocbot_timer);
+        tocbot_timer = setTimeout(function () {
+            tocbot.refresh(obj_merge(tocbot_default_config, { hasInnerContainers: true }));
+        }, 420); // 这个值是由 tocbot 源码里定义的 scrollSmoothDuration 得来的
+    }
+
+    document.ready(function () {
+        tocbot.init(obj_merge(tocbot_default_config, { collapseDepth: 1 }));
+    });
+
+    function expandToc() {
+        var b = document.querySelector('.tocbot-toc-expand');
+        var expanded = b.getAttribute('data-expanded');
+        expanded ? b.removeAttribute('data-expanded') : b.setAttribute('data-expanded', true);
+        tocbot.refresh(obj_merge(tocbot_default_config, { collapseDepth: expanded ? 1 : DEPTH_MAX }));
+        b.innerText = expanded ? 'Expand all' : 'Collapse all';
+    }
+
+    function go_top() {
+        window.scrollTo(0, 0);
+    }
+
+    function go_bottom() {
+        window.scrollTo(0, document.body.scrollHeight);
+    }
+
+    function obj_merge(target, source) {
+        for (var item in source) {
+            if (source.hasOwnProperty(item)) {
+                target[item] = source[item];
+            }
+        }
+        return target;
+    }
+</script>
+    
+
+    
+    <article class="post-wrap">
+        <header class="post-header">
+            <h1 class="post-title">发票匹配(待对账明细匹配)</h1>
+            
+                <div class="post-meta">
+                    
+                        Author: <a itemprop="author" rel="author" href="/">王八吉吉</a>
+                    
+
+                    
+                        <span class="post-time">
+                        Date: <a href="#">五月 12, 2022&nbsp;&nbsp;14:33:21</a>
+                        </span>
+                    
+                    
+                        <span class="post-category">
+                    Category:
+                            
+                                <a href="/category/%E4%B8%9A%E5%8A%A1/">业务</a>
+                            
+                        </span>
+                    
+                </div>
+            
+        </header>
+
+        <div class="post-content">
+            <h2 id="交互图"><a href="#交互图" class="headerlink" title="交互图"></a>交互图</h2><p><img src="%E6%94%AF%E6%8C%81%E6%89%8B%E5%8A%A8%E5%8C%B9%E9%85%8D%E5%BE%85%E5%AF%B9%E8%B4%A6%E6%98%8E%E7%BB%86.png" alt="支持手动匹配待对账明细.png"></p>
+<h2 id="与单配发票的区别"><a href="#与单配发票的区别" class="headerlink" title="与单配发票的区别"></a>与单配发票的区别</h2><table>
+<thead>
+<tr>
+<th>单配发票</th>
+<th>发票配待对账明细</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>首先做准入性校验</td>
+<td>不需要做准入性校验(发票采集已做)</td>
+</tr>
+<tr>
+<td>优先后端自动匹配</td>
+<td>用户选择明细匹配，提交校验</td>
+</tr>
+<tr>
+<td>发票：单据明细 = 1:1</td>
+<td>发票：单据明细 = n:n</td>
+</tr>
+</tbody></table>
+<a id="more"></a>
+
+<h2 id="整体设计"><a href="#整体设计" class="headerlink" title="整体设计"></a>整体设计</h2><h3 id="组件设计"><a href="#组件设计" class="headerlink" title="组件设计"></a>组件设计</h3><p><img src="%E7%B2%BE%E7%A1%AE%E5%8C%B9%E9%85%8D%E5%85%A5%E5%8F%A3%E4%BA%A4%E4%BA%92.png" alt="精确匹配入口交互.png"></p>
+<p>对应的组件结构图<br><img src="%E5%8F%91%E7%A5%A8%E5%8C%B9%E9%85%8D%E5%BE%85%E5%AF%B9%E8%B4%A6%E6%98%8E%E7%BB%86%E7%BB%84%E4%BB%B6%E7%BB%93%E6%9E%84%E5%9B%BE.png" alt="发票匹配待对账明细组件结构图.png"></p>
+<h3 id="流程设计"><a href="#流程设计" class="headerlink" title="流程设计"></a>流程设计</h3><p>与 <a href="https://auglyxu.github.io/2022/02/21/%E5%85%AC%E5%8F%B8%E5%A4%8D%E6%9D%82%E4%B8%9A%E5%8A%A1-%E5%8F%91%E7%A5%A8%E5%8C%B9%E9%85%8D%E9%87%8D%E6%9E%84/">发票匹配2.0技术设计</a> 的流程中的手动匹配一致(去掉容差部分)，区别在于容差非前端计算</p>
+<h3 id="数据结构设计"><a href="#数据结构设计" class="headerlink" title="数据结构设计"></a>数据结构设计</h3><p>原数据结构</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 单张发票对象 </span></span><br><span class="line">&#123;   </span><br><span class="line">    invoiceItems: [&#123;      </span><br><span class="line">        <span class="comment">// 单张发票匹配的单据      </span></span><br><span class="line">        sourceItems: [&#123;           </span><br><span class="line">            invoiceAmount: ,          </span><br><span class="line">            invoicedQuantity: , <span class="comment">// 数量          </span></span><br><span class="line">            totalAmountIncludedTax: , <span class="comment">// 含税金额          </span></span><br><span class="line">            totalAmountExcludedTax: , <span class="comment">// 未税金额           </span></span><br><span class="line">            totalTax: ,<span class="comment">// 税额           </span></span><br><span class="line">            ...     </span><br><span class="line">        &#125;],  </span><br><span class="line">    ]，</span><br><span class="line">    <span class="comment">// 发票明细      </span></span><br><span class="line">    status，</span><br><span class="line">    <span class="comment">// 发票验真状态      </span></span><br><span class="line">    errorCode, <span class="comment">// 准入性校验结果      </span></span><br><span class="line">    matchStatus，</span><br><span class="line">    <span class="comment">// 匹配结果     </span></span><br><span class="line">    matchResult， <span class="comment">// 容差匹配结果      </span></span><br><span class="line">    matchOffset， <span class="comment">// 模糊匹配后端返回容量      </span></span><br><span class="line">    leftCapacity: &#123;  <span class="comment">// 人工介入的剩余容量         </span></span><br><span class="line">        alert， <span class="comment">// 是否需要人工介入         </span></span><br><span class="line">        ... <span class="comment">// 剩下的就是容量字段      </span></span><br><span class="line">    &#125;，</span><br><span class="line">&#125;]&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// 全局数据管理</span></span><br><span class="line">referenceType: 匹配模式</span><br><span class="line">globalInvoice: 匹配的发票列表</span><br><span class="line">globalSourceItems: 全局的单据</span><br><span class="line">globalMatchedSourceItems: 全局匹配的单据</span><br><span class="line">globalUnMatchedSourceItems: 全局未匹配的单据</span><br><span class="line">globalMatchedSourceItemsMap: 全局匹配的单据code与对应金额数量映射表</span><br><span class="line">globalConfirmList: 全局待确认的映射表</span><br></pre></td></tr></table></figure>
+
+<p>上一个版本发票明细：单据明细为多对多，但是发票明细只能存在于同一张发票中</p>
+<p>这个版本需要修改数据结构，改成匹配关系更为明确的方式，要支持跨发票的发票明细多对多(即发票明细：单据明细 = n:n 并且 发票：单据明细 = n:n)</p>
+<p>数据流设计与原发票基本一致，参考 <a href="https://maycur.yuque.com/bquybs/xm4vbx/cp5wop" target="_blank" rel="noopener">发票匹配2.0技术设计</a> 中的数据流设计，区别在于增加了全局的globalMatchGroupList</p>
+<p>假如是<strong>发票与单据明细匹配</strong>， 那么groupId挂在发票对象上，如果是<strong>发票明细与单据明细匹配</strong>，那么groupId挂在发票明细对象上</p>
+<p>一条发票明细只能存在于一个匹配组，对于未验真发票来说，一张发票也只能存在一个匹配组，并且对于未验真发票来说不能单独匹配</p>
+<p>现有数据结构</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 单张发票对象 </span></span><br><span class="line">&#123;   </span><br><span class="line">    invoiceItems: [&#123;      </span><br><span class="line">        <span class="comment">// 单张发票匹配的单据  </span></span><br><span class="line">        groupId, <span class="comment">// 多对多的话针对的是匹配组</span></span><br><span class="line">    ],</span><br><span class="line">    <span class="comment">// 发票明细      </span></span><br><span class="line">    status,</span><br><span class="line">    <span class="comment">// 发票验真状态      </span></span><br><span class="line">    errorCode, <span class="comment">// 准入性校验结果      </span></span><br><span class="line">    matchStatus，</span><br><span class="line">    <span class="comment">// 匹配结果     </span></span><br><span class="line">    matchResult， <span class="comment">// 容差匹配结果      </span></span><br><span class="line">    matchOffset， <span class="comment">// 模糊匹配后端返回容量      </span></span><br><span class="line">    groupId, <span class="comment">// 未验真发票匹配的单据(未验真发票没有明细)</span></span><br><span class="line">    leftCapacity: &#123;  <span class="comment">// 人工介入的剩余容量         </span></span><br><span class="line">        alert， <span class="comment">// 是否需要人工介入         </span></span><br><span class="line">        ... <span class="comment">// 剩下的就是容量字段      </span></span><br><span class="line">    &#125;，</span><br><span class="line">&#125;]&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// globalMatchGroupList</span></span><br><span class="line">&#123;</span><br><span class="line">    matchGroupList: &#123;</span><br><span class="line">        <span class="number">1</span>: &#123;</span><br><span class="line">            invoiceItems: [],</span><br><span class="line">            sourceItems: [],</span><br><span class="line">            invoiceCode: <span class="number">12121212</span></span><br><span class="line">        &#125;,</span><br><span class="line">        <span class="number">2</span>: &#123;</span><br><span class="line">            invoiceItems: [],</span><br><span class="line">            sourceItems: [],</span><br><span class="line">            invoiceCode: <span class="number">12121212</span></span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// 全局数据管理</span></span><br><span class="line">referenceType: 匹配模式</span><br><span class="line">globalInvoice: 匹配的发票列表</span><br><span class="line">globalSourceItems: 全局的单据</span><br><span class="line">globalMatchedSourceItems: 全局匹配的单据</span><br><span class="line">globalUnMatchedSourceItems: 全局未匹配的单据</span><br><span class="line">globalMatchedSourceItemsMap: 全局匹配的单据code与对应金额数量映射表</span><br><span class="line">globalConfirmList: 全局待确认的映射表</span><br><span class="line">globalMatchGroupList: 全局匹配的匹配组</span><br></pre></td></tr></table></figure>
+
+        </div>
+
+        
+            <section class="post-copyright">
+                
+                    <p class="copyright-item">
+                        <span>Author:</span>
+                        <span>王八吉吉</span>
+                    </p>
+                
+                
+                    <p class="copyright-item">
+                        <span>Permalink:</span>
+                        <span><a href="http://auglyxu.github.io/2022/05/12/%E5%8F%91%E7%A5%A8%E5%8C%B9%E9%85%8D%E2%80%94%E2%80%94%E6%89%8B%E5%8A%A8%E5%BD%95%E5%85%A5%E5%BE%85%E5%AF%B9%E8%B4%A6%E6%98%8E%E7%BB%86%E6%8A%80%E6%9C%AF%E6%96%87%E6%A1%A3/">http://auglyxu.github.io/2022/05/12/%E5%8F%91%E7%A5%A8%E5%8C%B9%E9%85%8D%E2%80%94%E2%80%94%E6%89%8B%E5%8A%A8%E5%BD%95%E5%85%A5%E5%BE%85%E5%AF%B9%E8%B4%A6%E6%98%8E%E7%BB%86%E6%8A%80%E6%9C%AF%E6%96%87%E6%A1%A3/</a></span>
+                    </p>
+                
+                
+                    <p class="copyright-item">
+                        <span>License:</span>
+                        <span>Copyright (c) 2019 <a href="http://creativecommons.org/licenses/by-nc/4.0/" target="_blank" rel="noopener">CC-BY-NC-4.0</a> LICENSE</span>
+                    </p>
+                
+                
+                     <p class="copyright-item">
+                         <span>Slogan:</span>
+                         <span>享受当下</span>
+                     </p>
+                
+
+            </section>
+        
+        <section class="post-tags">
+            <div>
+                <span>Tag(s):</span>
+                <span class="tag">
+                    
+                    
+                        <a href="/tags/%E4%B8%9A%E5%8A%A1/"># 业务</a>
+                    
+                        <a href="/tags/%E5%89%8D%E7%AB%AF/"># 前端</a>
+                    
+                        
+                </span>
+            </div>
+            <div>
+                <a href="javascript:window.history.back();">back</a>
+                <span>· </span>
+                <a href="/">home</a>
+            </div>
+        </section>
+        <section class="post-nav">
+            
+                <a class="prev" rel="prev" href="/2022/06/09/%E5%89%91%E6%8C%87offer/">剑指offer(持续更新)</a>
+            
+            
+            <a class="next" rel="next" href="/2022/04/20/%E5%88%9D%E6%8E%A2CKEditor5/">初探CKEditor5</a>
+            
+        </section>
+
+
+    </article>
+</div>
+
+            </div>
+            <footer id="footer" class="footer">
+    <div class="copyright">
+        <span>© 王八吉吉 | Powered by <a href="https://hexo.io" target="_blank">Hexo</a> & <a href="https://github.com/Siricee/hexo-theme-Chic" target="_blank">Chic</a></span>
+    </div>
+</footer>
+
+    </div>
+</body>
+
+</html>

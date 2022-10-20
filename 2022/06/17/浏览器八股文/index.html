@@ -1,0 +1,455 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+    <meta charset="UTF-8">
+<meta name="viewport"
+      content="width=device-width, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+<meta http-equiv="X-UA-Compatible" content="ie=edge">
+
+    <meta name="author" content="王八吉吉">
+
+
+    <meta name="subtitle" content="前端小匠">
+
+
+    <meta name="description" content="专心学技术">
+
+
+    <meta name="keywords" content="前端">
+
+
+<title>浏览器八股文(持续更新) | Gaxy</title>
+
+
+
+    <link rel="icon" href="/favicon.png">
+
+
+
+
+    <!-- stylesheets list from _config.yml -->
+    
+    <link rel="stylesheet" href="/css/style.css">
+    
+
+
+
+    <!-- scripts list from _config.yml -->
+    
+    <script src="/js/script.js"></script>
+    
+    <script src="/js/tocbot.min.js"></script>
+    
+
+
+
+    
+    
+        
+    
+
+
+<meta name="generator" content="Hexo 4.2.1"></head>
+
+<body>
+    <script>
+        // this function is used to check current theme before page loaded.
+        (() => {
+            const currentTheme = window.localStorage && window.localStorage.getItem('theme') || '';
+            const isDark = currentTheme === 'dark';
+            const pagebody = document.getElementsByTagName('body')[0]
+            if (isDark) {
+                pagebody.classList.add('dark-theme');
+                // mobile
+                document.getElementById("mobile-toggle-theme").innerText = "· Dark"
+            } else {
+                pagebody.classList.remove('dark-theme');
+                // mobile
+                document.getElementById("mobile-toggle-theme").innerText = "· Light"
+            }
+        })();
+    </script>
+
+    <div class="wrapper">
+        <header>
+    <nav class="navbar">
+        <div class="container">
+            <div class="navbar-header header-logo"><a href="/">Gaxy</a></div>
+            <div class="menu navbar-right">
+                
+                    <a class="menu-item" href="/archives">归档</a>
+                
+                    <a class="menu-item" href="/category">分类</a>
+                
+                    <a class="menu-item" href="/tag">标签</a>
+                
+                    <a class="menu-item" href="/about">关于</a>
+                
+                <input id="switch_default" type="checkbox" class="switch_default">
+                <label for="switch_default" class="toggleBtn"></label>
+            </div>
+        </div>
+    </nav>
+
+    
+    <nav class="navbar-mobile" id="nav-mobile">
+        <div class="container">
+            <div class="navbar-header">
+                <div>
+                    <a href="/">Gaxy</a><a id="mobile-toggle-theme">·&nbsp;Light</a>
+                </div>
+                <div class="menu-toggle" onclick="mobileBtn()">&#9776; Menu</div>
+            </div>
+            <div class="menu" id="mobile-menu">
+                
+                    <a class="menu-item" href="/archives">归档</a>
+                
+                    <a class="menu-item" href="/category">分类</a>
+                
+                    <a class="menu-item" href="/tag">标签</a>
+                
+                    <a class="menu-item" href="/about">关于</a>
+                
+            </div>
+        </div>
+    </nav>
+
+</header>
+<script>
+    var mobileBtn = function f() {
+        var toggleMenu = document.getElementsByClassName("menu-toggle")[0];
+        var mobileMenu = document.getElementById("mobile-menu");
+        if(toggleMenu.classList.contains("active")){
+           toggleMenu.classList.remove("active")
+            mobileMenu.classList.remove("active")
+        }else{
+            toggleMenu.classList.add("active")
+            mobileMenu.classList.add("active")
+        }
+    }
+</script>
+            <div class="main">
+                <div class="container">
+    
+    
+        <div class="post-toc">
+    <div class="tocbot-list">
+    </div>
+    <div class="tocbot-list-menu">
+        <a class="tocbot-toc-expand" onclick="expand_toc()">Expand all</a>
+        <a onclick="go_top()">Back to top</a>
+        <a onclick="go_bottom()">Go to bottom</a>
+    </div>
+</div>
+
+<script>
+    var tocbot_timer;
+    var DEPTH_MAX = 6;    // 为 6 时展开所有
+    var tocbot_default_config = {
+        tocSelector: '.tocbot-list',
+        contentSelector: '.post-content',
+        headingSelector: 'h1, h2, h3, h4, h5',
+        orderedList: false,
+        scrollSmooth: true,
+        onClick: extend_click,
+    };
+
+    function extend_click() {
+        clearTimeout(tocbot_timer);
+        tocbot_timer = setTimeout(function () {
+            tocbot.refresh(obj_merge(tocbot_default_config, { hasInnerContainers: true }));
+        }, 420); // 这个值是由 tocbot 源码里定义的 scrollSmoothDuration 得来的
+    }
+
+    document.ready(function () {
+        tocbot.init(obj_merge(tocbot_default_config, { collapseDepth: 1 }));
+    });
+
+    function expandToc() {
+        var b = document.querySelector('.tocbot-toc-expand');
+        var expanded = b.getAttribute('data-expanded');
+        expanded ? b.removeAttribute('data-expanded') : b.setAttribute('data-expanded', true);
+        tocbot.refresh(obj_merge(tocbot_default_config, { collapseDepth: expanded ? 1 : DEPTH_MAX }));
+        b.innerText = expanded ? 'Expand all' : 'Collapse all';
+    }
+
+    function go_top() {
+        window.scrollTo(0, 0);
+    }
+
+    function go_bottom() {
+        window.scrollTo(0, document.body.scrollHeight);
+    }
+
+    function obj_merge(target, source) {
+        for (var item in source) {
+            if (source.hasOwnProperty(item)) {
+                target[item] = source[item];
+            }
+        }
+        return target;
+    }
+</script>
+    
+
+    
+    <article class="post-wrap">
+        <header class="post-header">
+            <h1 class="post-title">浏览器八股文(持续更新)</h1>
+            
+                <div class="post-meta">
+                    
+                        Author: <a itemprop="author" rel="author" href="/">王八吉吉</a>
+                    
+
+                    
+                        <span class="post-time">
+                        Date: <a href="#">六月 17, 2022&nbsp;&nbsp;21:09:31</a>
+                        </span>
+                    
+                    
+                        <span class="post-category">
+                    Category:
+                            
+                                <a href="/category/%E9%9D%A2%E8%AF%95/">面试</a>
+                            
+                        </span>
+                    
+                </div>
+            
+        </header>
+
+        <div class="post-content">
+            <p><em>只针对自己不太熟或者面试常问的有针对性的整理</em></p>
+<h1 id="浏览器架构"><a href="#浏览器架构" class="headerlink" title="浏览器架构"></a>浏览器架构</h1><p>现代浏览器的多进程架构如下</p>
+<p><img src="%E6%B5%8F%E8%A7%88%E5%99%A8%E5%A4%9A%E8%BF%9B%E7%A8%8B.png" alt=""></p>
+<p>多进程架构的优势：</p>
+<p>各个进程<strong>相互独立，不会互相影响</strong>，不会因为一个进程的崩溃而影响整个浏览器的运行</p>
+<p>浏览器主进程: 负责各个页面的展示交互</p>
+<p>渲染进程: js引擎等</p>
+<p>GPU进程：绘制ui界面</p>
+<p>网络进程: 负责网络资源加载，<strong>浏览器的跨域从渲染进程发起，被网络进程拦截</strong></p>
+<p>插件进程: 负责插件运行</p>
+<h1 id="JavaScript单线程模型"><a href="#JavaScript单线程模型" class="headerlink" title="JavaScript单线程模型"></a>JavaScript单线程模型</h1><ol>
+<li><p><code>GUI</code>线程与<code>js引擎线程</code><strong>互斥</strong></p>
+</li>
+<li><p><code>js</code>会阻塞页面加载</p>
+</li>
+<li><p><code>webWorker</code>可以再开启一个线程，但是这个线程由主线程控制，且不能操作<code>DOM</code>，但是<code>webWorker</code>需要通信，通信时长如果大于线程执行之间将得不偿失。</p>
+</li>
+</ol>
+<h1 id="渲染机制"><a href="#渲染机制" class="headerlink" title="渲染机制"></a>渲染机制</h1><h2 id="基本流程"><a href="#基本流程" class="headerlink" title="基本流程"></a>基本流程</h2><p><img src="%E6%B5%8F%E8%A7%88%E5%99%A8%E6%B8%B2%E6%9F%93.png" alt=""></p>
+<ol>
+<li>解析<code>HTML</code>生成<code>DOM</code>树</li>
+</ol>
+<ul>
+<li>期间如果遇到<code>脚本(js或者其他)</code>那么暂停解析，加载脚本，加载完重新构建<code>DOM</code>树</li>
+</ul>
+<ol start="2">
+<li><p>解析<code>CSS</code>生成<code>CSSOM</code>树</p>
+</li>
+<li><p><code>DOM树</code>和<code>CSSOM树</code>合并生成<code>渲染树</code></p>
+</li>
+<li><p><code>渲染树</code>进行布局<code>layout</code>，计算节点的位置大小等等</p>
+</li>
+<li><p>调用<code>GPU绘制</code>，这个过程称为重绘</p>
+</li>
+</ol>
+<h2 id="重绘回流"><a href="#重绘回流" class="headerlink" title="重绘回流"></a>重绘回流</h2><h3 id="基本概念"><a href="#基本概念" class="headerlink" title="基本概念"></a>基本概念</h3><p>回流：会计算布局的大小位置，重新生成<code>渲染树</code></p>
+<ul>
+<li><p>局部回流: 外层<code>dom</code>大小位置不变化，只变化了内层的</p>
+</li>
+<li><p>全局范围：从根节点开始回流</p>
+</li>
+</ul>
+<p>重绘：只更改外观，<strong>不更改布局</strong></p>
+<h3 id="针对回流优化"><a href="#针对回流优化" class="headerlink" title="针对回流优化"></a>针对回流优化</h3><ol>
+<li><p>不要直接修改<code>DOM</code>中会改变定位或者大小的属性</p>
+</li>
+<li><p>不要过度的获取计算<code>DOM</code>的位置，大小</p>
+</li>
+<li><p><code>visibility</code>取代<code>display: none</code></p>
+</li>
+<li><p>频繁运行的动画使用<code>requestAnimationFrame</code>或者变成一个新的图层</p>
+</li>
+</ol>
+<p>变图层的方式: </p>
+<ul>
+<li><p><code>3D</code> 变换：<code>translate3d</code>、<code>translateZ</code></p>
+</li>
+<li><p><code>will-change</code></p>
+</li>
+<li><p><code>video、iframe 标签</code></p>
+</li>
+<li><p><code>position: fixed</code></p>
+</li>
+</ul>
+<h3 id="与EventLoop的关系"><a href="#与EventLoop的关系" class="headerlink" title="与EventLoop的关系"></a>与EventLoop的关系</h3><p><code>requestAnimationFrame</code>是一个能让<code>js</code>线程和浏览器交互的方法，这个函数传入的方法可以在浏览器重绘前调用,下面写一个简单的demo，让浏览器自己决定函数的触发时机保证不卡顿</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">let</span> count = <span class="number">0</span>;</span><br><span class="line"><span class="keyword">let</span> start = <span class="number">0</span>;</span><br><span class="line"><span class="keyword">let</span> ref;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">animation</span>(<span class="params">temp</span>)</span>&#123;</span><br><span class="line">    <span class="keyword">if</span>(temp - start &gt; <span class="number">100</span>)&#123;</span><br><span class="line">        start = temp;</span><br><span class="line">        count++</span><br><span class="line">    &#125;</span><br><span class="line">    ref = <span class="built_in">window</span>.requestAnimationFrame(animation)</span><br><span class="line">&#125;</span><br><span class="line">ref = <span class="built_in">window</span>.requestAnimationFrame(animation)</span><br></pre></td></tr></table></figure>
+
+<h2 id="其余渲染优化"><a href="#其余渲染优化" class="headerlink" title="其余渲染优化"></a>其余渲染优化</h2><ol>
+<li><p><code>script</code>标签尽量放在后面，最好支持异步加载，最好支持延迟加载</p>
+</li>
+<li><p>尽可能快的加载<code>CSS</code>样式表，避免js加载时样式表还没加载完</p>
+</li>
+<li><p>适当使用图层</p>
+</li>
+</ol>
+<ul>
+<li>浏览器标准流可以视为一个图层，我们可以手动创建图层，脱离标准流，<strong>脱离标准流的图层会单独渲染</strong>，因此如果遇到渲染麻烦的图层我们可以单独为其创建一个图层渲染，但是不要过度使用，渲染本身也耗性能</li>
+</ul>
+<p>注意点：</p>
+<ol>
+<li><p><code>CSSOM</code>树的构建会影响<code>渲染树</code>的生成，因此<code>CSS</code>会影响页面渲染</p>
+</li>
+<li><p><code>HTML</code>标签遇到<code>script</code>标签会暂停构建，加载完后再去构建<code>DOM</code></p>
+</li>
+<li><p><code>script</code>标签引入的<code>js</code>文件，也需要在<code>css</code>样式表加载完之后才会执行</p>
+</li>
+</ol>
+<h2 id="Load-和-DOMContentLoaded"><a href="#Load-和-DOMContentLoaded" class="headerlink" title="Load 和 DOMContentLoaded"></a>Load 和 DOMContentLoaded</h2><p><code>Load</code>是等<code>HTML、CSS、JS、图片等</code>资源都加载完时触发，可以用来计算首屏渲染时间</p>
+<p><code>DOMContentLoaded</code>是<code>HTML</code>解析完成触发，不需要等待<code>CSS、JS、图片</code></p>
+<h1 id="浏览器缓存"><a href="#浏览器缓存" class="headerlink" title="浏览器缓存"></a>浏览器缓存</h1><p>强缓存：<code>Cache-Control</code> 和 <code>Expire</code></p>
+<p>协商缓存：<code>If-none-match</code>配合<code>Etag</code> 和 <code>If-modified-since</code>配合<code>last-modified</code></p>
+<p>优先强缓存，然后协商缓存</p>
+<h1 id="存储方案"><a href="#存储方案" class="headerlink" title="存储方案"></a>存储方案</h1><p>Cookie：小 4k左右、会带到请求头<br>localStorage： 5m，需要手动清理<br>sessionStorage 5m，一直存在</p>
+<h1 id="跨域"><a href="#跨域" class="headerlink" title="跨域"></a>跨域</h1><p>详细看<a href="https://auglyxu.github.io/2021/09/13/HTTP/#%E8%B7%A8%E5%9F%9F%E9%97%AE%E9%A2%98">HTTP</a></p>
+<h1 id="安全-XSS和CSRF"><a href="#安全-XSS和CSRF" class="headerlink" title="安全(XSS和CSRF)"></a>安全(XSS和CSRF)</h1><p>XSS：代码注入</p>
+<ul>
+<li>持久型：数据库代码注入</li>
+<li>非持久: url代码注入(浏览器自动防范)</li>
+</ul>
+<p>CSP: 白名单(设置外部资源访问限制)，meta标签可以做<code>&lt;meta http-equiv=&quot;Content-Security-Policy&quot;&gt;</code></p>
+<p>CSRF: 跨站请求伪造，本站请求黑客服务器的方式来获取用户的信息</p>
+<ul>
+<li><code>cookie</code>设为同域</li>
+<li>请求带上<code>token</code><h1 id="从输入URL到页面展示的过程-经典面试题"><a href="#从输入URL到页面展示的过程-经典面试题" class="headerlink" title="从输入URL到页面展示的过程(经典面试题)"></a>从输入URL到页面展示的过程(经典面试题)</h1></li>
+</ul>
+<ol>
+<li>合成<code>url</code>，判断是否是一个合法的域名，非合法就调用浏览器默认搜索功能，合法就跳转到对应的网站</li>
+<li><code>DNS</code>检索，检索优先从缓存中拿(浏览器缓存中 -&gt; 本地<code>HOST</code> -&gt; 本地<code>DNS</code>解析缓存 -&gt; 本地<code>DNS</code>服务器)，缓存中如果没有，依次查找根域名服务器、顶级域名服务器、二级域名服务器</li>
+<li>建立<code>TCP</code>连接，<code>TCP</code>连接主要是三次握手</li>
+</ol>
+<ul>
+<li>第一次：客户端发送标记位<code>SYN</code>, <code>seq = p</code></li>
+<li>第二次：服务端响应<code>ACK</code>，<code>ack = p + 1</code>，请求建立连接标记位<code>SYN seq = q</code></li>
+<li>第三次: 客户端响应标记位为<code>ACK ack = q + 1</code></li>
+</ul>
+<ol start="4">
+<li><p>获取文件，优先从缓存中获取文件，<strong>优先强缓存</strong>，然后协商缓存</p>
+</li>
+<li><p>断开连接，TCP四次挥手</p>
+</li>
+</ol>
+<ul>
+<li>客户端发出标记位<code>FIN</code>，请求关闭</li>
+<li>服务端发送标记位<code>ACK</code>，表示收到</li>
+<li>服务端发出标记位<code>FIN</code>，表示可以关闭</li>
+<li>客户端发出标记位<code>ACK</code>，表示收到</li>
+<li>客户端等待两个<code>MSL</code>后断开连接</li>
+</ul>
+<ol start="6">
+<li>获取文件后，解析HTML，渲染页面</li>
+</ol>
+<ul>
+<li>解析HTML，生成 <code>DOM</code> 树， 解析<code>CSS</code>，生成<code>CSSOM</code>树</li>
+<li>合并生成<code>render树</code></li>
+<li>交由<code>GPU渲染</code>页面</li>
+<li>交给浏览器绘制展示到页面上<h1 id="图层"><a href="#图层" class="headerlink" title="图层"></a>图层</h1></li>
+</ul>
+<p>层叠上下文是HTML元素的三维概念，这些HTML元素在一条假想的相对于面向（电脑屏幕的）视窗或者网页的用户的z轴上延伸，HTML元素依据其自身属性按照优先级顺序占用层叠上下文的空间。</p>
+<p>拥有层叠上下文属性的元素会被提升为单独的一层。<br>拥有层叠上下文属性：</p>
+<ul>
+<li>根元素 (HTML),</li>
+<li><code>z-index</code> 值不为 <code>&quot;auto&quot;</code>的 绝对/相对定位元素，</li>
+<li><code>position</code>,固定<code>（fixed）</code> / 沾滞<code>（sticky）</code>定位（沾滞定位适配所有移动设- 备上的浏览器，但老的桌面浏览器不支持）</li>
+<li><code>z-index</code>值不为 <code>&quot;auto&quot;</code>的 <code>flex</code> 子项 (<code>flex item</code>)，即：父元素 - <code>display: flex|inline-flex</code>，</li>
+<li><code>z-index</code>值不为<code>&quot;auto&quot;</code>的<code>grid</code>子项，即：父元素<code>display：grid</code></li>
+<li><code>opacity</code> 属性值<code>小于 1</code>的元素（参考 the specification for - opacity），</li>
+<li><code>transform</code> 属性值不为 <code>&quot;none&quot;</code>的元素，</li>
+<li><code>mix-blend-mode</code> 属性值不为 <code>&quot;normal&quot;</code>的元素，</li>
+<li><code>filter</code>值不为<code>&quot;none&quot;</code>的元素，</li>
+<li><code>perspective</code>值不为<code>&quot;none&quot;</code>的元素，</li>
+<li><code>clip-path</code>值不为<code>&quot;none&quot;</code>的元素</li>
+<li><code>mask / mask-image / mask-border</code>不为”none”的元素</li>
+<li><code>isolation</code> 属性被设置为 <code>&quot;isolate&quot;</code>的元素</li>
+<li>在 <code>will-change</code> 中指定了任意<code>CSS</code>属性</li>
+<li><code>-webkit-overflow-scrolling</code> 属性被设置 “touch”的元素</li>
+<li><code>contain</code>属性值为<code>&quot;layout&quot;</code>，<code>&quot;paint&quot;</code>，或者综合值比如<code>&quot;strict&quot;</code>，<code>&quot;content&quot;</code></li>
+</ul>
+<h1 id="requestAnimationFrame-和-requestIdleCallback"><a href="#requestAnimationFrame-和-requestIdleCallback" class="headerlink" title="requestAnimationFrame 和 requestIdleCallback"></a>requestAnimationFrame 和 requestIdleCallback</h1><p><code>requestAnimationFrame</code>浏览器渲染前调用，60刷新率大概为16.7ms</p>
+<p><code>requestIdleCallback</code>，浏览器两帧间的<strong>空闲时间</strong>调用</p>
+
+        </div>
+
+        
+            <section class="post-copyright">
+                
+                    <p class="copyright-item">
+                        <span>Author:</span>
+                        <span>王八吉吉</span>
+                    </p>
+                
+                
+                    <p class="copyright-item">
+                        <span>Permalink:</span>
+                        <span><a href="http://auglyxu.github.io/2022/06/17/%E6%B5%8F%E8%A7%88%E5%99%A8%E5%85%AB%E8%82%A1%E6%96%87/">http://auglyxu.github.io/2022/06/17/%E6%B5%8F%E8%A7%88%E5%99%A8%E5%85%AB%E8%82%A1%E6%96%87/</a></span>
+                    </p>
+                
+                
+                    <p class="copyright-item">
+                        <span>License:</span>
+                        <span>Copyright (c) 2019 <a href="http://creativecommons.org/licenses/by-nc/4.0/" target="_blank" rel="noopener">CC-BY-NC-4.0</a> LICENSE</span>
+                    </p>
+                
+                
+                     <p class="copyright-item">
+                         <span>Slogan:</span>
+                         <span>享受当下</span>
+                     </p>
+                
+
+            </section>
+        
+        <section class="post-tags">
+            <div>
+                <span>Tag(s):</span>
+                <span class="tag">
+                    
+                    
+                        <a href="/tags/%E9%9D%A2%E8%AF%95/"># 面试</a>
+                    
+                        
+                </span>
+            </div>
+            <div>
+                <a href="javascript:window.history.back();">back</a>
+                <span>· </span>
+                <a href="/">home</a>
+            </div>
+        </section>
+        <section class="post-nav">
+            
+                <a class="prev" rel="prev" href="/2022/06/18/%E4%BB%8E%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90diff%E7%AE%97%E6%B3%95/">从源码分析diff算法</a>
+            
+            
+            <a class="next" rel="next" href="/2022/06/10/Js%E5%85%AB%E8%82%A1%E6%96%87/">Js八股文(持续更新)</a>
+            
+        </section>
+
+
+    </article>
+</div>
+
+            </div>
+            <footer id="footer" class="footer">
+    <div class="copyright">
+        <span>© 王八吉吉 | Powered by <a href="https://hexo.io" target="_blank">Hexo</a> & <a href="https://github.com/Siricee/hexo-theme-Chic" target="_blank">Chic</a></span>
+    </div>
+</footer>
+
+    </div>
+</body>
+
+</html>

@@ -1,0 +1,397 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+    <meta charset="UTF-8">
+<meta name="viewport"
+      content="width=device-width, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+<meta http-equiv="X-UA-Compatible" content="ie=edge">
+
+    <meta name="author" content="王八吉吉">
+
+
+    <meta name="subtitle" content="前端小匠">
+
+
+    <meta name="description" content="专心学技术">
+
+
+    <meta name="keywords" content="前端">
+
+
+<title>从源码分析diff算法 | Gaxy</title>
+
+
+
+    <link rel="icon" href="/favicon.png">
+
+
+
+
+    <!-- stylesheets list from _config.yml -->
+    
+    <link rel="stylesheet" href="/css/style.css">
+    
+
+
+
+    <!-- scripts list from _config.yml -->
+    
+    <script src="/js/script.js"></script>
+    
+    <script src="/js/tocbot.min.js"></script>
+    
+
+
+
+    
+    
+        
+    
+
+
+<meta name="generator" content="Hexo 4.2.1"></head>
+
+<body>
+    <script>
+        // this function is used to check current theme before page loaded.
+        (() => {
+            const currentTheme = window.localStorage && window.localStorage.getItem('theme') || '';
+            const isDark = currentTheme === 'dark';
+            const pagebody = document.getElementsByTagName('body')[0]
+            if (isDark) {
+                pagebody.classList.add('dark-theme');
+                // mobile
+                document.getElementById("mobile-toggle-theme").innerText = "· Dark"
+            } else {
+                pagebody.classList.remove('dark-theme');
+                // mobile
+                document.getElementById("mobile-toggle-theme").innerText = "· Light"
+            }
+        })();
+    </script>
+
+    <div class="wrapper">
+        <header>
+    <nav class="navbar">
+        <div class="container">
+            <div class="navbar-header header-logo"><a href="/">Gaxy</a></div>
+            <div class="menu navbar-right">
+                
+                    <a class="menu-item" href="/archives">归档</a>
+                
+                    <a class="menu-item" href="/category">分类</a>
+                
+                    <a class="menu-item" href="/tag">标签</a>
+                
+                    <a class="menu-item" href="/about">关于</a>
+                
+                <input id="switch_default" type="checkbox" class="switch_default">
+                <label for="switch_default" class="toggleBtn"></label>
+            </div>
+        </div>
+    </nav>
+
+    
+    <nav class="navbar-mobile" id="nav-mobile">
+        <div class="container">
+            <div class="navbar-header">
+                <div>
+                    <a href="/">Gaxy</a><a id="mobile-toggle-theme">·&nbsp;Light</a>
+                </div>
+                <div class="menu-toggle" onclick="mobileBtn()">&#9776; Menu</div>
+            </div>
+            <div class="menu" id="mobile-menu">
+                
+                    <a class="menu-item" href="/archives">归档</a>
+                
+                    <a class="menu-item" href="/category">分类</a>
+                
+                    <a class="menu-item" href="/tag">标签</a>
+                
+                    <a class="menu-item" href="/about">关于</a>
+                
+            </div>
+        </div>
+    </nav>
+
+</header>
+<script>
+    var mobileBtn = function f() {
+        var toggleMenu = document.getElementsByClassName("menu-toggle")[0];
+        var mobileMenu = document.getElementById("mobile-menu");
+        if(toggleMenu.classList.contains("active")){
+           toggleMenu.classList.remove("active")
+            mobileMenu.classList.remove("active")
+        }else{
+            toggleMenu.classList.add("active")
+            mobileMenu.classList.add("active")
+        }
+    }
+</script>
+            <div class="main">
+                <div class="container">
+    
+    
+        <div class="post-toc">
+    <div class="tocbot-list">
+    </div>
+    <div class="tocbot-list-menu">
+        <a class="tocbot-toc-expand" onclick="expand_toc()">Expand all</a>
+        <a onclick="go_top()">Back to top</a>
+        <a onclick="go_bottom()">Go to bottom</a>
+    </div>
+</div>
+
+<script>
+    var tocbot_timer;
+    var DEPTH_MAX = 6;    // 为 6 时展开所有
+    var tocbot_default_config = {
+        tocSelector: '.tocbot-list',
+        contentSelector: '.post-content',
+        headingSelector: 'h1, h2, h3, h4, h5',
+        orderedList: false,
+        scrollSmooth: true,
+        onClick: extend_click,
+    };
+
+    function extend_click() {
+        clearTimeout(tocbot_timer);
+        tocbot_timer = setTimeout(function () {
+            tocbot.refresh(obj_merge(tocbot_default_config, { hasInnerContainers: true }));
+        }, 420); // 这个值是由 tocbot 源码里定义的 scrollSmoothDuration 得来的
+    }
+
+    document.ready(function () {
+        tocbot.init(obj_merge(tocbot_default_config, { collapseDepth: 1 }));
+    });
+
+    function expandToc() {
+        var b = document.querySelector('.tocbot-toc-expand');
+        var expanded = b.getAttribute('data-expanded');
+        expanded ? b.removeAttribute('data-expanded') : b.setAttribute('data-expanded', true);
+        tocbot.refresh(obj_merge(tocbot_default_config, { collapseDepth: expanded ? 1 : DEPTH_MAX }));
+        b.innerText = expanded ? 'Expand all' : 'Collapse all';
+    }
+
+    function go_top() {
+        window.scrollTo(0, 0);
+    }
+
+    function go_bottom() {
+        window.scrollTo(0, document.body.scrollHeight);
+    }
+
+    function obj_merge(target, source) {
+        for (var item in source) {
+            if (source.hasOwnProperty(item)) {
+                target[item] = source[item];
+            }
+        }
+        return target;
+    }
+</script>
+    
+
+    
+    <article class="post-wrap">
+        <header class="post-header">
+            <h1 class="post-title">从源码分析diff算法</h1>
+            
+                <div class="post-meta">
+                    
+                        Author: <a itemprop="author" rel="author" href="/">王八吉吉</a>
+                    
+
+                    
+                        <span class="post-time">
+                        Date: <a href="#">六月 18, 2022&nbsp;&nbsp;21:34:56</a>
+                        </span>
+                    
+                    
+                        <span class="post-category">
+                    Category:
+                            
+                                <a href="/category/React/">React</a>
+                            
+                        </span>
+                    
+                </div>
+            
+        </header>
+
+        <div class="post-content">
+            <h1 id="从源码分析diff算法"><a href="#从源码分析diff算法" class="headerlink" title="从源码分析diff算法"></a>从源码分析diff算法</h1><blockquote>
+<p>以下需要建立在对<code>react理念</code>和<code>react render阶段</code>有一定理解的基础上</p>
+</blockquote>
+<p><code>diff</code>算法发生在<code>beginWork</code>函数中</p>
+<p>满足<code>current !== null</code>时进行<code>diff</code>(为<code>null</code>时意味着本次是<code>mount</code>阶段)，<strong>mount阶段beginWork生成的子Fiber均被打上Placement的标记并存储在flags属性上(前几个版本存在effectTag上)</strong></p>
+<p><code>diff</code>算法本质是<strong>将current树上的fiber与组件update后返回的jsx进行对比，生成打好flags的子Fiber节点</strong></p>
+<h2 id="入口"><a href="#入口" class="headerlink" title="入口"></a>入口</h2><p>以<code>div</code>举例，<code>beginWork</code>会根据 <strong>当前workInProgress的tag(即上一次beginWork生成好的子Fiber节点)</strong> 来判断更新的类型, <code>div</code>属于<code>HostComponent</code>将执行<code>updateHostComponent</code></p>
+<p><img src="diff%E7%AE%97%E6%B3%95%E5%85%A5%E5%8F%A3.png" alt=""></p>
+<h2 id="比较对象"><a href="#比较对象" class="headerlink" title="比较对象"></a>比较对象</h2><p>以以下代码为例，<code>workInProgress</code>为下图红框时</p>
+<p><img src="diff%E5%8D%95%E8%8A%82%E7%82%B9%E6%A1%88%E4%BE%8B.png" alt=""></p>
+<p>由下图可以看出，调用<code>reconcileChildren</code>传入的<code>nextChildren</code>是当前<code>workInProgress</code>的 <code>children</code>, 以我们的例子来说就是<code>div</code>下的<code>jsx</code></p>
+<p>注意点：<code>div</code>下的<code>jsx</code>并非单一节点时，<code>nextChildren</code>为数组类型，因此diff算法可能是<strong>链表与数组</strong>间的比较</p>
+<p><img src="diff%E6%AF%94%E8%BE%83%E5%AF%B9%E8%B1%A1.png" alt=""></p>
+<p>下图可知，比较对象是<code>current.child</code>与上面说的<code>nextChildren</code>的比较</p>
+<p><img src="%E6%AF%94%E8%BE%83%E5%AF%B9%E8%B1%A12.png" alt=""></p>
+<h2 id="diff流程"><a href="#diff流程" class="headerlink" title="diff流程"></a>diff流程</h2><p>由下图可知，<code>diff</code>主要分为<strong>jsx返回的是单节点的diff</strong>和<strong>jsx返回的是多节点的diff</strong></p>
+<p>单节点中，至于其他的关于<code>Portal、TextNode</code>都比较好理解，简单概述一下</p>
+<ol>
+<li><p><code>Portal</code>的更新和单节点的diff<code>算法</code>很像</p>
+</li>
+<li><p>如果是文本节点，则将<code>current.child</code>的比较节点全部删除(原因是因为<code>beginWork</code>一次只生成一个<code>child</code>节点), 并基于此<code>current.child</code>重新克隆一个<code>fiber</code>节点</p>
+</li>
+</ol>
+<p><img src="diff%E6%B5%81%E7%A8%8B.png" alt=""></p>
+<h3 id="jsx返回的是单节点的diff"><a href="#jsx返回的是单节点的diff" class="headerlink" title="jsx返回的是单节点的diff"></a>jsx返回的是单节点的diff</h3><p>下图红框表示<strong>节点是更新的节点</strong>, 棕色框表示<strong>节点是新增的节点</strong></p>
+<ol>
+<li><p>红框意味着刚进来有值，说明当前<code>current.child</code>处在同层级</p>
+</li>
+<li><p>棕框意味着当前界面上的节点不存在，本次更新或者挂载的是一个全新的节点，因此要为当前全新的节点创建一个<code>fiber</code>并返回</p>
+</li>
+</ol>
+<p><img src="%E5%8D%95%E8%8A%82%E7%82%B9%E7%9A%84diff_1.png" alt=""></p>
+<p>主要关注红框的部分, 核心逻辑如下</p>
+<ol>
+<li><p><code>key</code>不相同，把<strong>当前</strong><code>current.child(即当前current树上进行diff的节点)</code>删除，将指针移到<code>current.child</code>的兄弟节点进行比较</p>
+<ul>
+<li>注意点：<code>key</code>不相同不会把所有兄弟节点都删除，只会删除当前比较的，如果兄弟节点<code>key</code>相同还是会有复用的可能性</li>
+</ul>
+</li>
+<li><p><code>key</code>相同，比较<code>elementType</code>是否相同，如果相同，直接基于当前<code>current.child</code>创建一个<code>fiber</code></p>
+<ul>
+<li>注意如果复用这个<code>fiber</code>节点的<code>child</code>是和当前的<code>current.child</code>完全一样，可以减少渲染</li>
+</ul>
+</li>
+<li><p><code>key</code>相同，如果<code>type</code>不相同，要把<code>current.child</code>及其的兄弟节点一并删除</p>
+</li>
+</ol>
+<p>看如下代码，<code>React</code>不会复用更新前的<code>div</code>，而是把两个全都删了，重新创建</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 更新前</span></span><br><span class="line">&lt;p key=<span class="string">"1"</span>&gt;<span class="number">1</span>&lt;<span class="regexp">/p&gt;</span></span><br><span class="line"><span class="regexp">&lt;div key="1"&gt;1&lt;/</span>div&gt;</span><br><span class="line"></span><br><span class="line"><span class="comment">// 更新后</span></span><br><span class="line">&lt;div key=<span class="string">"1"</span>&gt;<span class="number">1</span>&lt;<span class="regexp">/div&gt;</span></span><br></pre></td></tr></table></figure>
+
+<p><img src="%E5%8D%95%E8%8A%82%E7%82%B9diff_2.png" alt=""></p>
+<h3 id="jsx返回的是多节点的diff-Array-Iterator"><a href="#jsx返回的是多节点的diff-Array-Iterator" class="headerlink" title="jsx返回的是多节点的diff(Array, Iterator)"></a>jsx返回的是多节点的diff(Array, Iterator)</h3><h4 id="第一轮遍历"><a href="#第一轮遍历" class="headerlink" title="第一轮遍历"></a>第一轮遍历</h4><h5 id="终止条件"><a href="#终止条件" class="headerlink" title="终止条件"></a>终止条件</h5><ol>
+<li><p><code>oldFiber</code>遍历完或者<code>newChildren</code>遍历完或者说<code>当前diff的两个节点key不相同</code></p>
+</li>
+<li><p>如果<code>key</code>相同，继续判断，调用<code>updateElement</code>，方法比较简单</p>
+<ul>
+<li>如果<code>type</code>不相同那么不能复用，这个时候会基于当前的<code>newFiber</code>创建<code>fiber</code>, 并将当前的<code>oldFiber</code>删除，<strong>继续遍历</strong></li>
+<li>如果<code>type</code>相同，那么可以复用</li>
+</ul>
+</li>
+</ol>
+<p><img src="%E5%A4%9A%E8%8A%82%E7%82%B9diff%E7%9A%84%E7%AC%AC%E4%B8%80%E6%AC%A1%E9%81%8D%E5%8E%86.png" alt=""></p>
+<h4 id="第二轮遍历"><a href="#第二轮遍历" class="headerlink" title="第二轮遍历"></a>第二轮遍历</h4><p>第二轮遍历是会带着第一轮遍历的结果去进行遍历，结果有以下情况：</p>
+<p>下图先解释比较容易得两种情况：</p>
+<ol>
+<li><p><code>newIdx === newChildren.length</code>意味着新节点遍历完，那么直接把剩余没遍历的<code>oldFiber</code>删掉即可</p>
+</li>
+<li><p><code>oldFiber === null</code>意味着旧的节点遍历完了，那么遍历剩余的新节点依次创建<code>Fiber</code>即可</p>
+</li>
+</ol>
+<p><img src="%E7%AC%AC%E4%BA%8C%E8%BD%AE%E9%81%8D%E5%8E%86_1.png" alt=""></p>
+<p>下图解释最复杂的情况，能进下图的位置说明<code>newChildren</code>和<code>oldFiber</code>都没遍历完</p>
+<ol>
+<li><p><code>mapRemainingChildren</code>这个方法是为了在<code>O(1)</code>复杂度快速找到对应的<code>current节点</code>，因此把<code>key</code>或者<code>索引index</code>作为<code>key</code>，<code>current节点</code>作为<code>value</code>存在<code>map</code>中</p>
+</li>
+<li><p>遍历剩下的<code>newFiber</code>，先找<code>key</code>一样的，没有<code>key</code>就找同位置的，<strong>为了找到移动的节点</strong>，调用<code>updateElement——能复用就复用，不能复用就自己创建</code></p>
+</li>
+</ol>
+<p><img src="%E7%AC%AC%E4%BA%8C%E8%BD%AE%E9%81%8D%E5%8E%86_2.png" alt=""></p>
+<h4 id="lastPlacedIndex详细解释-精髓"><a href="#lastPlacedIndex详细解释-精髓" class="headerlink" title="lastPlacedIndex详细解释(精髓)"></a>lastPlacedIndex详细解释(精髓)</h4><p><code>lastPlacedIndex</code>这个索引解释——<strong>新创建的Fiber节点在dom中要插入的位置</strong></p>
+<ol>
+<li><p>如果当前节点没有被复用，是<code>全新创建</code>的话，那么这个值不变，并打上<code>Placement</code></p>
+</li>
+<li><p>如果当前节点被复用了，这个值是返回<code>Max{oldIndex, lastPlacedIndex}</code></p>
+</li>
+<li><p>如果这个节点被复用了，<code>oldIndex &lt; lastPlacedIndex</code>需要移动</p>
+</li>
+</ol>
+<p><img src="lastPlacedIndex.png" alt=""></p>
+<h4 id="多节点diff总结"><a href="#多节点diff总结" class="headerlink" title="多节点diff总结"></a>多节点diff总结</h4><ol>
+<li><p>第一次遍历用新旧同层判断key是否相同，不相同跳出，遍历完跳出</p>
+</li>
+<li><p>第二次遍历</p>
+<p> 2.1 <code>oldFiber</code>遍历完，创建新节点。<code>newChildren</code>遍历完删除多的<code>oldFiber</code></p>
+<p> 2.2 两个都没遍历完，将剩余的<code>oldFiber</code>存成map。遍历<code>newChildren</code>，如果可以找到可以复用，判断<code>oldIndex &lt; lastPlacedIndex</code>，标记<code>Placement</code>。并将<code>lastPlacedIndex</code>设置为<code>oldFiber</code>里<strong>当前遍历到的！！！最后一个可复用的节点</strong></p>
+</li>
+</ol>
+
+        </div>
+
+        
+            <section class="post-copyright">
+                
+                    <p class="copyright-item">
+                        <span>Author:</span>
+                        <span>王八吉吉</span>
+                    </p>
+                
+                
+                    <p class="copyright-item">
+                        <span>Permalink:</span>
+                        <span><a href="http://auglyxu.github.io/2022/06/18/%E4%BB%8E%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90diff%E7%AE%97%E6%B3%95/">http://auglyxu.github.io/2022/06/18/%E4%BB%8E%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90diff%E7%AE%97%E6%B3%95/</a></span>
+                    </p>
+                
+                
+                    <p class="copyright-item">
+                        <span>License:</span>
+                        <span>Copyright (c) 2019 <a href="http://creativecommons.org/licenses/by-nc/4.0/" target="_blank" rel="noopener">CC-BY-NC-4.0</a> LICENSE</span>
+                    </p>
+                
+                
+                     <p class="copyright-item">
+                         <span>Slogan:</span>
+                         <span>享受当下</span>
+                     </p>
+                
+
+            </section>
+        
+        <section class="post-tags">
+            <div>
+                <span>Tag(s):</span>
+                <span class="tag">
+                    
+                    
+                        <a href="/tags/%E5%89%8D%E7%AB%AF/"># 前端</a>
+                    
+                        <a href="/tags/React/"># React</a>
+                    
+                        <a href="/tags/%E6%BA%90%E7%A0%81%E7%B3%BB%E5%88%97/"># 源码系列</a>
+                    
+                        
+                </span>
+            </div>
+            <div>
+                <a href="javascript:window.history.back();">back</a>
+                <span>· </span>
+                <a href="/">home</a>
+            </div>
+        </section>
+        <section class="post-nav">
+            
+                <a class="prev" rel="prev" href="/2022/06/22/TCP%E7%9B%B8%E5%85%B3/">TCP相关(持续更新)</a>
+            
+            
+            <a class="next" rel="next" href="/2022/06/17/%E6%B5%8F%E8%A7%88%E5%99%A8%E5%85%AB%E8%82%A1%E6%96%87/">浏览器八股文(持续更新)</a>
+            
+        </section>
+
+
+    </article>
+</div>
+
+            </div>
+            <footer id="footer" class="footer">
+    <div class="copyright">
+        <span>© 王八吉吉 | Powered by <a href="https://hexo.io" target="_blank">Hexo</a> & <a href="https://github.com/Siricee/hexo-theme-Chic" target="_blank">Chic</a></span>
+    </div>
+</footer>
+
+    </div>
+</body>
+
+</html>

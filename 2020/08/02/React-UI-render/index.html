@@ -1,0 +1,458 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+    <meta charset="UTF-8">
+<meta name="viewport"
+      content="width=device-width, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+<meta http-equiv="X-UA-Compatible" content="ie=edge">
+
+    <meta name="author" content="王八吉吉">
+
+
+    <meta name="subtitle" content="前端小匠">
+
+
+    <meta name="description" content="专心学技术">
+
+
+    <meta name="keywords" content="前端">
+
+
+<title>React运行时 | Gaxy</title>
+
+
+
+    <link rel="icon" href="/favicon.png">
+
+
+
+
+    <!-- stylesheets list from _config.yml -->
+    
+    <link rel="stylesheet" href="/css/style.css">
+    
+
+
+
+    <!-- scripts list from _config.yml -->
+    
+    <script src="/js/script.js"></script>
+    
+    <script src="/js/tocbot.min.js"></script>
+    
+
+
+
+    
+    
+        
+    
+
+
+<meta name="generator" content="Hexo 4.2.1"></head>
+
+<body>
+    <script>
+        // this function is used to check current theme before page loaded.
+        (() => {
+            const currentTheme = window.localStorage && window.localStorage.getItem('theme') || '';
+            const isDark = currentTheme === 'dark';
+            const pagebody = document.getElementsByTagName('body')[0]
+            if (isDark) {
+                pagebody.classList.add('dark-theme');
+                // mobile
+                document.getElementById("mobile-toggle-theme").innerText = "· Dark"
+            } else {
+                pagebody.classList.remove('dark-theme');
+                // mobile
+                document.getElementById("mobile-toggle-theme").innerText = "· Light"
+            }
+        })();
+    </script>
+
+    <div class="wrapper">
+        <header>
+    <nav class="navbar">
+        <div class="container">
+            <div class="navbar-header header-logo"><a href="/">Gaxy</a></div>
+            <div class="menu navbar-right">
+                
+                    <a class="menu-item" href="/archives">归档</a>
+                
+                    <a class="menu-item" href="/category">分类</a>
+                
+                    <a class="menu-item" href="/tag">标签</a>
+                
+                    <a class="menu-item" href="/about">关于</a>
+                
+                <input id="switch_default" type="checkbox" class="switch_default">
+                <label for="switch_default" class="toggleBtn"></label>
+            </div>
+        </div>
+    </nav>
+
+    
+    <nav class="navbar-mobile" id="nav-mobile">
+        <div class="container">
+            <div class="navbar-header">
+                <div>
+                    <a href="/">Gaxy</a><a id="mobile-toggle-theme">·&nbsp;Light</a>
+                </div>
+                <div class="menu-toggle" onclick="mobileBtn()">&#9776; Menu</div>
+            </div>
+            <div class="menu" id="mobile-menu">
+                
+                    <a class="menu-item" href="/archives">归档</a>
+                
+                    <a class="menu-item" href="/category">分类</a>
+                
+                    <a class="menu-item" href="/tag">标签</a>
+                
+                    <a class="menu-item" href="/about">关于</a>
+                
+            </div>
+        </div>
+    </nav>
+
+</header>
+<script>
+    var mobileBtn = function f() {
+        var toggleMenu = document.getElementsByClassName("menu-toggle")[0];
+        var mobileMenu = document.getElementById("mobile-menu");
+        if(toggleMenu.classList.contains("active")){
+           toggleMenu.classList.remove("active")
+            mobileMenu.classList.remove("active")
+        }else{
+            toggleMenu.classList.add("active")
+            mobileMenu.classList.add("active")
+        }
+    }
+</script>
+            <div class="main">
+                <div class="container">
+    
+    
+        <div class="post-toc">
+    <div class="tocbot-list">
+    </div>
+    <div class="tocbot-list-menu">
+        <a class="tocbot-toc-expand" onclick="expand_toc()">Expand all</a>
+        <a onclick="go_top()">Back to top</a>
+        <a onclick="go_bottom()">Go to bottom</a>
+    </div>
+</div>
+
+<script>
+    var tocbot_timer;
+    var DEPTH_MAX = 6;    // 为 6 时展开所有
+    var tocbot_default_config = {
+        tocSelector: '.tocbot-list',
+        contentSelector: '.post-content',
+        headingSelector: 'h1, h2, h3, h4, h5',
+        orderedList: false,
+        scrollSmooth: true,
+        onClick: extend_click,
+    };
+
+    function extend_click() {
+        clearTimeout(tocbot_timer);
+        tocbot_timer = setTimeout(function () {
+            tocbot.refresh(obj_merge(tocbot_default_config, { hasInnerContainers: true }));
+        }, 420); // 这个值是由 tocbot 源码里定义的 scrollSmoothDuration 得来的
+    }
+
+    document.ready(function () {
+        tocbot.init(obj_merge(tocbot_default_config, { collapseDepth: 1 }));
+    });
+
+    function expandToc() {
+        var b = document.querySelector('.tocbot-toc-expand');
+        var expanded = b.getAttribute('data-expanded');
+        expanded ? b.removeAttribute('data-expanded') : b.setAttribute('data-expanded', true);
+        tocbot.refresh(obj_merge(tocbot_default_config, { collapseDepth: expanded ? 1 : DEPTH_MAX }));
+        b.innerText = expanded ? 'Expand all' : 'Collapse all';
+    }
+
+    function go_top() {
+        window.scrollTo(0, 0);
+    }
+
+    function go_bottom() {
+        window.scrollTo(0, document.body.scrollHeight);
+    }
+
+    function obj_merge(target, source) {
+        for (var item in source) {
+            if (source.hasOwnProperty(item)) {
+                target[item] = source[item];
+            }
+        }
+        return target;
+    }
+</script>
+    
+
+    
+    <article class="post-wrap">
+        <header class="post-header">
+            <h1 class="post-title">React运行时</h1>
+            
+                <div class="post-meta">
+                    
+                        Author: <a itemprop="author" rel="author" href="/">王八吉吉</a>
+                    
+
+                    
+                        <span class="post-time">
+                        Date: <a href="#">八月 2, 2020&nbsp;&nbsp;15:34:00</a>
+                        </span>
+                    
+                    
+                        <span class="post-category">
+                    Category:
+                            
+                                <a href="/category/React/">React</a>
+                            
+                        </span>
+                    
+                </div>
+            
+        </header>
+
+        <div class="post-content">
+            <blockquote>
+<p>Dan在OverReact上发表的文章深入浅出，本文只针对个人之前不理解的点进行思考，采用了他的案例，参考了他的文章——<a href="https://overreacted.io/zh-hans/react-as-a-ui-runtime/" target="_blank" rel="noopener">将 React 作为 UI 运行时</a>。</p>
+</blockquote>
+<blockquote>
+<p>再写UI运行时的时候,发现一切都离不开Fiber,这里参考了掘金博主<em>武器大师1024</em>的一篇文章,并补充了一些他的案例<a href="https://juejin.im/post/6844903582622285831" target="_blank" rel="noopener">React Fiber</a>,同时,此案例也是<a href="https://www.youtube.com/watch?v=ZCuYPiUIONs" target="_blank" rel="noopener">Lin Clark presentation in ReactConf 2017</a>演讲上的一篇案例。</p>
+</blockquote>
+<p>大多数人关注React，关注它的使用方法，关注它创建页面的逻辑和效果，而忽略其模型和React本质上的一些东西，到底React帮我们做了什么?</p>
+<a id="more"></a>
+
+<hr>
+<h2 id="宿主树和宿主实例"><a href="#宿主树和宿主实例" class="headerlink" title="宿主树和宿主实例"></a>宿主树和宿主实例</h2><hr>
+<h4 id="什么是宿主树，什么是宿主实例？"><a href="#什么是宿主树，什么是宿主实例？" class="headerlink" title="什么是宿主树，什么是宿主实例？"></a>什么是宿主树，什么是宿主实例？</h4><p>这是一个概念上的问题，区别两者，其实很简单，就像<strong>整体</strong>和<strong>局部</strong>的关系。例如一个Dom树，就是一个宿主树，Dom树中的一个<code>div</code>，就是一个宿主实例。</p>
+<p>宿主实例有自己的属性和方法，我们可以操作宿主方法做一些想做的事情，例如<code>appendChild</code>，<code>setAttribute</code>等等</p>
+<h4 id="React又是怎么利用宿主树和宿主实例的呢？"><a href="#React又是怎么利用宿主树和宿主实例的呢？" class="headerlink" title="React又是怎么利用宿主树和宿主实例的呢？"></a>React又是怎么利用宿主树和宿主实例的呢？</h4><p>在我看来，React的宿主树，是由其宿主实例构成的，而React的宿主实例，就是<strong>React元素</strong>，React元素是一个对象，与DOM树横向比对，大同小异，所以React再做UI渲染时，可以轻松的将其映射为对应的DOM元素，React经常帮我们做的，就是这个。</p>
+<p>React解放了我们直接操作宿主树和宿主实例，因为React帮我们做了这个事情。做这些事情的同时，React又保证了另外两个事情:</p>
+<ul>
+<li><strong>稳定性</strong>: 宿主树的稳定性</li>
+<li><strong>通用性</strong>：宿主树中的宿主实例单独抽出来，依旧不会改变其UI结构，达到可复用的状态</li>
+</ul>
+<h4 id="React操作宿主树和DOM有什么不同？"><a href="#React操作宿主树和DOM有什么不同？" class="headerlink" title="React操作宿主树和DOM有什么不同？"></a>React操作宿主树和DOM有什么不同？</h4><ul>
+<li>DOM会导致突变，直接操作宿主实例。在之后往里面增加或者删除子节点。宿主实例是完全可变的。</li>
+<li>React是通过克隆双亲树并始终替换掉顶级子树的宿主环境。</li>
+</ul>
+<h4 id="React的宿主实例——React元素"><a href="#React的宿主实例——React元素" class="headerlink" title="React的宿主实例——React元素"></a>React的宿主实例——React元素</h4><ul>
+<li>React的元素不是永远存在的，他总是在<strong>重建</strong>和<strong>删除</strong>之间循环</li>
+<li>你<strong>不能直接</strong>操作React元素(与DOM不同)，如果想改变，从头开始渲染</li>
+</ul>
+<h2 id="React渲染"><a href="#React渲染" class="headerlink" title="React渲染"></a>React渲染</h2><hr>
+<h3 id="ReactDOM-render"><a href="#ReactDOM-render" class="headerlink" title="ReactDOM.render"></a>ReactDOM.render</h3><h4 id="初次调用"><a href="#初次调用" class="headerlink" title="初次调用"></a>初次调用</h4><p>看以下一段代码</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">ReactDOM.render(</span><br><span class="line">  <span class="comment">// &#123; type: 'button', props: &#123; className: 'blue' &#125; &#125;</span></span><br><span class="line">  &lt;button className=<span class="string">"blue"</span> /&gt;,</span><br><span class="line">  <span class="built_in">document</span>.getElementById(<span class="string">'container'</span>)</span><br><span class="line">);</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>初始调用时，实际操作就是把你的宿主树转换成实际的dom树渲染</li>
+</ul>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 在 ReactDOM 渲染器内部（简化版）</span></span><br><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">createHostInstance</span>(<span class="params">reactElement</span>) </span>&#123;</span><br><span class="line">  <span class="keyword">let</span> domNode = <span class="built_in">document</span>.createElement(reactElement.type); <span class="comment">// 这里是button</span></span><br><span class="line">  domNode.className = reactElement.props.className; <span class="comment">// 这里是blue</span></span><br><span class="line">  <span class="keyword">return</span> domNode;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// 然后将其放进dom</span></span><br><span class="line">domContainer.appendChild(domNode);</span><br></pre></td></tr></table></figure>
+
+<h4 id="再次调用会如何做"><a href="#再次调用会如何做" class="headerlink" title="再次调用会如何做"></a>再次调用会如何做</h4><ul>
+<li>想必看过React文档的都知道，会进行比对，只对需要更新的一部分进行更新，下面贴了Dan文章里的两段代码，简述了React的过程。但实际比对算法要复杂的多</li>
+</ul>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line">ReactDOM.render(</span><br><span class="line">  &lt;button className=<span class="string">"blue"</span> /&gt;,</span><br><span class="line">  <span class="built_in">document</span>.getElementById(<span class="string">'container'</span>)</span><br><span class="line">);</span><br><span class="line"></span><br><span class="line"><span class="comment">// ... 之后 ...</span></span><br><span class="line"></span><br><span class="line"><span class="comment">// 应该替换掉 button 宿主实例吗？</span></span><br><span class="line"><span class="comment">// 还是在已有的 button 上更新属性？</span></span><br><span class="line">ReactDOM.render(</span><br><span class="line">  &lt;button className=<span class="string">"red"</span> /&gt;,</span><br><span class="line">  <span class="built_in">document</span>.getElementById(<span class="string">'container'</span>)</span><br><span class="line">);</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>React工作流程大致如下</li>
+</ul>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// let domNode = document.createElement('button');</span></span><br><span class="line"><span class="comment">// domNode.className = 'blue';</span></span><br><span class="line"><span class="comment">// domContainer.appendChild(domNode);</span></span><br><span class="line">ReactDOM.render(</span><br><span class="line">  &lt;button className=<span class="string">"blue"</span> /&gt;,</span><br><span class="line">  <span class="built_in">document</span>.getElementById(<span class="string">'container'</span>)</span><br><span class="line">);</span><br><span class="line"></span><br><span class="line"><span class="comment">// 能重用宿主实例吗？能！(button → button)</span></span><br><span class="line"><span class="comment">// domNode.className = 'red';</span></span><br><span class="line">ReactDOM.render(</span><br><span class="line">  &lt;button className=<span class="string">"red"</span> /&gt;,</span><br><span class="line">  <span class="built_in">document</span>.getElementById(<span class="string">'container'</span>)</span><br><span class="line">);</span><br><span class="line"></span><br><span class="line"><span class="comment">// 能重用宿主实例吗？不能！(button → p)</span></span><br><span class="line"><span class="comment">// domContainer.removeChild(domNode);</span></span><br><span class="line"><span class="comment">// domNode = document.createElement('p');</span></span><br><span class="line"><span class="comment">// domNode.textContent = 'Hello';</span></span><br><span class="line"><span class="comment">// domContainer.appendChild(domNode);</span></span><br><span class="line">ReactDOM.render(</span><br><span class="line">  &lt;p&gt;Hello&lt;<span class="regexp">/p&gt;,</span></span><br><span class="line"><span class="regexp">  document.getElementById('container')</span></span><br><span class="line"><span class="regexp">);</span></span><br><span class="line"><span class="regexp"></span></span><br><span class="line"><span class="regexp">/</span><span class="regexp">/ 能重用宿主实例吗？能！(p → p)</span></span><br><span class="line"><span class="regexp">/</span><span class="regexp">/ domNode.textContent = 'Goodbye';</span></span><br><span class="line"><span class="regexp">ReactDOM.render(</span></span><br><span class="line"><span class="regexp">  &lt;p&gt;Goodbye&lt;/</span>p&gt;,</span><br><span class="line">  <span class="built_in">document</span>.getElementById(<span class="string">'container'</span>)</span><br><span class="line">);</span><br></pre></td></tr></table></figure>
+
+<p>这里有个小注意点需要注意一下，当遇到条件语句时，React并不会重新创建元素，这依赖于元素的顺序，例如：这里的input始终在第二个</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">Form</span>(<span class="params">&#123; showMessage &#125;</span>) </span>&#123;</span><br><span class="line">  <span class="keyword">let</span> message = <span class="literal">null</span>;</span><br><span class="line">  <span class="keyword">if</span> (showMessage) &#123;</span><br><span class="line">    message = &#123;</span><br><span class="line">      type: <span class="string">'p'</span>,</span><br><span class="line">      props: &#123; <span class="attr">children</span>: <span class="string">'I was just added here!'</span> &#125;</span><br><span class="line">    &#125;;</span><br><span class="line">  &#125;</span><br><span class="line">  <span class="keyword">return</span> &#123;</span><br><span class="line">    type: <span class="string">'dialog'</span>,</span><br><span class="line">    props: &#123;</span><br><span class="line">      children: [</span><br><span class="line">        message,</span><br><span class="line">        &#123; <span class="attr">type</span>: <span class="string">'input'</span>, <span class="attr">props</span>: &#123;&#125; &#125;</span><br><span class="line">      ]</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>由上面的小注意点引申出，当遇到列表时，React会去比对元素，如果<strong>元素相同</strong>，那么<strong>直接复用</strong>。问题是，当我们遇到类似于商品列表时，商品列表往往各项都不相同，或者说一个列表中有几项相同，那么React该怎么办，如果还是按照顺序来，那每个元素都将被更新。</p>
+<p>这样导致的问题是，每个元素更新，消耗性能。同时，React会把类似于input这样的组件当时的值一并复用过来，导致潜在的bug。</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">ShoppingList</span>(<span class="params">&#123; list &#125;</span>) </span>&#123;</span><br><span class="line">  <span class="keyword">return</span> (</span><br><span class="line">    &lt;form&gt;</span><br><span class="line">      &#123;list.map(<span class="function"><span class="params">item</span> =&gt;</span> (</span><br><span class="line">        &lt;p&gt;</span><br><span class="line">          You bought &#123;item.name&#125;</span><br><span class="line">          &lt;br /&gt;</span><br><span class="line">          Enter how many <span class="keyword">do</span> you want: <span class="xml"><span class="tag">&lt;<span class="name">input</span> /&gt;</span></span></span><br><span class="line">        &lt;<span class="regexp">/p&gt;</span></span><br><span class="line"><span class="regexp">      ))&#125;</span></span><br><span class="line"><span class="regexp">    &lt;/</span>form&gt;</span><br><span class="line">  )</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>React将会以以下的形式更新：</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">for</span> (<span class="keyword">let</span> i = <span class="number">0</span>; i &lt; <span class="number">10</span>; i++) &#123;</span><br><span class="line">  <span class="keyword">let</span> pNode = formNode.childNodes[i];</span><br><span class="line">  <span class="keyword">let</span> textNode = pNode.firstChild;</span><br><span class="line">  textNode.textContent = <span class="string">'You bought '</span> + items[i].name;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>因此我们需要一个唯一标识key，来告诉React渲染前后元素是否是相同的。</li>
+</ul>
+<p><em>组件和元素大同小异，React也会递归组件，渲染想要的元素。组件首字母必须大写，为了让React区分，告诉它这是一个组件而不是一个dom元素</em></p>
+<p><em>补充两个小点</em></p>
+<ul>
+<li><p>什么是Hooks？</p>
+<ul>
+<li>其实Hooks是绑定组件局部状态的特性。</li>
+</ul>
+</li>
+<li><p>什么是局部状态</p>
+<ul>
+<li>局部状态是宿主实例相关的能拥有的状态，例如focus、selection等等。</li>
+</ul>
+</li>
+</ul>
+<h3 id="控制反转"><a href="#控制反转" class="headerlink" title="控制反转"></a>控制反转</h3><p>组件是函数，为什么不用函数调用，而用JSX的形式呢？</p>
+<ul>
+<li>我们自身调用函数，控制权在我们手里，用JSX的形式，React会为我们调用函数，这就是控制反转。使用控制反转有以下几个好处：<ul>
+<li><strong>组件 &gt; 函数</strong> React组件帮助我们维护了局部状态</li>
+<li><strong>组件参与协调</strong> 也就是说React调用组件，可以更了解宿主树的结构，便于进行比对</li>
+<li><strong>组件推迟协调</strong> 不会引起渲染导致的主线程阻塞</li>
+<li><strong>组件便于调试</strong> React提供了丰富的组件调试工具</li>
+<li><strong>组件可以懒加载</strong> 组件不会去执行不需要执行的东西，例如<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">Page</span>(<span class="params">&#123; currentUser, children &#125;</span>) </span>&#123;</span><br><span class="line">    <span class="keyword">if</span> (!currentUser.isLoggedIn) &#123;</span><br><span class="line">        <span class="keyword">return</span> <span class="xml"><span class="tag">&lt;<span class="name">h1</span>&gt;</span>Please login<span class="tag">&lt;/<span class="name">h1</span>&gt;</span></span>;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">return</span> (</span><br><span class="line">        &lt;Layout&gt;</span><br><span class="line">            &#123;children&#125;</span><br><span class="line">        &lt;<span class="regexp">/Layout&gt;</span></span><br><span class="line"><span class="regexp">    );</span></span><br><span class="line"><span class="regexp">&#125;</span></span><br><span class="line"><span class="regexp"></span></span><br><span class="line"><span class="regexp">/</span><span class="regexp">/ 这里有个地方调用组件</span></span><br><span class="line"><span class="regexp">&lt;Page&gt;</span></span><br><span class="line"><span class="regexp">    &#123;Comments()&#125; /</span><span class="regexp">/ 这个Comments函数无论是否登录永远都将执行</span></span><br><span class="line"><span class="regexp">&lt;/</span>Page&gt;</span><br><span class="line"></span><br><span class="line"><span class="comment">// 这里有个地方调用组件</span></span><br><span class="line">&lt;Page&gt;</span><br><span class="line">    &lt;Comments /&gt; <span class="comment">// 这个Comments组件</span></span><br><span class="line">&lt;<span class="regexp">/Page&gt;</span></span><br></pre></td></tr></table></figure>
+
+</li>
+</ul>
+</li>
+</ul>
+<h3 id="渲染阶段-React-Fiber-和提交阶段"><a href="#渲染阶段-React-Fiber-和提交阶段" class="headerlink" title="渲染阶段(React Fiber)和提交阶段"></a>渲染阶段(<code>React Fiber</code>)和提交阶段</h3><figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">ClickCounter</span> <span class="keyword">extends</span> <span class="title">React</span>.<span class="title">Component</span> </span>&#123;</span><br><span class="line">    <span class="keyword">constructor</span>(props) &#123;</span><br><span class="line">        <span class="keyword">super</span>(props);</span><br><span class="line">        <span class="keyword">this</span>.state = &#123;<span class="attr">count</span>: <span class="number">0</span>&#125;;</span><br><span class="line">        <span class="keyword">this</span>.handleClick = <span class="keyword">this</span>.handleClick.bind(<span class="keyword">this</span>);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    handleClick() &#123;</span><br><span class="line">        <span class="keyword">this</span>.setState(<span class="function">(<span class="params">state</span>) =&gt;</span> &#123;</span><br><span class="line">            <span class="keyword">return</span> &#123; <span class="attr">count</span>: state.count + <span class="number">1</span> &#125;;</span><br><span class="line">        &#125;);</span><br><span class="line">    &#125;</span><br><span class="line">    </span><br><span class="line">    componentDidUpdate() &#123;&#125;</span><br><span class="line"></span><br><span class="line">    render() &#123;</span><br><span class="line">        <span class="keyword">return</span> [</span><br><span class="line">            &lt;button key=<span class="string">"1"</span> onClick=&#123;<span class="keyword">this</span>.handleClick&#125;&gt;Update counter&lt;<span class="regexp">/button&gt;,</span></span><br><span class="line"><span class="regexp">            &lt;span key="2"&gt;&#123;this.state.count&#125;&lt;/</span>span&gt;</span><br><span class="line">        ]</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h4 id="React-Fiber"><a href="#React-Fiber" class="headerlink" title="React Fiber"></a>React Fiber</h4><p>什么是Fiber？为什么使用Fiber？看以下的图:</p>
+<p><img src="stack-reconciler" alt=""></p>
+<p><img src="Fiber-reconciler" alt=""></p>
+<p><code>React 16</code>版本之前，<code>React</code>完全通过<code>stack reconciler</code>进行比对(见图1)，这种比对会在<code>setState</code>进行后立即发生，会递归函数，当<code>vDom</code>遍历完成之后，得到对应的真实Dom的信息，并传递给<code>render</code>进行渲染。如果有大量的比对，那么会<strong>消耗过长的时间</strong>，浏览器线程此时被js代码所<strong>阻塞</strong>，如果遇到类似于动画效果，那么动画效果将被延迟执行，不仅如此，交互布局都将被阻塞，给用户的感觉就是卡顿的感觉。</p>
+<p><img src="stack-workflow" alt=""></p>
+<p>上述图片展示了<code>stack</code>工作时的内存情况，因此，<code>React</code>重写了其算法，使用了<code>Fiber</code>。</p>
+<h4 id="Schedule-调度"><a href="#Schedule-调度" class="headerlink" title="Schedule(调度)"></a>Schedule(调度)</h4><p>调度是什么？—— 调度就是调动，安排人力，车辆。(来自百度百科)</p>
+<p>我们已经知道<code>stack reconciler</code>模式的弊端，比对占用大量时间，阻塞了主线程。因此，我们需要有人安排，何时能够进行比对。这种调度是<code>Fiber reconciler</code>中的过程之一，如果浏览器主线程的优先级高，那么我们优先进行浏览器想要进行的操作。类似于下图。</p>
+<p><img src="Fiber-workflow" alt=""></p>
+<p>如上图所示，我们需要达成此目的，我们需要拆分我们的宿主树，拆分成一个个<strong>片段</strong>，以链表的形式，为每个节点添加一些必要的数据结构，来达成连续的片段。并且这些连续的片段可以被高优先级的任务随时中断。</p>
+<p>这样引发一个问题，真实<code>Dom</code>与我当前的<code>vDom</code>不一致(由于我可能已经更新了一些片段)，因此，调度过程中，我们必须保存我们的调度信息，除了当前正在比对的树(current树)。我们还需要维护一棵正在比对的树，这棵树保存的是已经比对过的片段(workInProgress树)。</p>
+<h5 id="怎么和浏览器进行通信，何时和浏览器进行通信呢"><a href="#怎么和浏览器进行通信，何时和浏览器进行通信呢" class="headerlink" title="怎么和浏览器进行通信，何时和浏览器进行通信呢?"></a>怎么和浏览器进行通信，何时和浏览器进行通信呢?</h5><p>客户端执行任务按帧来计算，通常执行帧在30~60帧之间。在两个执行帧之间的空闲时间，通常被用来进行调度，执行任务。</p>
+<p><img src="requestIdelCallback" alt=""></p>
+<p>如上图所示，浏览器可以在这两个空闲期之间执行<a href="https://developer.mozilla.org/zh-CN/docs/Web/API/Window/requestIdleCallback" target="_blank" rel="noopener"><code>requestIdleCallback</code></a>，浏览器同时也会传递给回调函数<code>deadline</code>相关的对象信息，如果说你这个<code>fiber node</code>执行时间过长，这个<code>fiber node</code>依旧会执行完才会去向浏览器征求意见，如果说你这个里面写了个死循环，那么页面将会卡死，通常一个<code>fiber node</code>不会超过16ms，超过了则将出现卡顿的情况。</p>
+<h4 id="一个例子"><a href="#一个例子" class="headerlink" title="一个例子"></a>一个例子</h4><blockquote>
+<p>这个例子借用React Conf 2017上Lin Clark的演讲(<a href="https://www.youtube.com/watch?v=ZCuYPiUIONs&list=PLb0IAmt7-GS3fZ46IGFirdqKTIxlws7e0&index=6&t=0s" target="_blank" rel="noopener">附上链接</a>)</p>
+</blockquote>
+<p>现在有一个列表，渲染一个<code>button</code>和一组<code>item</code>, <code>item</code>中包含一个<code>div</code>，其中的内容为数字。通过点击<code>button</code>，可以使列表中的所有数字进行平方。另外有一个按钮，点击可以调节字体大小。</p>
+<p><img src="demo-0" alt=""></p>
+<p>1.0 页面初始化完成，渲染一个<code>fiber tree</code>，如下图所示</p>
+<p><em>这里注意：每个<code>fiber node</code>，<code>child</code>指针指向的节点都为其直接子节点，至于其他子节点，将会由直接子节点的<code>sibling</code>指针指向，具体可见<code>fiber</code>数据结构，每个<code>fiber node</code>都向其父节点返回</em></p>
+<p><img src="demo-0.1" alt=""></p>
+<p>1.0.1 React同时维护用于计算更新，保存当前计算状态的树，称之为<code>workInProgressTree</code>，。</p>
+<p><img src="demo-0.2" alt=""></p>
+<p>1.1 用户点击平方操作，调用<code>setState</code>，<code>React</code>将其送入更新队列(<code>update queue</code>), 不会立即进行对比，修改<code>dom</code>，而是交给调度器(<code>scheduler</code>)</p>
+<p><img src="demo-0.3" alt=""></p>
+<p>1.2 调度器会去询问主线程的使用情况，上文已经描述了如何与浏览器进行通信，借用<code>requestIdelCallback</code>，根据优先级执行任务，低优先级通过<code>requestIdelCallback</code>，高优先级(动画)通过<code>requestAnimationFrame</code>执行。</p>
+<p><img src="requestIdelCallback" alt=""></p>
+<p>2.1 一旦调度器得到了时间，就开始进入了<code>work loop</code>，这种循环是等待与执行的循环，每次<code>fiber node</code><strong>执行完成</strong>才会去询问浏览器主线程状态，上文说了，通常是在16ms之内完成，否则会有卡顿情况，如果写了死循环，依旧会导致页面卡死的情况。在这个过程中，当前的<code>fiber node</code>需要记住下一个工作单元，如果浏览器有时间，那么我将进行下一个<code>fiber node</code>的任务执行</p>
+<p><img src="demo-1" alt=""></p>
+<p>2.2 根节点上的更新队列为空，所以直接从<code>fiber-tree</code>上将根节点复制到<code>workInProgressTree</code>中去。根节点中包含指向子节点<code>List</code>的指针。</p>
+<p><img src="demo-2" alt=""></p>
+<p>2.3 根节点根据child指针，将<code>List</code>节点和对应的更新队列一起放到<code>workInProgressTree</code>中，<code>List</code>插入后返回给父节点，标志着根节点<code>fiber node</code>处理完成</p>
+<p><img src="demo-3" alt=""></p>
+<p>2.4 重复1.2操作，询问主线程情况</p>
+<p><img src="demo-4" alt=""></p>
+<p>3.1 处理下一个<code>List</code>节点，进入<code>work loop</code>，因此此时<code>react</code>会调用<code>setState</code>时传入的<code>updater funciton</code>获取最新的state值，此时应该是<code>[1,4,9]</code></p>
+<ul>
+<li>在继续之前，我们简单回顾一下<code>setState</code>的前几步流程:<ul>
+<li>触发<code>setState</code>函数，将触发<code>setState</code>的<code>this</code>和<code>setState</code>的参数传入<code>enqueueSetState</code>函数中。</li>
+<li><code>enqueueSetState</code>函数，提出当前触发<code>setState</code>的<code>Fiber</code>节点并将传入的<code>setState</code>的参数创建一个<code>update</code>对象，<code>update</code>对象中的<code>payload</code>就是传入的<code>state</code>对象。</li>
+<li><code>enqueueUpdate</code>函数，将当前<code>Fiber</code>的<code>state</code>和需要修改的<code>state</code>创建一个对象传入当前<code>Fiber</code>节点的<code>updateQueue</code>对象中。<code>updateQueue</code>对象有几个关键值，<code>baseState</code>(当前<code>Fiber</code>节点的<code>state</code>)、<code>firstUpdate</code>(首个更新任务)、<code>lastUpdate</code>(最后一个更新任务，防止多次重复<code>setState</code>)。</li>
+</ul>
+</li>
+</ul>
+<p>在获取到最新的<code>state</code>值后，<code>react</code>会更新<code>List</code>的<code>state</code>和<code>props</code>值，并且根据<code>element</code>类型判断是否可重用，然后渲染到<code>workInProgress</code>树中，由于<code>List</code>组件有更新，因此我们需要将<code>List</code>打上标签，表明需要更新。</p>
+<p><img src="demo-5" alt=""></p>
+<p>3.2 重复1.2操作，询问主线程情况</p>
+<p><img src="demo-6" alt=""></p>
+<p>3.3 <code>button</code>没有子节点，也没有更新，因此直接标记<code>button</code>处理完成。</p>
+<p><img src="demo-7" alt=""></p>
+<p>3.4 重复1.2操作，询问主线程情况。由于我们点击了放大字体的操作，主线程已经有放大字体的操作在等待<code>fiber node</code>任务完成。</p>
+<p><img src="demo-8" alt=""></p>
+<p>3.5 对于每一个<code>item</code>,判断<code>shouldComponentUpdate</code>,如果不需要更新，那么我们像3.3中的<code>button</code>一样操作，如果需要更新，那么我们像3.1中的<code>List</code>一样操作，打需要更新的标签</p>
+<p><img src="demo-9" alt=""></p>
+<p>4.1 对于叶子节点<code>div</code>，无兄弟节点，更新操作也已结束，需要合并到父节点，才算<code>fiber node</code>完成。</p>
+<p><img src="demo-10" alt=""></p>
+<p>4.2 合并回到父节点，并移除标签，标记完成。</p>
+<p><img src="demo-11" alt=""></p>
+<p>4.3 重复1.2操作，询问主线程情况。现在有放大字体的操作在等待。因此交换主线程，放大字体。</p>
+<p><img src="demo-12" alt=""></p>
+<p>4.4 放大字体完成，<code>React</code>完成接下来的操作，形成一个完成的<code>workInProgress</code>树。</p>
+<p><img src="demo-13" alt=""></p>
+<p>4.5 那些更新的<code>item</code>向<code>List</code>返回, 标签列表如下</p>
+<p><img src="demo-14" alt=""></p>
+<p>4.6 所有节点标记完成后,<code>React</code>正式进入提交阶段,同样询问主线程,时间够用,更新<code>Dom</code></p>
+<p><img src="demo-15" alt=""></p>
+<p>4.7 更新完过后还需要交换指针</p>
+<p><img src="demo-16" alt=""></p>
+<h4 id="废除生命周期"><a href="#废除生命周期" class="headerlink" title="废除生命周期"></a>废除生命周期</h4><ul>
+<li>为什么<code>Fiber Reconciler</code>下, <code>React</code>要废除生命周期例如<code>componentWillUpdate</code>?</li>
+</ul>
+<p>我们通过刚刚<code>Fiber Reconciler</code>的过程我们看到, 这个过程是可以被高优先级例如动画所打断的, 我们初次调用<code>componentWillUpdate</code>, 结果我<code>Reconciler</code>到一半,被打断了, 当主线程又有时间的时候,我又要进行<code>componentWillUpdate</code>,显然是不合理的.</p>
+
+        </div>
+
+        
+            <section class="post-copyright">
+                
+                    <p class="copyright-item">
+                        <span>Author:</span>
+                        <span>王八吉吉</span>
+                    </p>
+                
+                
+                    <p class="copyright-item">
+                        <span>Permalink:</span>
+                        <span><a href="http://auglyxu.github.io/2020/08/02/React-UI-render/">http://auglyxu.github.io/2020/08/02/React-UI-render/</a></span>
+                    </p>
+                
+                
+                    <p class="copyright-item">
+                        <span>License:</span>
+                        <span>Copyright (c) 2019 <a href="http://creativecommons.org/licenses/by-nc/4.0/" target="_blank" rel="noopener">CC-BY-NC-4.0</a> LICENSE</span>
+                    </p>
+                
+                
+                     <p class="copyright-item">
+                         <span>Slogan:</span>
+                         <span>享受当下</span>
+                     </p>
+                
+
+            </section>
+        
+        <section class="post-tags">
+            <div>
+                <span>Tag(s):</span>
+                <span class="tag">
+                    
+                    
+                        <a href="/tags/%E5%89%8D%E7%AB%AF/"># 前端</a>
+                    
+                        <a href="/tags/React/"># React</a>
+                    
+                        
+                </span>
+            </div>
+            <div>
+                <a href="javascript:window.history.back();">back</a>
+                <span>· </span>
+                <a href="/">home</a>
+            </div>
+        </section>
+        <section class="post-nav">
+            
+                <a class="prev" rel="prev" href="/2020/08/02/Redux/">Redux</a>
+            
+            
+            <a class="next" rel="next" href="/2020/07/26/useEffect/">重学Hooks——useEffect</a>
+            
+        </section>
+
+
+    </article>
+</div>
+
+            </div>
+            <footer id="footer" class="footer">
+    <div class="copyright">
+        <span>© 王八吉吉 | Powered by <a href="https://hexo.io" target="_blank">Hexo</a> & <a href="https://github.com/Siricee/hexo-theme-Chic" target="_blank">Chic</a></span>
+    </div>
+</footer>
+
+    </div>
+</body>
+
+</html>

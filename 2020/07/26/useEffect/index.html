@@ -1,0 +1,607 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+    <meta charset="UTF-8">
+<meta name="viewport"
+      content="width=device-width, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+<meta http-equiv="X-UA-Compatible" content="ie=edge">
+
+    <meta name="author" content="王八吉吉">
+
+
+    <meta name="subtitle" content="前端小匠">
+
+
+    <meta name="description" content="专心学技术">
+
+
+    <meta name="keywords" content="前端">
+
+
+<title>重学Hooks——useEffect | Gaxy</title>
+
+
+
+    <link rel="icon" href="/favicon.png">
+
+
+
+
+    <!-- stylesheets list from _config.yml -->
+    
+    <link rel="stylesheet" href="/css/style.css">
+    
+
+
+
+    <!-- scripts list from _config.yml -->
+    
+    <script src="/js/script.js"></script>
+    
+    <script src="/js/tocbot.min.js"></script>
+    
+
+
+
+    
+    
+        
+    
+
+
+<meta name="generator" content="Hexo 4.2.1"></head>
+
+<body>
+    <script>
+        // this function is used to check current theme before page loaded.
+        (() => {
+            const currentTheme = window.localStorage && window.localStorage.getItem('theme') || '';
+            const isDark = currentTheme === 'dark';
+            const pagebody = document.getElementsByTagName('body')[0]
+            if (isDark) {
+                pagebody.classList.add('dark-theme');
+                // mobile
+                document.getElementById("mobile-toggle-theme").innerText = "· Dark"
+            } else {
+                pagebody.classList.remove('dark-theme');
+                // mobile
+                document.getElementById("mobile-toggle-theme").innerText = "· Light"
+            }
+        })();
+    </script>
+
+    <div class="wrapper">
+        <header>
+    <nav class="navbar">
+        <div class="container">
+            <div class="navbar-header header-logo"><a href="/">Gaxy</a></div>
+            <div class="menu navbar-right">
+                
+                    <a class="menu-item" href="/archives">归档</a>
+                
+                    <a class="menu-item" href="/category">分类</a>
+                
+                    <a class="menu-item" href="/tag">标签</a>
+                
+                    <a class="menu-item" href="/about">关于</a>
+                
+                <input id="switch_default" type="checkbox" class="switch_default">
+                <label for="switch_default" class="toggleBtn"></label>
+            </div>
+        </div>
+    </nav>
+
+    
+    <nav class="navbar-mobile" id="nav-mobile">
+        <div class="container">
+            <div class="navbar-header">
+                <div>
+                    <a href="/">Gaxy</a><a id="mobile-toggle-theme">·&nbsp;Light</a>
+                </div>
+                <div class="menu-toggle" onclick="mobileBtn()">&#9776; Menu</div>
+            </div>
+            <div class="menu" id="mobile-menu">
+                
+                    <a class="menu-item" href="/archives">归档</a>
+                
+                    <a class="menu-item" href="/category">分类</a>
+                
+                    <a class="menu-item" href="/tag">标签</a>
+                
+                    <a class="menu-item" href="/about">关于</a>
+                
+            </div>
+        </div>
+    </nav>
+
+</header>
+<script>
+    var mobileBtn = function f() {
+        var toggleMenu = document.getElementsByClassName("menu-toggle")[0];
+        var mobileMenu = document.getElementById("mobile-menu");
+        if(toggleMenu.classList.contains("active")){
+           toggleMenu.classList.remove("active")
+            mobileMenu.classList.remove("active")
+        }else{
+            toggleMenu.classList.add("active")
+            mobileMenu.classList.add("active")
+        }
+    }
+</script>
+            <div class="main">
+                <div class="container">
+    
+    
+        <div class="post-toc">
+    <div class="tocbot-list">
+    </div>
+    <div class="tocbot-list-menu">
+        <a class="tocbot-toc-expand" onclick="expand_toc()">Expand all</a>
+        <a onclick="go_top()">Back to top</a>
+        <a onclick="go_bottom()">Go to bottom</a>
+    </div>
+</div>
+
+<script>
+    var tocbot_timer;
+    var DEPTH_MAX = 6;    // 为 6 时展开所有
+    var tocbot_default_config = {
+        tocSelector: '.tocbot-list',
+        contentSelector: '.post-content',
+        headingSelector: 'h1, h2, h3, h4, h5',
+        orderedList: false,
+        scrollSmooth: true,
+        onClick: extend_click,
+    };
+
+    function extend_click() {
+        clearTimeout(tocbot_timer);
+        tocbot_timer = setTimeout(function () {
+            tocbot.refresh(obj_merge(tocbot_default_config, { hasInnerContainers: true }));
+        }, 420); // 这个值是由 tocbot 源码里定义的 scrollSmoothDuration 得来的
+    }
+
+    document.ready(function () {
+        tocbot.init(obj_merge(tocbot_default_config, { collapseDepth: 1 }));
+    });
+
+    function expandToc() {
+        var b = document.querySelector('.tocbot-toc-expand');
+        var expanded = b.getAttribute('data-expanded');
+        expanded ? b.removeAttribute('data-expanded') : b.setAttribute('data-expanded', true);
+        tocbot.refresh(obj_merge(tocbot_default_config, { collapseDepth: expanded ? 1 : DEPTH_MAX }));
+        b.innerText = expanded ? 'Expand all' : 'Collapse all';
+    }
+
+    function go_top() {
+        window.scrollTo(0, 0);
+    }
+
+    function go_bottom() {
+        window.scrollTo(0, document.body.scrollHeight);
+    }
+
+    function obj_merge(target, source) {
+        for (var item in source) {
+            if (source.hasOwnProperty(item)) {
+                target[item] = source[item];
+            }
+        }
+        return target;
+    }
+</script>
+    
+
+    
+    <article class="post-wrap">
+        <header class="post-header">
+            <h1 class="post-title">重学Hooks——useEffect</h1>
+            
+                <div class="post-meta">
+                    
+                        Author: <a itemprop="author" rel="author" href="/">王八吉吉</a>
+                    
+
+                    
+                        <span class="post-time">
+                        Date: <a href="#">七月 26, 2020&nbsp;&nbsp;14:50:00</a>
+                        </span>
+                    
+                    
+                        <span class="post-category">
+                    Category:
+                            
+                                <a href="/category/React/">React</a>
+                            
+                        </span>
+                    
+                </div>
+            
+        </header>
+
+        <div class="post-content">
+            <blockquote>
+<p>Dan在OverReact上发表的文章深入浅出，本文只针对个人之前不理解的点进行思考，采用了他的案例，参考了他的文章——<a href="https://overreacted.io/zh-hans/a-complete-guide-to-useeffect/" target="_blank" rel="noopener">useEffect的完整指南</a>.</p>
+</blockquote>
+<p>在我看来，Effect hook是React Hooks中最强大最核心的一个hook，是驱动整个程序的纽带我也将采用Dan的案例进行思考</p>
+<hr>
+<ul>
+<li>根据文章问题，进行思考后，抛出了以下几个问题，将在下文对这几个问题做详细的思考<ol>
+<li>Effect是如何进行渲染的?</li>
+<li>如何用Effect模拟React的生命周期？<code>useEffect(fn,[])</code>和<code>componentDidMount</code>一样吗？</li>
+<li>如何正确的使用Effect请求数据？</li>
+<li>Effect的依赖到底用什么，可以用函数嘛，什么时候用函数作为依赖？</li>
+<li>Effect Hook怎么会导致死循环？</li>
+<li>Effect Hook怎么会拿到旧state和props，如果我真的想用旧的state和props，我应该怎么去获取？</li>
+</ol>
+</li>
+</ul>
+<a id="more"></a>
+
+<h2 id="Effect到底是如何渲染的"><a href="#Effect到底是如何渲染的" class="headerlink" title="Effect到底是如何渲染的?"></a>Effect到底是如何渲染的?</h2><h3 id="渲染中state的渲染"><a href="#渲染中state的渲染" class="headerlink" title="渲染中state的渲染"></a>渲染中state的渲染</h3><ul>
+<li>以下是最简单的点击次数加一的事件， 分析一下点击后数字的改变</li>
+</ul>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">Counter</span>(<span class="params"></span>) </span>&#123;</span><br><span class="line">  <span class="keyword">const</span> [count, setCount] = useState(<span class="number">0</span>);</span><br><span class="line"></span><br><span class="line">  <span class="keyword">return</span> (</span><br><span class="line">    &lt;div&gt;</span><br><span class="line">      &lt;p&gt;You clicked &#123;count&#125; times&lt;<span class="regexp">/p&gt;</span></span><br><span class="line"><span class="regexp">      &lt;button onClick=&#123;() =&gt; setCount(count + 1)&#125;&gt;</span></span><br><span class="line"><span class="regexp">        Click me</span></span><br><span class="line"><span class="regexp">      &lt;/</span>button&gt;</span><br><span class="line">    &lt;<span class="regexp">/div&gt;</span></span><br><span class="line"><span class="regexp">  );</span></span><br><span class="line"><span class="regexp">&#125;</span></span><br></pre></td></tr></table></figure>
+<p>以下展示了count改变的来源，并非是通过事件监听或是事件绑定或是代理等对count本身做出的改变，而是<strong>重新创建了一个count</strong>， 新创建的count值是最后一次改变的state中的count.</p>
+<table>
+<thead>
+<tr>
+<th>点击次数</th>
+<th>值</th>
+<th>count来源</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>0</td>
+<td>0</td>
+<td>useState默认值</td>
+</tr>
+<tr>
+<td>1</td>
+<td>1</td>
+<td>上一个useState的返回值</td>
+</tr>
+<tr>
+<td>2</td>
+<td>2</td>
+<td>上一个useState的返回值</td>
+</tr>
+</tbody></table>
+<p>代码体现则是如下</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// During first render</span></span><br><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">Counter</span>(<span class="params"></span>) </span>&#123;</span><br><span class="line">  <span class="keyword">const</span> count = <span class="number">0</span>; <span class="comment">// Returned by useState()</span></span><br><span class="line">  <span class="comment">// ...</span></span><br><span class="line">  &lt;p&gt;You clicked &#123;count&#125; times&lt;<span class="regexp">/p&gt;</span></span><br><span class="line"><span class="regexp">  /</span><span class="regexp">/ ...</span></span><br><span class="line"><span class="regexp">&#125;</span></span><br><span class="line"><span class="regexp"></span></span><br><span class="line"><span class="regexp">/</span><span class="regexp">/ After a click, our function is called again</span></span><br><span class="line"><span class="regexp">function Counter() &#123;</span></span><br><span class="line"><span class="regexp">  const count = 1; /</span><span class="regexp">/ Returned by useState()</span></span><br><span class="line"><span class="regexp">  /</span><span class="regexp">/ ...</span></span><br><span class="line"><span class="regexp">  &lt;p&gt;You clicked &#123;count&#125; times&lt;/</span>p&gt;</span><br><span class="line">  <span class="comment">// ...</span></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// After another click, our function is called again</span></span><br><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">Counter</span>(<span class="params"></span>) </span>&#123;</span><br><span class="line">  <span class="keyword">const</span> count = <span class="number">2</span>; <span class="comment">// Returned by useState()</span></span><br><span class="line">  <span class="comment">// ...</span></span><br><span class="line">  &lt;p&gt;You clicked &#123;count&#125; times&lt;<span class="regexp">/p&gt;</span></span><br><span class="line"><span class="regexp">  /</span><span class="regexp">/ ...</span></span><br><span class="line"><span class="regexp">&#125;</span></span><br></pre></td></tr></table></figure>
+<ul>
+<li>因此发现，其实count只是一个常量，React在使用<code>setCount</code>后，带着一个新count再次调用组件!<blockquote>
+<p>至于更深入的研究，还未研究过，准备参考Dan的另一篇文章<a href="https://overreacted.io/zh-hans/react-as-a-ui-runtime/" target="_blank" rel="noopener">将 React 作为 UI 运行时</a></p>
+</blockquote>
+</li>
+</ul>
+<!--more-->
+
+<h3 id="渲染中事件处理函数的渲染"><a href="#渲染中事件处理函数的渲染" class="headerlink" title="渲染中事件处理函数的渲染"></a>渲染中事件处理函数的渲染</h3><figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">Counter</span>(<span class="params"></span>) </span>&#123;</span><br><span class="line">  <span class="keyword">const</span> [count, setCount] = useState(<span class="number">0</span>);</span><br><span class="line"></span><br><span class="line">  <span class="function"><span class="keyword">function</span> <span class="title">handleAlertClick</span>(<span class="params"></span>) </span>&#123;</span><br><span class="line">    setTimeout(<span class="function"><span class="params">()</span> =&gt;</span> &#123;</span><br><span class="line">      alert(<span class="string">'You clicked on: '</span> + count);</span><br><span class="line">    &#125;, <span class="number">3000</span>);</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  <span class="keyword">return</span> (</span><br><span class="line">    &lt;div&gt;</span><br><span class="line">      &lt;p&gt;You clicked &#123;count&#125; times&lt;<span class="regexp">/p&gt;</span></span><br><span class="line"><span class="regexp">      &lt;button onClick=&#123;() =&gt; setCount(count + 1)&#125;&gt;</span></span><br><span class="line"><span class="regexp">        Click me</span></span><br><span class="line"><span class="regexp">      &lt;/</span>button&gt;</span><br><span class="line">      &lt;button onClick=&#123;handleAlertClick&#125;&gt;</span><br><span class="line">        Show alert</span><br><span class="line">      &lt;<span class="regexp">/button&gt;</span></span><br><span class="line"><span class="regexp">    &lt;/</span>div&gt;</span><br><span class="line">  );</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<ul>
+<li>我们按照以下步骤做<ol>
+<li>我先点击到按钮，使count到达1</li>
+<li>点击show alert，再3秒内迅速点击按钮使count到3</li>
+<li>观察alert的值， 值为1 or 3 ?? </li>
+</ol>
+</li>
+</ul>
+<p><a href="https://codesandbox.io/s/w2wxl3yo0l" target="_blank" rel="noopener">点我操作，看看到底是个啥</a></p>
+<ul>
+<li>根据上文，以下展示了这个调用的情况</li>
+</ul>
+<table>
+<thead>
+<tr>
+<th>是否点击alert</th>
+<th>此时点击次数</th>
+<th>值</th>
+<th>count来源</th>
+<th>handleAlertClick</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>否</td>
+<td>0</td>
+<td>0</td>
+<td>useState默认值</td>
+<td>handleAlertClick中的count取0</td>
+</tr>
+<tr>
+<td>否</td>
+<td>1</td>
+<td>1</td>
+<td>上一个useState的返回值</td>
+<td>handleAlertClick中的count取1</td>
+</tr>
+<tr>
+<td>是</td>
+<td>1</td>
+<td>1</td>
+<td>上一个useState的返回值</td>
+<td>handleAlertClick中的count取1</td>
+</tr>
+<tr>
+<td>否</td>
+<td>2</td>
+<td>2</td>
+<td>上一个useState的返回值</td>
+<td>handleAlertClick中的count取2</td>
+</tr>
+<tr>
+<td>否</td>
+<td>3</td>
+<td>3</td>
+<td>上一个useState的返回值</td>
+<td>handleAlertClick中的count取3</td>
+</tr>
+<tr>
+<td>alert弹出</td>
+<td>…</td>
+<td>…</td>
+<td>…</td>
+<td>弹出表格对应的第三行的handleAlertClick</td>
+</tr>
+</tbody></table>
+<ul>
+<li>我们发现，每次调用的count和handleAlertClick，都是<strong>重新创建的<code>count</code>和<code>handleAlertClick</code></strong>，每次重新渲染组件，上一次的栈内存都将被释放。由于闭包，第一次的count并未被释放，而handleAlertClick被存放在了任务队列，记录的是没有被释放的count，哪怕点到了3，与之前的也没有任何关系，每次渲染都是<strong>独立</strong>的，因此值是1。</li>
+</ul>
+<p><em>每次渲染的state和props在渲染中是不会被改变的，因此每次渲染都是独立的，每次渲染的state和props都是不同的state和props。这种独立关系，再修改引用类型时，希望我们<code>setObject(newObject)</code>，这样可以保证上一个state不被污染</em></p>
+<h4 id="问题1：Effect清理与浏览器渲染屏幕的执行顺序是什么样的呢？"><a href="#问题1：Effect清理与浏览器渲染屏幕的执行顺序是什么样的呢？" class="headerlink" title="问题1：Effect清理与浏览器渲染屏幕的执行顺序是什么样的呢？"></a>问题1：Effect清理与浏览器渲染屏幕的执行顺序是什么样的呢？</h4><figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// First render, props are &#123;id: 10&#125;</span></span><br><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">Example</span>(<span class="params"></span>) </span>&#123;</span><br><span class="line">  <span class="comment">// ...</span></span><br><span class="line">  useEffect(</span><br><span class="line">    <span class="comment">// Effect from first render</span></span><br><span class="line">    () =&gt; &#123;</span><br><span class="line">      ChatAPI.subscribeToFriendStatus(<span class="number">10</span>, handleStatusChange);</span><br><span class="line">      <span class="comment">// Cleanup for effect from first render</span></span><br><span class="line">      <span class="keyword">return</span> <span class="function"><span class="params">()</span> =&gt;</span> &#123;</span><br><span class="line">        ChatAPI.unsubscribeFromFriendStatus(<span class="number">10</span>, handleStatusChange);</span><br><span class="line">      &#125;;</span><br><span class="line">    &#125;</span><br><span class="line">  );</span><br><span class="line">  <span class="comment">// ...</span></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// Next render, props are &#123;id: 20&#125;</span></span><br><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">Example</span>(<span class="params"></span>) </span>&#123;</span><br><span class="line">  <span class="comment">// ...</span></span><br><span class="line">  useEffect(</span><br><span class="line">    <span class="comment">// Effect from second render</span></span><br><span class="line">    () =&gt; &#123;</span><br><span class="line">      ChatAPI.subscribeToFriendStatus(<span class="number">20</span>, handleStatusChange);</span><br><span class="line">      <span class="comment">// Cleanup for effect from second render</span></span><br><span class="line">      <span class="keyword">return</span> <span class="function"><span class="params">()</span> =&gt;</span> &#123;</span><br><span class="line">        ChatAPI.unsubscribeFromFriendStatus(<span class="number">20</span>, handleStatusChange);</span><br><span class="line">      &#125;;</span><br><span class="line">    &#125;</span><br><span class="line">  );</span><br><span class="line">  <span class="comment">// ...</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>按照常理的逻辑，是这个顺序吗？？？？？？？</p>
+<table>
+<thead>
+<tr>
+<th>次数</th>
+<th>操作</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>1</td>
+<td>渲染props.id为10的UI</td>
+</tr>
+<tr>
+<td>2</td>
+<td>执行Effect，订阅数据</td>
+</tr>
+<tr>
+<td>3</td>
+<td>清除id为10的Effect</td>
+</tr>
+<tr>
+<td>4</td>
+<td>渲染props.id为20的UI</td>
+</tr>
+<tr>
+<td>5</td>
+<td>执行Effect，订阅数据</td>
+</tr>
+<tr>
+<td>yes？？？？</td>
+<td></td>
+</tr>
+<tr>
+<td><strong>No</strong></td>
+<td></td>
+</tr>
+</tbody></table>
+<p>结果应该是如下的</p>
+<table>
+<thead>
+<tr>
+<th>次数</th>
+<th>操作</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>1</td>
+<td>渲染props.id为10的UI</td>
+</tr>
+<tr>
+<td>2</td>
+<td>执行Effect，订阅数据</td>
+</tr>
+<tr>
+<td>3</td>
+<td>渲染props.id为20的UI</td>
+</tr>
+<tr>
+<td>4</td>
+<td>清除id为10的Effect</td>
+</tr>
+<tr>
+<td>5</td>
+<td>执行Effect，订阅数据</td>
+</tr>
+</tbody></table>
+<p>因为Effect的执行一定是放在<strong>浏览器渲染屏幕</strong>之后的！因为每次渲染都是独立的，上一个Effect只能记住id为10的状态，因此，effect的清除并不会读取<strong>最新</strong>的<code>props</code>。它只能读取到定义它的那次渲染中的<code>props</code>值。</p>
+<h4 id="问题2：每次渲染的Effect都是不同的Effect嘛？那么Effect中的state和外部state是什么关系？"><a href="#问题2：每次渲染的Effect都是不同的Effect嘛？那么Effect中的state和外部state是什么关系？" class="headerlink" title="问题2：每次渲染的Effect都是不同的Effect嘛？那么Effect中的state和外部state是什么关系？"></a>问题2：每次渲染的Effect都是不同的Effect嘛？那么Effect中的state和外部state是什么关系？</h4><p><strong>每次渲染的Effect都是不同的Effect</strong><br><strong>Effect中的state和props，都是特定的那次渲染的state和props</strong></p>
+<h5 id="React执行Effect的时机是什么？"><a href="#React执行Effect的时机是什么？" class="headerlink" title="React执行Effect的时机是什么？"></a>React执行Effect的时机是什么？</h5><figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">Counter</span>(<span class="params"></span>) </span>&#123;</span><br><span class="line">  <span class="keyword">const</span> [count, setCount] = useState(<span class="number">0</span>);</span><br><span class="line">    <span class="comment">// console.log('effect外部被执行了')</span></span><br><span class="line">    useEffect(<span class="function"><span class="params">()</span> =&gt;</span> &#123;</span><br><span class="line">        <span class="comment">// console.log('effect内部被执行了')</span></span><br><span class="line">        <span class="built_in">document</span>.title = count</span><br><span class="line">    &#125;)</span><br><span class="line">  <span class="keyword">return</span> (</span><br><span class="line">    &lt;div&gt;</span><br><span class="line">      &lt;p&gt;You clicked &#123;count&#125; times&lt;<span class="regexp">/p&gt;</span></span><br><span class="line"><span class="regexp">      &lt;button onClick=&#123;() =&gt; setCount(count + 1)&#125;&gt;</span></span><br><span class="line"><span class="regexp">        Click me</span></span><br><span class="line"><span class="regexp">      &lt;/</span>button&gt;</span><br><span class="line">    &lt;<span class="regexp">/div&gt;</span></span><br><span class="line"><span class="regexp">  );</span></span><br><span class="line"><span class="regexp">&#125;</span></span><br></pre></td></tr></table></figure>
+<ul>
+<li>执行顺序如下<ol>
+<li>执行<code>const [count, setCount] = useState(0);</code></li>
+<li>React记住Effect</li>
+<li><strong>渲染dom</strong></li>
+<li>调用<code>document.title = count</code></li>
+</ol>
+</li>
+<li>因此我们要记住，<strong>Effect是在每次更改作用于DOM并让<em>浏览器绘制屏幕后</em>去调用它</strong></li>
+</ul>
+<h3 id="Effect中的异步"><a href="#Effect中的异步" class="headerlink" title="Effect中的异步"></a>Effect中的异步</h3><p>针对同步的情况，已经了解的差不多了，那么如果Effect中有延迟呢？</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">Counter</span>(<span class="params"></span>) </span>&#123;</span><br><span class="line">  <span class="keyword">const</span> [count, setCount] = useState(<span class="number">0</span>);</span><br><span class="line"></span><br><span class="line">  useEffect(<span class="function"><span class="params">()</span> =&gt;</span> &#123;</span><br><span class="line">    setTimeout(<span class="function"><span class="params">()</span> =&gt;</span> &#123;</span><br><span class="line">      <span class="built_in">console</span>.log(<span class="string">`You clicked <span class="subst">$&#123;count&#125;</span> times`</span>);</span><br><span class="line">    &#125;, <span class="number">3000</span>);</span><br><span class="line">  &#125;);</span><br><span class="line"></span><br><span class="line">  <span class="keyword">return</span> (</span><br><span class="line">    &lt;div&gt;</span><br><span class="line">      &lt;p&gt;You clicked &#123;count&#125; times&lt;<span class="regexp">/p&gt;</span></span><br><span class="line"><span class="regexp">      &lt;button onClick=&#123;() =&gt; setCount(count + 1)&#125;&gt;</span></span><br><span class="line"><span class="regexp">        Click me</span></span><br><span class="line"><span class="regexp">      &lt;/</span>button&gt;</span><br><span class="line">    &lt;<span class="regexp">/div&gt;</span></span><br><span class="line"><span class="regexp">  );</span></span><br><span class="line"><span class="regexp">&#125;</span></span><br></pre></td></tr></table></figure>
+<p>假如我点击三次，将会打印什么，结论如下，原因很简单，因为每一个Effect中保存的是当前的count</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">You clicked 0 times</span><br><span class="line">You clicked 1 times</span><br><span class="line">You clicked 2 times</span><br><span class="line">You clicked 3 times</span><br></pre></td></tr></table></figure>
+
+<p>但是！上述工作机制与类并不相同，hooks写法中，每一个count是独立的，类写法中，将会输出一次<code>you clicked 0 times</code>和3次<code>you clicked 3 times</code>，原因是因为类写法中的count是同一个count</p>
+<p><em>这原来就是困扰我好久好久的Effect中的闭包啊</em></p>
+<h4 id="问题来了，如果我就想打印3次you-clicked-3-times怎么办"><a href="#问题来了，如果我就想打印3次you-clicked-3-times怎么办" class="headerlink" title="问题来了，如果我就想打印3次you clicked 3 times怎么办"></a>问题来了，如果我就想打印3次<code>you clicked 3 times</code>怎么办</h4><h5 id="ref登场"><a href="#ref登场" class="headerlink" title="ref登场"></a>ref登场</h5><ul>
+<li>不同于class中的ref，hooks中的ref不仅可以保存dom元素，他可以作为<strong>任何值</strong>的容器<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">Example</span>(<span class="params"></span>) </span>&#123;</span><br><span class="line">  <span class="keyword">const</span> [count, setCount] = useState(<span class="number">0</span>);</span><br><span class="line">  <span class="keyword">const</span> latestCount = useRef(count);</span><br><span class="line"></span><br><span class="line">  useEffect(<span class="function"><span class="params">()</span> =&gt;</span> &#123;</span><br><span class="line">    <span class="comment">// Set the mutable latest value</span></span><br><span class="line">    latestCount.current = count;</span><br><span class="line">    setTimeout(<span class="function"><span class="params">()</span> =&gt;</span> &#123;</span><br><span class="line">      <span class="comment">// Read the mutable latest value</span></span><br><span class="line">      <span class="built_in">console</span>.log(<span class="string">`You clicked <span class="subst">$&#123;latestCount.current&#125;</span> times`</span>);</span><br><span class="line">    &#125;, <span class="number">3000</span>);</span><br><span class="line">  &#125;);</span><br></pre></td></tr></table></figure></li>
+<li>ok，这样就搞定啦，官网说了， <code>useRef</code>返回的对象，在<strong>整个生命周期内</strong>保持不变，因此不用担心每次创建的都是新的ref，这样我Effect函数中改变的ref内的容器值，都是同一个。</li>
+<li>文章上半部分已经可以解决我们开篇提到的1、2、5、6三个问题<h2 id="Effect到底是怎么更新的？"><a href="#Effect到底是怎么更新的？" class="headerlink" title="Effect到底是怎么更新的？"></a>Effect到底是怎么更新的？</h2></li>
+</ul>
+<hr>
+<h3 id="告诉React你要做什么样的比对"><a href="#告诉React你要做什么样的比对" class="headerlink" title="告诉React你要做什么样的比对"></a>告诉React你要做什么样的比对</h3><ul>
+<li>我想关于这个依赖项，React文档做了更详尽的阐述。这里只拎几个点出来</li>
+</ul>
+<h4 id="类似于setState的函数式更新"><a href="#类似于setState的函数式更新" class="headerlink" title="类似于setState的函数式更新"></a>类似于setState的函数式更新</h4><figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">Counter</span>(<span class="params"></span>) </span>&#123;</span><br><span class="line">  <span class="keyword">const</span> [count, setCount] = useState(<span class="number">0</span>);</span><br><span class="line"></span><br><span class="line">  useEffect(<span class="function"><span class="params">()</span> =&gt;</span> &#123;</span><br><span class="line">    <span class="keyword">const</span> id = setInterval(<span class="function"><span class="params">()</span> =&gt;</span> &#123;</span><br><span class="line">      setCount(count + <span class="number">1</span>);</span><br><span class="line">    &#125;, <span class="number">1000</span>);</span><br><span class="line">    <span class="keyword">return</span> <span class="function"><span class="params">()</span> =&gt;</span> clearInterval(id);</span><br><span class="line">  &#125;, []);</span><br><span class="line"></span><br><span class="line">  <span class="keyword">return</span> <span class="xml"><span class="tag">&lt;<span class="name">h1</span>&gt;</span>&#123;count&#125;<span class="tag">&lt;/<span class="name">h1</span>&gt;</span></span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<ul>
+<li>由于每次渲染都是独立的，我们知道，这里count永远都是1</li>
+<li>解决方案如下：<ul>
+<li>1、设置count作为依赖项<ul>
+<li>虽然解决了问题，但是非常不好，代码如下，原因是因为每次修改count，都将重新生成一个定时器，useEffect都会被重新执行，这显然不是我们想要的结果</li>
+</ul>
+</li>
+<li>2、函数式更新<ul>
+<li>比较理想的解决方案</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 设置count为依赖项</span></span><br><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">Counter</span>(<span class="params"></span>) </span>&#123;</span><br><span class="line">  <span class="keyword">const</span> [count, setCount] = useState(<span class="number">0</span>);</span><br><span class="line"></span><br><span class="line">  useEffect(<span class="function"><span class="params">()</span> =&gt;</span> &#123;</span><br><span class="line">    <span class="keyword">const</span> id = setInterval(<span class="function"><span class="params">()</span> =&gt;</span> &#123;</span><br><span class="line">      setCount(count + <span class="number">1</span>);</span><br><span class="line">    &#125;, <span class="number">1000</span>);</span><br><span class="line">    <span class="keyword">return</span> <span class="function"><span class="params">()</span> =&gt;</span> clearInterval(id);</span><br><span class="line">  &#125;, [count]);</span><br><span class="line"></span><br><span class="line">  <span class="keyword">return</span> <span class="xml"><span class="tag">&lt;<span class="name">h1</span>&gt;</span>&#123;count&#125;<span class="tag">&lt;/<span class="name">h1</span>&gt;</span></span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 函数式更新</span></span><br><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">Counter</span>(<span class="params"></span>) </span>&#123;</span><br><span class="line">  <span class="keyword">const</span> [count, setCount] = useState(<span class="number">0</span>);</span><br><span class="line"></span><br><span class="line">  useEffect(<span class="function"><span class="params">()</span> =&gt;</span> &#123;</span><br><span class="line">    <span class="keyword">const</span> id = setInterval(<span class="function"><span class="params">()</span> =&gt;</span> &#123;</span><br><span class="line">      setCount(<span class="function"><span class="params">c</span> =&gt;</span> c + <span class="number">1</span>);</span><br><span class="line">    &#125;, <span class="number">1000</span>);</span><br><span class="line">    <span class="keyword">return</span> <span class="function"><span class="params">()</span> =&gt;</span> clearInterval(id);</span><br><span class="line">  &#125;, []);</span><br><span class="line"></span><br><span class="line">  <span class="keyword">return</span> <span class="xml"><span class="tag">&lt;<span class="name">h1</span>&gt;</span>&#123;count&#125;<span class="tag">&lt;/<span class="name">h1</span>&gt;</span></span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<ul>
+<li>这种函数式更新，无需知道count的值，React已经知道，并将最新的count传递进去。成功将依赖项count移除</li>
+</ul>
+<p><strong>但是</strong></p>
+<p>我不仅想要知道最新的count，我还想要知道最新的<code>props</code>或是其他的<code>state</code>。。（函数式更新凉凉）</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">Counter</span>(<span class="params"></span>) </span>&#123;</span><br><span class="line">  <span class="keyword">const</span> [count, setCount] = useState(<span class="number">0</span>);</span><br><span class="line">  <span class="keyword">const</span> [step, setStep] = useState(<span class="number">1</span>);</span><br><span class="line"></span><br><span class="line">  useEffect(<span class="function"><span class="params">()</span> =&gt;</span> &#123;</span><br><span class="line">    <span class="keyword">const</span> id = setInterval(<span class="function"><span class="params">()</span> =&gt;</span> &#123;</span><br><span class="line">      setCount(<span class="function"><span class="params">c</span> =&gt;</span> c + step);</span><br><span class="line">    &#125;, <span class="number">1000</span>);</span><br><span class="line">    <span class="keyword">return</span> <span class="function"><span class="params">()</span> =&gt;</span> clearInterval(id);</span><br><span class="line">  &#125;, [step]);</span><br><span class="line"></span><br><span class="line">  <span class="keyword">return</span> (</span><br><span class="line">    &lt;&gt;</span><br><span class="line">      &lt;h1&gt;&#123;count&#125;&lt;<span class="regexp">/h1&gt;</span></span><br><span class="line"><span class="regexp">      &lt;input value=&#123;step&#125; onChange=&#123;e =&gt; setStep(Number(e.target.value))&#125; /</span>&gt;</span><br><span class="line">    &lt;<span class="regexp">/&gt;</span></span><br><span class="line"><span class="regexp">  );</span></span><br><span class="line"><span class="regexp">&#125;</span></span><br></pre></td></tr></table></figure>
+<p>炸了，不是我们想要的</p>
+<h3 id="useReducer"><a href="#useReducer" class="headerlink" title="useReducer"></a>useReducer</h3><ul>
+<li>首先我们要知道，什么时候用这个useReducer？这里引用了React文档的内容。<blockquote>
+<p>在某些场景下，<code>useReducer</code> 会比 <code>useState</code> 更适用，例如 <code>state</code> <strong>逻辑较复杂</strong>且包含多个子值，或者<strong>下一个 <code>state</code> 依赖于之前的 <code>state</code></strong> 等。并且，使用 useReducer 还能给那些会触发深更新的组件做性能优化，因为你可以向子组件传递 dispatch 而不是回调函数。</p>
+</blockquote>
+</li>
+</ul>
+<p>这里默认已经会Redux了。</p>
+<ul>
+<li>关键点：<ul>
+<li><ol>
+<li>逻辑复杂</li>
+</ol>
+</li>
+<li><ol start="2">
+<li><strong>状态依赖</strong></li>
+</ol>
+</li>
+<li><ol start="3">
+<li>嵌套深的组件性能优化<br>其中第二点就是我们说的那一点，因此上面的案例可以改写为:</li>
+</ol>
+</li>
+</ul>
+</li>
+</ul>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">Counter</span>(<span class="params"></span>) </span>&#123;</span><br><span class="line">  <span class="keyword">const</span> [state, dispatch] = useReducer(reducer, initialState);</span><br><span class="line">  <span class="keyword">const</span> &#123; count, step &#125; = state;</span><br><span class="line"></span><br><span class="line">  useEffect(<span class="function"><span class="params">()</span> =&gt;</span> &#123;</span><br><span class="line">    <span class="keyword">const</span> id = setInterval(<span class="function"><span class="params">()</span> =&gt;</span> &#123;</span><br><span class="line">      dispatch(&#123; <span class="attr">type</span>: <span class="string">'tick'</span> &#125;);</span><br><span class="line">    &#125;, <span class="number">1000</span>);</span><br><span class="line">    <span class="keyword">return</span> <span class="function"><span class="params">()</span> =&gt;</span> clearInterval(id);</span><br><span class="line">  &#125;, [dispatch]);</span><br><span class="line"></span><br><span class="line">  <span class="keyword">return</span> (</span><br><span class="line">    &lt;&gt;</span><br><span class="line">      &lt;h1&gt;&#123;count&#125;&lt;<span class="regexp">/h1&gt;</span></span><br><span class="line"><span class="regexp">      &lt;input value=&#123;step&#125; onChange=&#123;e =&gt; &#123;</span></span><br><span class="line"><span class="regexp">        dispatch(&#123;</span></span><br><span class="line"><span class="regexp">          type: 'step',</span></span><br><span class="line"><span class="regexp">          step: Number(e.target.value)</span></span><br><span class="line"><span class="regexp">        &#125;);</span></span><br><span class="line"><span class="regexp">      &#125;&#125; /</span>&gt;</span><br><span class="line">    &lt;<span class="regexp">/&gt;</span></span><br><span class="line"><span class="regexp">  );</span></span><br><span class="line"><span class="regexp">&#125;</span></span><br><span class="line"><span class="regexp"></span></span><br><span class="line"><span class="regexp">const initialState = &#123;</span></span><br><span class="line"><span class="regexp">  count: 0,</span></span><br><span class="line"><span class="regexp">  step: 1,</span></span><br><span class="line"><span class="regexp">&#125;;</span></span><br><span class="line"><span class="regexp"></span></span><br><span class="line"><span class="regexp">function reducer(state, action) &#123;</span></span><br><span class="line"><span class="regexp">  const &#123; count, step &#125; = state;</span></span><br><span class="line"><span class="regexp">  if (action.type === 'tick') &#123;</span></span><br><span class="line"><span class="regexp">    return &#123; count: count + step, step &#125;;</span></span><br><span class="line"><span class="regexp">  &#125; else if (action.type === 'step') &#123;</span></span><br><span class="line"><span class="regexp">    return &#123; count, step: action.step &#125;;</span></span><br><span class="line"><span class="regexp">  &#125; else &#123;</span></span><br><span class="line"><span class="regexp">    throw new Error();</span></span><br><span class="line"><span class="regexp">  &#125;</span></span><br><span class="line"><span class="regexp">&#125;</span></span><br></pre></td></tr></table></figure>
+<ul>
+<li>关键点： 用<code>dispatch</code>替代依赖(<strong><code>dispatch</code>会保证生命周期内保持不变</strong>)</li>
+<li>这种模式的好处：通过<code>reducer</code>让我们不必再关心<code>state</code>和<code>props</code>的状态，成功达到了解耦的目的。</li>
+</ul>
+<p><em>但是问题来了，如果我每次都想获取最新的<code>props</code>，还有戏嘛？</em></p>
+<p><strong>有的，把reducer扔组件里</strong></p>
+<p>每次<code>dispatch</code>，都会调用<code>reducer</code>，这时候<code>reducer</code>获取的就是最新的<code>props</code>了。</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">Counter</span>(<span class="params">&#123; step &#125;</span>) </span>&#123;</span><br><span class="line">  <span class="keyword">const</span> [count, dispatch] = useReducer(reducer, <span class="number">0</span>);</span><br><span class="line"></span><br><span class="line">  <span class="function"><span class="keyword">function</span> <span class="title">reducer</span>(<span class="params">state, action</span>) </span>&#123;</span><br><span class="line">    <span class="keyword">if</span> (action.type === <span class="string">'tick'</span>) &#123;</span><br><span class="line">      <span class="keyword">return</span> state + step;</span><br><span class="line">    &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">      <span class="keyword">throw</span> <span class="keyword">new</span> <span class="built_in">Error</span>();</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  useEffect(<span class="function"><span class="params">()</span> =&gt;</span> &#123;</span><br><span class="line">    <span class="keyword">const</span> id = setInterval(<span class="function"><span class="params">()</span> =&gt;</span> &#123;</span><br><span class="line">      dispatch(&#123; <span class="attr">type</span>: <span class="string">'tick'</span> &#125;);</span><br><span class="line">    &#125;, <span class="number">1000</span>);</span><br><span class="line">    <span class="keyword">return</span> <span class="function"><span class="params">()</span> =&gt;</span> clearInterval(id);</span><br><span class="line">  &#125;, [dispatch]);</span><br><span class="line"></span><br><span class="line">  <span class="keyword">return</span> <span class="xml"><span class="tag">&lt;<span class="name">h1</span>&gt;</span>&#123;count&#125;<span class="tag">&lt;/<span class="name">h1</span>&gt;</span></span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p><em>难怪Dan说是Hooks的作弊模式</em></p>
+<p><strong>接下来，我们着重解决第三和第四个问题</strong></p>
+<h2 id="Effect中的数据请求"><a href="#Effect中的数据请求" class="headerlink" title="Effect中的数据请求"></a>Effect中的数据请求</h2><hr>
+<p><strong>直接上案例</strong></p>
+<p>这个模式曾经也是我在不是很懂Effect的情况下经常使用的模式，我曾经对<code>eslint-plugin-react-hooks</code>这个插件提供的警告存有很大的疑问，现在终于明白了。</p>
+<p>乍一看？没问题！</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">SearchResults</span>(<span class="params"></span>) </span>&#123;</span><br><span class="line">  <span class="comment">// Imagine this function is long</span></span><br><span class="line">  <span class="function"><span class="keyword">function</span> <span class="title">getFetchUrl</span>(<span class="params"></span>) </span>&#123;</span><br><span class="line">    <span class="keyword">return</span> <span class="string">'https://hn.algolia.com/api/v1/search?query=react'</span>;</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  <span class="comment">// Imagine this function is also long</span></span><br><span class="line">  <span class="keyword">async</span> <span class="function"><span class="keyword">function</span> <span class="title">fetchData</span>(<span class="params"></span>) </span>&#123;</span><br><span class="line">    <span class="keyword">const</span> result = <span class="keyword">await</span> axios(getFetchUrl());</span><br><span class="line">    setData(result.data);</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  useEffect(<span class="function"><span class="params">()</span> =&gt;</span> &#123;</span><br><span class="line">    fetchData();</span><br><span class="line">  &#125;, []);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<ul>
+<li>但是上述模式存在一个弊端，如果我们忘记写入依赖，那么我们的effects就不会同步props和state带来的变更。这当然不是我们想要的。</li>
+</ul>
+<p>我们把他放进去，前提是某些函数仅在effect中调用。</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">SearchResults</span>(<span class="params"></span>) </span>&#123;</span><br><span class="line">  <span class="comment">// ...</span></span><br><span class="line">  useEffect(<span class="function"><span class="params">()</span> =&gt;</span> &#123;</span><br><span class="line">    <span class="comment">// We moved these functions inside!</span></span><br><span class="line">    <span class="function"><span class="keyword">function</span> <span class="title">getFetchUrl</span>(<span class="params"></span>) </span>&#123;</span><br><span class="line">      <span class="keyword">return</span> <span class="string">'https://hn.algolia.com/api/v1/search?query=react'</span>;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">async</span> <span class="function"><span class="keyword">function</span> <span class="title">fetchData</span>(<span class="params"></span>) </span>&#123;</span><br><span class="line">      <span class="keyword">const</span> result = <span class="keyword">await</span> axios(getFetchUrl());</span><br><span class="line">      setData(result.data);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    fetchData();</span><br><span class="line">  &#125;, []); <span class="comment">// ✅ Deps are OK</span></span><br><span class="line">  <span class="comment">// ...</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>还是没问题吗？是的，没问题了。</p>
+<p>稍微修改一下，使请求url中需要我们的状态，对，就是这么请求。</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">SearchResults</span>(<span class="params"></span>) </span>&#123;</span><br><span class="line">  <span class="keyword">const</span> [query, setQuery] = useState(<span class="string">'react'</span>);</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">  useEffect(<span class="function"><span class="params">()</span> =&gt;</span> &#123;</span><br><span class="line">    <span class="comment">// Imagine this function is also long</span></span><br><span class="line">    <span class="function"><span class="keyword">function</span> <span class="title">getFetchUrl</span>(<span class="params"></span>) </span>&#123;</span><br><span class="line">      <span class="keyword">return</span> <span class="string">'https://hn.algolia.com/api/v1/search?query='</span> + query;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// Imagine this function is also long</span></span><br><span class="line">    <span class="keyword">async</span> <span class="function"><span class="keyword">function</span> <span class="title">fetchData</span>(<span class="params"></span>) </span>&#123;</span><br><span class="line">      <span class="keyword">const</span> result = <span class="keyword">await</span> axios(getFetchUrl());</span><br><span class="line">      setData(result.data);</span><br><span class="line">    &#125;</span><br><span class="line">    fetchData();</span><br><span class="line">  &#125;, [query]);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>但我曾经有一次，在封装自定义Hook的时候，我将request提供给自定义hook，但是我却没法将我的state或者是props放进自定义hook，因为他们属于不同的js文件，这可怎么办？<br>说白了，就是逻辑复用咋搞。</p>
+<h3 id="useCallback"><a href="#useCallback" class="headerlink" title="useCallback"></a>useCallback</h3><p>这个Hook很简单，缓存一个函数，只在函数本身需要改变的时候调用副作用</p>
+<p>怎么知道这个函数是否需要改变，通过第二个参数</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">SearchResults</span>(<span class="params"></span>) </span>&#123;</span><br><span class="line">  <span class="keyword">const</span> [query, setQuery] = useState(<span class="string">'react'</span>);</span><br><span class="line">  <span class="keyword">const</span> getFetchUrl = useCallback(<span class="function"><span class="params">()</span> =&gt;</span> &#123;</span><br><span class="line">    <span class="keyword">return</span> <span class="string">'https://hn.algolia.com/api/v1/search?query='</span> + query;</span><br><span class="line">  &#125;, [query]);  <span class="comment">// ✅ Callback deps are OK</span></span><br><span class="line"></span><br><span class="line">  useEffect(<span class="function"><span class="params">()</span> =&gt;</span> &#123;</span><br><span class="line">    <span class="keyword">const</span> url = getFetchUrl(<span class="string">'react'</span>);</span><br><span class="line">    <span class="comment">// ... Fetch data and do something ...</span></span><br><span class="line">  &#125;, [getFetchUrl]); <span class="comment">// ✅ Effect deps are OK</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>问题解决！</p>
+<p><em>Dan对<code>class</code>模式和<code>hooks</code>模式的这种网络请求没法放入依赖的情况分别作了比较，当request作为<strong>请求向下传递</strong>的情况。这里不细说了，class模式本身不是数据流的一部分，因此他必须将不必要的<code>query</code>传下去才能再<code>componentDidUpdate</code>中发生响应，而Hooks就完美的解决了这个问题</em></p>
+<p><em>在我看来，useCallback就是一个工具人，我是老板，你没法直接跟我说话，就跟我秘书说。我秘书会传达给我的。</em></p>
+<p>OK！1、2、3、4、5、6问题全都解决了！</p>
+<h1 id="总结-amp-致谢"><a href="#总结-amp-致谢" class="headerlink" title="总结&amp;致谢"></a>总结&amp;致谢</h1><p>前前后后通读了Dan的文章好多遍，并看了好几遍Effect的文档。初识Effect，似乎很简单，随着项目的锻炼，发现越来越难以管理自己的状态。花心思重新学了一下Effect。让我更清晰的明白了设计Hooks的初衷和目的，找到正确使用的姿势。</p>
+<p>从阅读到完成，花了大概有半个月，主要参考资料来自Dan的Overreacted上的一篇文章useEffect完整指南。</p>
+
+        </div>
+
+        
+            <section class="post-copyright">
+                
+                    <p class="copyright-item">
+                        <span>Author:</span>
+                        <span>王八吉吉</span>
+                    </p>
+                
+                
+                    <p class="copyright-item">
+                        <span>Permalink:</span>
+                        <span><a href="http://auglyxu.github.io/2020/07/26/useEffect/">http://auglyxu.github.io/2020/07/26/useEffect/</a></span>
+                    </p>
+                
+                
+                    <p class="copyright-item">
+                        <span>License:</span>
+                        <span>Copyright (c) 2019 <a href="http://creativecommons.org/licenses/by-nc/4.0/" target="_blank" rel="noopener">CC-BY-NC-4.0</a> LICENSE</span>
+                    </p>
+                
+                
+                     <p class="copyright-item">
+                         <span>Slogan:</span>
+                         <span>享受当下</span>
+                     </p>
+                
+
+            </section>
+        
+        <section class="post-tags">
+            <div>
+                <span>Tag(s):</span>
+                <span class="tag">
+                    
+                    
+                        <a href="/tags/%E5%89%8D%E7%AB%AF/"># 前端</a>
+                    
+                        <a href="/tags/React/"># React</a>
+                    
+                        <a href="/tags/Hooks/"># Hooks</a>
+                    
+                        
+                </span>
+            </div>
+            <div>
+                <a href="javascript:window.history.back();">back</a>
+                <span>· </span>
+                <a href="/">home</a>
+            </div>
+        </section>
+        <section class="post-nav">
+            
+                <a class="prev" rel="prev" href="/2020/08/02/React-UI-render/">React运行时</a>
+            
+            
+            <a class="next" rel="next" href="/2020/07/25/setState/">setState到底是同步还是异步的</a>
+            
+        </section>
+
+
+    </article>
+</div>
+
+            </div>
+            <footer id="footer" class="footer">
+    <div class="copyright">
+        <span>© 王八吉吉 | Powered by <a href="https://hexo.io" target="_blank">Hexo</a> & <a href="https://github.com/Siricee/hexo-theme-Chic" target="_blank">Chic</a></span>
+    </div>
+</footer>
+
+    </div>
+</body>
+
+</html>

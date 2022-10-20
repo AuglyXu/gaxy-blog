@@ -1,0 +1,363 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+    <meta charset="UTF-8">
+<meta name="viewport"
+      content="width=device-width, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+<meta http-equiv="X-UA-Compatible" content="ie=edge">
+
+    <meta name="author" content="王八吉吉">
+
+
+    <meta name="subtitle" content="前端小匠">
+
+
+    <meta name="description" content="专心学技术">
+
+
+    <meta name="keywords" content="前端">
+
+
+<title>发票匹配2.0技术设计 | Gaxy</title>
+
+
+
+    <link rel="icon" href="/favicon.png">
+
+
+
+
+    <!-- stylesheets list from _config.yml -->
+    
+    <link rel="stylesheet" href="/css/style.css">
+    
+
+
+
+    <!-- scripts list from _config.yml -->
+    
+    <script src="/js/script.js"></script>
+    
+    <script src="/js/tocbot.min.js"></script>
+    
+
+
+
+    
+    
+        
+    
+
+
+<meta name="generator" content="Hexo 4.2.1"></head>
+
+<body>
+    <script>
+        // this function is used to check current theme before page loaded.
+        (() => {
+            const currentTheme = window.localStorage && window.localStorage.getItem('theme') || '';
+            const isDark = currentTheme === 'dark';
+            const pagebody = document.getElementsByTagName('body')[0]
+            if (isDark) {
+                pagebody.classList.add('dark-theme');
+                // mobile
+                document.getElementById("mobile-toggle-theme").innerText = "· Dark"
+            } else {
+                pagebody.classList.remove('dark-theme');
+                // mobile
+                document.getElementById("mobile-toggle-theme").innerText = "· Light"
+            }
+        })();
+    </script>
+
+    <div class="wrapper">
+        <header>
+    <nav class="navbar">
+        <div class="container">
+            <div class="navbar-header header-logo"><a href="/">Gaxy</a></div>
+            <div class="menu navbar-right">
+                
+                    <a class="menu-item" href="/archives">归档</a>
+                
+                    <a class="menu-item" href="/category">分类</a>
+                
+                    <a class="menu-item" href="/tag">标签</a>
+                
+                    <a class="menu-item" href="/about">关于</a>
+                
+                <input id="switch_default" type="checkbox" class="switch_default">
+                <label for="switch_default" class="toggleBtn"></label>
+            </div>
+        </div>
+    </nav>
+
+    
+    <nav class="navbar-mobile" id="nav-mobile">
+        <div class="container">
+            <div class="navbar-header">
+                <div>
+                    <a href="/">Gaxy</a><a id="mobile-toggle-theme">·&nbsp;Light</a>
+                </div>
+                <div class="menu-toggle" onclick="mobileBtn()">&#9776; Menu</div>
+            </div>
+            <div class="menu" id="mobile-menu">
+                
+                    <a class="menu-item" href="/archives">归档</a>
+                
+                    <a class="menu-item" href="/category">分类</a>
+                
+                    <a class="menu-item" href="/tag">标签</a>
+                
+                    <a class="menu-item" href="/about">关于</a>
+                
+            </div>
+        </div>
+    </nav>
+
+</header>
+<script>
+    var mobileBtn = function f() {
+        var toggleMenu = document.getElementsByClassName("menu-toggle")[0];
+        var mobileMenu = document.getElementById("mobile-menu");
+        if(toggleMenu.classList.contains("active")){
+           toggleMenu.classList.remove("active")
+            mobileMenu.classList.remove("active")
+        }else{
+            toggleMenu.classList.add("active")
+            mobileMenu.classList.add("active")
+        }
+    }
+</script>
+            <div class="main">
+                <div class="container">
+    
+    
+        <div class="post-toc">
+    <div class="tocbot-list">
+    </div>
+    <div class="tocbot-list-menu">
+        <a class="tocbot-toc-expand" onclick="expand_toc()">Expand all</a>
+        <a onclick="go_top()">Back to top</a>
+        <a onclick="go_bottom()">Go to bottom</a>
+    </div>
+</div>
+
+<script>
+    var tocbot_timer;
+    var DEPTH_MAX = 6;    // 为 6 时展开所有
+    var tocbot_default_config = {
+        tocSelector: '.tocbot-list',
+        contentSelector: '.post-content',
+        headingSelector: 'h1, h2, h3, h4, h5',
+        orderedList: false,
+        scrollSmooth: true,
+        onClick: extend_click,
+    };
+
+    function extend_click() {
+        clearTimeout(tocbot_timer);
+        tocbot_timer = setTimeout(function () {
+            tocbot.refresh(obj_merge(tocbot_default_config, { hasInnerContainers: true }));
+        }, 420); // 这个值是由 tocbot 源码里定义的 scrollSmoothDuration 得来的
+    }
+
+    document.ready(function () {
+        tocbot.init(obj_merge(tocbot_default_config, { collapseDepth: 1 }));
+    });
+
+    function expandToc() {
+        var b = document.querySelector('.tocbot-toc-expand');
+        var expanded = b.getAttribute('data-expanded');
+        expanded ? b.removeAttribute('data-expanded') : b.setAttribute('data-expanded', true);
+        tocbot.refresh(obj_merge(tocbot_default_config, { collapseDepth: expanded ? 1 : DEPTH_MAX }));
+        b.innerText = expanded ? 'Expand all' : 'Collapse all';
+    }
+
+    function go_top() {
+        window.scrollTo(0, 0);
+    }
+
+    function go_bottom() {
+        window.scrollTo(0, document.body.scrollHeight);
+    }
+
+    function obj_merge(target, source) {
+        for (var item in source) {
+            if (source.hasOwnProperty(item)) {
+                target[item] = source[item];
+            }
+        }
+        return target;
+    }
+</script>
+    
+
+    
+    <article class="post-wrap">
+        <header class="post-header">
+            <h1 class="post-title">发票匹配2.0技术设计</h1>
+            
+                <div class="post-meta">
+                    
+                        Author: <a itemprop="author" rel="author" href="/">王八吉吉</a>
+                    
+
+                    
+                        <span class="post-time">
+                        Date: <a href="#">二月 21, 2022&nbsp;&nbsp;14:51:00</a>
+                        </span>
+                    
+                    
+                        <span class="post-category">
+                    Category:
+                            
+                                <a href="/category/%E4%B8%9A%E5%8A%A1/">业务</a>
+                            
+                        </span>
+                    
+                </div>
+            
+        </header>
+
+        <div class="post-content">
+            <h2 id="整体设计"><a href="#整体设计" class="headerlink" title="整体设计"></a>整体设计</h2><h3 id="组件结构图"><a href="#组件结构图" class="headerlink" title="组件结构图"></a>组件结构图</h3><ul>
+<li>父： 发票列表页 InvoiceListModal</li>
+<li>父： 发票明细匹配情况(未匹配 和 已匹配) InvoiceMatch<ul>
+<li>子：NeedManualMatchTable（未匹配列表）</li>
+<li>子：InvoiceMatchedTable （已匹配列表）</li>
+</ul>
+</li>
+<li>父：手动匹配 InvoiceManualMatch <ul>
+<li>子：SoureceManualMatchTable（单据明细列表）</li>
+<li>子：InvoiceManualMatchTable （发票明细列表）</li>
+</ul>
+</li>
+<li>父： 用户待确认明细 InvoiceUniqueness<ul>
+<li>子：ConfirmManualMatchTable （待确认单据列表）</li>
+<li>子：InvoiceManualMatchTable （待确认发票明细列表）</li>
+</ul>
+</li>
+</ul>
+<p><img src="%E5%8F%91%E7%A5%A8%E5%8C%B9%E9%85%8D2.0%E7%BB%84%E4%BB%B6%E7%BB%93%E6%9E%84%E5%9B%BE.png" alt=""></p>
+<a id="more"></a>
+
+<h3 id="组件数据交互流图"><a href="#组件数据交互流图" class="headerlink" title="组件数据交互流图"></a>组件数据交互流图</h3><h4 id="虚线代表数据传输-实线代表实际交互流程"><a href="#虚线代表数据传输-实线代表实际交互流程" class="headerlink" title="虚线代表数据传输 实线代表实际交互流程"></a><code>虚线代表数据传输 实线代表实际交互流程</code></h4><h4 id="方框代表组件-对应上图组件-数据结构"><a href="#方框代表组件-对应上图组件-数据结构" class="headerlink" title="方框代表组件(对应上图组件) / 数据结构"></a>方框代表组件(对应上图组件) / 数据结构</h4><h4 id="菱形代表数据处理-用户动作-判断条件"><a href="#菱形代表数据处理-用户动作-判断条件" class="headerlink" title="菱形代表数据处理 / 用户动作 / 判断条件"></a>菱形代表数据处理 / 用户动作 / 判断条件</h4><h4 id="气泡框代表解释"><a href="#气泡框代表解释" class="headerlink" title="气泡框代表解释"></a>气泡框代表解释</h4><p>主要设计思想：</p>
+<ol>
+<li>所有数据初始化过后不再进行修改，直接有用的参数全部挂在发票对象上</li>
+<li>对应发票匹配的单据挂发票上，<code>发票明细匹配的单据挂发票明细上</code>，多对多匹配的用groupId确认分组</li>
+<li>可逆操作的数据全都使用备份</li>
+<li>共同数据全部使用全局数据管理</li>
+<li>容差在需要的顶层配置好，把对应配置项传下去根据配置数据结构直接渲染</li>
+</ol>
+<p><img src="%E5%8F%91%E7%A5%A8%E5%8C%B9%E9%85%8D2.0%E6%95%B0%E6%8D%AE%E6%B5%81.png" alt=""></p>
+<h3 id="发票redux数据模型设计"><a href="#发票redux数据模型设计" class="headerlink" title="发票redux数据模型设计"></a>发票redux数据模型设计</h3><p>核心是高阶reducer的复用以及业务action的拆分</p>
+<ul>
+<li>高阶reducer好处1：同样的单据集的处理不用处理多套</li>
+<li>高阶reducer好处2：对于备份的发票和单据，也可以复用对应的处理方式(useReducer)</li>
+<li>action拆分好处：action不但可以用于生成新的全局state，还可以用于普通单据的增删改</li>
+</ul>
+<p><img src="redux%E6%95%B0%E6%8D%AE%E6%B5%81.png" alt=""></p>
+<h3 id="容差设计"><a href="#容差设计" class="headerlink" title="容差设计"></a>容差设计</h3><h4 id="顶层根据配置返回如下结构"><a href="#顶层根据配置返回如下结构" class="headerlink" title="顶层根据配置返回如下结构"></a>顶层根据配置返回如下结构</h4><figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">&#123;</span><br><span class="line">      [MONEY_MATCH_SETTING.AMOUNT_INCLUDED_TAX]: &#123;</span><br><span class="line">           isOpen, <span class="comment">// 存是否被打开了</span></span><br><span class="line">           usedOffset, <span class="comment">// 发票已经被占用的容差, 这里的可用容差都是针对发票的</span></span><br><span class="line">           isStrength, <span class="comment">// 强校验还是弱校验</span></span><br><span class="line">           isExceed, <span class="comment">// 是否超出容差值</span></span><br><span class="line">           tailing, <span class="comment">// 设置的容差值</span></span><br><span class="line">      &#125;</span><br><span class="line"> &#125;</span><br></pre></td></tr></table></figure>
+<ul>
+<li>后续对容差的操作直接通过 invoiceUtil.js 下对应的容差方法修改</li>
+<li>所有操作都是基于此数据结构（计算和渲染），如有可逆操作将此结构备份</li>
+</ul>
+<h3 id="强弱校验设计"><a href="#强弱校验设计" class="headerlink" title="强弱校验设计"></a>强弱校验设计</h3><p><strong>强弱校验相关的全部基于以下二进制进行操作</strong></p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">export</span> <span class="keyword">const</span> NoStatus = <span class="comment">/*                    */</span> <span class="number">0b00000000000000000000000000</span>; <span class="comment">// 不校验</span></span><br><span class="line"><span class="keyword">export</span> <span class="keyword">const</span> IgnoreStatus = <span class="comment">/*                */</span> <span class="number">0b00000000000000000000000001</span>; <span class="comment">// 校验通过</span></span><br><span class="line"><span class="keyword">export</span> <span class="keyword">const</span> WarningStatus = <span class="comment">/*               */</span> <span class="number">0b00000000000000000000000010</span>; <span class="comment">// 弱通过</span></span><br><span class="line"><span class="keyword">export</span> <span class="keyword">const</span> ForbiddenStatus = <span class="comment">/*             */</span> <span class="number">0b00000000000000000000000100</span>; <span class="comment">// 强通过</span></span><br></pre></td></tr></table></figure>
+
+<p><strong>以强校验举例</strong></p>
+<ul>
+<li>初始化为 NoStatus，如果遇到了某强校验， 则使用 <code>NoStatus |  ForbiddenStatus</code></li>
+<li>判断某校验是否为强校验(假设此变量x的二进制为ForbiddenStatus), 则：<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">(x &amp; ForbiddenStatus) !== NoStatus  代表变量x是强校验</span><br></pre></td></tr></table></figure></li>
+<li>通常后端会返回对应好字段 <code>&quot;FORBIDDEN&quot;</code>、<code>&quot;WARNING&quot;</code>、<code>&quot;IGNORE&quot;</code>，invoiceUtil做好映射如下：<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">export</span> <span class="keyword">const</span> resultStringMapStatus = &#123;</span><br><span class="line">    <span class="string">'FORBIDDEN'</span>: ForbiddenStatus,</span><br><span class="line">    <span class="string">'WARNING'</span>: WarningStatus,</span><br><span class="line">    <span class="string">'IGNORE'</span>: IgnoreStatus,</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure></li>
+<li>针对匹配错误相关的映射，invoiceUtil文件下做好映射如下：<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">[errorCode/matchStatus]: &#123;</span><br><span class="line">  text: <span class="string">'错误提示文字'</span>,</span><br><span class="line">  status: ForbiddenStatus,</span><br><span class="line">&#125;,</span><br></pre></td></tr></table></figure>
+
+</li>
+</ul>
+<h3 id="测试"><a href="#测试" class="headerlink" title="测试"></a>测试</h3><h4 id="前端对测试的减负点："><a href="#前端对测试的减负点：" class="headerlink" title="前端对测试的减负点："></a>前端对测试的减负点：</h4><ul>
+<li>现<code>容差</code>整体顶层配置，只需要详细测一个纬度即可，其他纬度挑一个点测</li>
+<li>发票<code>手动匹配流程</code>只需要测一个纬度就行，其他纬度挑一个情况测</li>
+<li>抬头联动的测试，只需要测 <code>有强有弱/无强有弱/无强无弱</code> 三种情况，分别是 <code>红/黄/白</code>，现逻辑都是有红则红，没红有黄则黄， 都没有则白</li>
+</ul>
+<h3 id="产品"><a href="#产品" class="headerlink" title="产品"></a>产品</h3><h4 id="产品设计对前端的影响点："><a href="#产品设计对前端的影响点：" class="headerlink" title="产品设计对前端的影响点："></a>产品设计对前端的影响点：</h4><ul>
+<li>不要让前端在发票列表页计算容差，影响性能（有些发票相关信息未必是发票上直接获取，需要去累加发票明细，如数量）。目前卡死在发票明细匹配情况页面，</li>
+<li>减少跨发票的操作（所有操作都是A发票的，操作完修改另一张发票匹配的相关数据），实现成本极大</li>
+<li>设计时减少跨级操作，例如：发票列表页直接跳过发票明细匹配情况页面，直接进入手动匹配页面，属于比较特殊的代码（目前有且只有未验真可以有如此操作），会让前端代码变得复杂难以维护</li>
+<li>尽可能按照组件结构图的流程走，匹配流程不要再整体的匹配过程中插入新的页面</li>
+</ul>
+
+        </div>
+
+        
+            <section class="post-copyright">
+                
+                    <p class="copyright-item">
+                        <span>Author:</span>
+                        <span>王八吉吉</span>
+                    </p>
+                
+                
+                    <p class="copyright-item">
+                        <span>Permalink:</span>
+                        <span><a href="http://auglyxu.github.io/2022/02/21/%E5%85%AC%E5%8F%B8%E5%A4%8D%E6%9D%82%E4%B8%9A%E5%8A%A1-%E5%8F%91%E7%A5%A8%E5%8C%B9%E9%85%8D%E9%87%8D%E6%9E%84/">http://auglyxu.github.io/2022/02/21/%E5%85%AC%E5%8F%B8%E5%A4%8D%E6%9D%82%E4%B8%9A%E5%8A%A1-%E5%8F%91%E7%A5%A8%E5%8C%B9%E9%85%8D%E9%87%8D%E6%9E%84/</a></span>
+                    </p>
+                
+                
+                    <p class="copyright-item">
+                        <span>License:</span>
+                        <span>Copyright (c) 2019 <a href="http://creativecommons.org/licenses/by-nc/4.0/" target="_blank" rel="noopener">CC-BY-NC-4.0</a> LICENSE</span>
+                    </p>
+                
+                
+                     <p class="copyright-item">
+                         <span>Slogan:</span>
+                         <span>享受当下</span>
+                     </p>
+                
+
+            </section>
+        
+        <section class="post-tags">
+            <div>
+                <span>Tag(s):</span>
+                <span class="tag">
+                    
+                    
+                        <a href="/tags/%E4%B8%9A%E5%8A%A1/"># 业务</a>
+                    
+                        <a href="/tags/%E5%89%8D%E7%AB%AF/"># 前端</a>
+                    
+                        
+                </span>
+            </div>
+            <div>
+                <a href="javascript:window.history.back();">back</a>
+                <span>· </span>
+                <a href="/">home</a>
+            </div>
+        </section>
+        <section class="post-nav">
+            
+                <a class="prev" rel="prev" href="/2022/04/01/ErrorBoundary%E9%A2%84%E9%98%B2%E7%99%BD%E5%B1%8F/">ErrorBoundary预防白屏</a>
+            
+            
+            <a class="next" rel="next" href="/2021/09/13/HTTP/">HTTP(持续更新)</a>
+            
+        </section>
+
+
+    </article>
+</div>
+
+            </div>
+            <footer id="footer" class="footer">
+    <div class="copyright">
+        <span>© 王八吉吉 | Powered by <a href="https://hexo.io" target="_blank">Hexo</a> & <a href="https://github.com/Siricee/hexo-theme-Chic" target="_blank">Chic</a></span>
+    </div>
+</footer>
+
+    </div>
+</body>
+
+</html>
